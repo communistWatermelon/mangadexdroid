@@ -48,6 +48,8 @@ fun Content(isLoggedIn: Boolean, chapters: List<String>, loginClicked: (username
 @Composable
 fun LoginScreen(loginClicked: (username: String, password: String) -> Unit) {
     Column {
+        val username = ""
+        val password = ""
         Button(onClick = { loginClicked(username, password) }) {
             Text(text = "Sign In")
         }
