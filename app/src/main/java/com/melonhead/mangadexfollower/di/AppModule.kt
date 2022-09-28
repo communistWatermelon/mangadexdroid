@@ -41,4 +41,7 @@ val appModule = module {
         MangaServiceImpl(get())
     }
 
+    viewModel {
+        MainViewModel(get(), get())
+    }
 }
