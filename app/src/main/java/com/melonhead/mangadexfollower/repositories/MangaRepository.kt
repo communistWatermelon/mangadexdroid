@@ -30,12 +30,11 @@ class MangaRepository(
     }
 
     private suspend fun refreshManga() {
-        if (tokenProviderService.token == null) return
-
+        val token = tokenProviderService.token.firstOrNull() ?: return
         // TODO: pass publishAtSince to reduce load
         val mangaList = manga.replayCache.firstOrNull()?.toMutableList() ?: mutableListOf()
 
-        val chapters = userService.getFollowedChapters()
+        val chapters = userService.getFollowedChapters(token)
         // TODO: make this async
         for (chapter in chapters.data) {
             val uiManga = chapter.relationships?.firstOrNull { it.type == "manga" } ?: continue

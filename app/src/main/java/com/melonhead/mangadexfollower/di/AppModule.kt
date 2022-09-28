@@ -30,15 +30,15 @@ val appModule = module {
     }
 
     single<TokenProviderService> {
-        InMemoryTokenProvider()
+        SharedPreferencesTokenProvider(get())
     }
 
     single<LoginService> {
-        LoginServiceImpl(get(), get())
+        LoginServiceImpl(get())
     }
 
     single<UserService> {
-        UserServiceImpl(get(), get())
+        UserServiceImpl(get())
     }
 
     single<MangaService> {
@@ -52,7 +52,7 @@ val appModule = module {
     }
 
     single(createdAtStart = true) {
-        AuthRepository(get(), get())
+        AuthRepository(get(), get(), get())
     }
 
     single<Flow<Boolean>>(named("loginFlow")) {

@@ -1,9 +1,6 @@
 package com.melonhead.mangadexfollower.services
 
-import com.melonhead.mangadexfollower.models.auth.AuthRequest
-import com.melonhead.mangadexfollower.models.auth.AuthResponse
-import com.melonhead.mangadexfollower.models.auth.CheckTokenResponse
-import com.melonhead.mangadexfollower.models.auth.RefreshTokenRequest
+import com.melonhead.mangadexfollower.models.auth.*
 import com.melonhead.mangadexfollower.routes.HttpRoutes
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -11,16 +8,15 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 
 interface LoginService {
-    suspend fun authenticate(email: String, password: String): Boolean
-    suspend fun isTokenValid(): Boolean
-    suspend fun refreshToken(): Boolean
+    suspend fun authenticate(email: String, password: String): AuthToken?
+    suspend fun isTokenValid(token: AuthToken): Boolean
+    suspend fun refreshToken(token: AuthToken): AuthToken?
 }
 
 class LoginServiceImpl(
     private val client: HttpClient,
-    private val tokenProvider: TokenProviderService
 ) : LoginService {
-    override suspend fun authenticate(email: String, password: String): Boolean {
+    override suspend fun authenticate(email: String, password: String): AuthToken? {
         val result = client.post(HttpRoutes.LOGIN_URL) {
             headers {
                 contentType(ContentType.Application.Json)
@@ -30,15 +26,13 @@ class LoginServiceImpl(
 
         val body: AuthResponse = result.body()
         return if (body.result == "ok") {
-            tokenProvider.token = body.token
-            true
+            body.token
         } else {
-            false
+            null
         }
     }
 
-    override suspend fun isTokenValid(): Boolean {
-        val token = tokenProvider.token ?: return false
+    override suspend fun isTokenValid(token: AuthToken): Boolean {
         val result: CheckTokenResponse = client.get(HttpRoutes.CHECK_TOKEN_URL ) {
             headers {
                 contentType(ContentType.Application.Json)
@@ -48,9 +42,8 @@ class LoginServiceImpl(
         return result.isAuthenticated
     }
 
-    override suspend fun refreshToken(): Boolean {
-        val token = tokenProvider.token ?: return false
-        val result: CheckTokenResponse = client.post(HttpRoutes.REFRESH_TOKEN_URL) {
+    override suspend fun refreshToken(token: AuthToken): AuthToken? {
+        val body: AuthResponse = client.post(HttpRoutes.REFRESH_TOKEN_URL) {
             headers {
                 contentType(ContentType.Application.Json)
                 bearerAuth(token.session)
@@ -58,7 +51,11 @@ class LoginServiceImpl(
             setBody(RefreshTokenRequest(token.refresh))
         }.body()
 
-        return result.isAuthenticated
+        return if (body.result == "ok") {
+            body.token
+        } else {
+            null
+        }
     }
 }
 
