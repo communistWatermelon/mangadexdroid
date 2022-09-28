@@ -25,6 +25,7 @@ class UserServiceImpl(
             url {
                 encodedParameters.append("translatedLanguage[]", "en")
                 parameters.append("order[readableAt]", "desc")
+                parameters.append("limit", "20")
             }
         }.body()
     }

@@ -5,9 +5,8 @@ import com.melonhead.mangadexfollower.models.content.Manga
 import com.melonhead.mangadexfollower.services.MangaService
 import com.melonhead.mangadexfollower.services.TokenProviderService
 import com.melonhead.mangadexfollower.services.UserService
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 class MangaRepository(
     private val externalScope: CoroutineScope,
@@ -34,30 +33,33 @@ class MangaRepository(
         // TODO: pass publishAtSince to reduce load
         val mangaList = manga.replayCache.firstOrNull()?.toMutableList() ?: mutableListOf()
 
+        val jobs = mutableListOf<Deferred<Unit>>()
         val chapters = userService.getFollowedChapters(token)
-        // TODO: make this async
         for (chapter in chapters.data) {
-            val uiManga = chapter.relationships?.firstOrNull { it.type == "manga" } ?: continue
-            val mangaId = uiManga.id
-            // fetch the manga title if it isn't cached
-            var manga = cachedManga[mangaId]
-            if (manga == null) {
-                manga = mangaService.getManga(mangaId)
-                // cache the manga
-                cachedManga[mangaId] = manga
-            }
+            jobs.add(externalScope.async {
+                val uiManga = chapter.relationships?.firstOrNull { it.type == "manga" } ?: return@async
+                val mangaId = uiManga.id
+                // fetch the manga title if it isn't cached
+                var manga = cachedManga[mangaId]
+                if (manga == null) {
+                    manga = mangaService.getManga(mangaId)
+                    // cache the manga
+                    cachedManga[mangaId] = manga
+                }
 
-            // build/update the manga object
-            var mangaObject = mangaList.firstOrNull { it.id == manga.id }
-            if (mangaObject == null) {
-                mangaObject = UIManga(id = manga.id, manga.attributes.title.values.firstOrNull() ?: "", chapters = mutableListOf())
-                mangaList.add(mangaObject)
-            }
-            // add chapter to manga model
-            mangaObject.chapters.add(chapter)
-            // TODO: sort by date
+                // build/update the manga object
+                var mangaObject = mangaList.firstOrNull { it.id == manga.id }
+                if (mangaObject == null) {
+                    mangaObject = UIManga(id = manga.id, manga.attributes.title.values.firstOrNull() ?: "", chapters = mutableListOf())
+                    mangaList.add(mangaObject)
+                }
+                // add chapter to manga model
+                mangaObject.chapters.add(chapter)
+            })
         }
 
-        mutableManga.value = mangaList.toList()
+        jobs.awaitAll()
+        mangaList.forEach { it.chapters.sortedByDescending { it.attributes.readableAt?.epochSeconds ?: 0 } }
+        mutableManga.value = mangaList.sortedByDescending { it.chapters.first().attributes.readableAt?.epochSeconds }.toList()
     }
 }
