@@ -16,7 +16,7 @@
         android:theme="@style/Theme.MangadexFollower"
         tools:targetApi="31">
         <activity
-            android:name=".scenes.MainActivity"
+            android:name=".ui.scenes.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.MangadexFollower">
             <intent-filter>
