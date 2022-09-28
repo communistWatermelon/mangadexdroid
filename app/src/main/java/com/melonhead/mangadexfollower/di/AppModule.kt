@@ -1,9 +1,7 @@
 package com.melonhead.mangadexfollower.di
 
-import com.melonhead.mangadexfollower.routes.*
-import com.melonhead.mangadexfollower.services.InMemoryTokenProvider
-import com.melonhead.mangadexfollower.services.TokenProviderService
-import com.melonhead.mangadexfollower.viewmodels.MainViewModel
+import com.melonhead.mangadexfollower.services.*
+import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*

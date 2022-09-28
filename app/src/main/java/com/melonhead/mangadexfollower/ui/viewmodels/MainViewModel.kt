@@ -1,11 +1,11 @@
-package com.melonhead.mangadexfollower.viewmodels
+package com.melonhead.mangadexfollower.ui.viewmodels
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.melonhead.mangadexfollower.extensions.asLiveData
 import com.melonhead.mangadexfollower.routes.LoginService
-import com.melonhead.mangadexfollower.routes.UserService
+import com.melonhead.mangadexfollower.services.UserService
 import kotlinx.coroutines.launch
 
 class MainViewModel(

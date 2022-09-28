@@ -1,10 +1,10 @@
-package com.melonhead.mangadexfollower.routes
+package com.melonhead.mangadexfollower.services
 
 import com.melonhead.mangadexfollower.models.auth.AuthRequest
 import com.melonhead.mangadexfollower.models.auth.AuthResponse
 import com.melonhead.mangadexfollower.models.auth.CheckTokenResponse
 import com.melonhead.mangadexfollower.models.auth.RefreshTokenRequest
-import com.melonhead.mangadexfollower.services.TokenProviderService
+import com.melonhead.mangadexfollower.routes.HttpRoutes
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*

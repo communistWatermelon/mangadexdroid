@@ -1,9 +1,8 @@
-package com.melonhead.mangadexfollower.routes
+package com.melonhead.mangadexfollower.services
 
-import com.melonhead.mangadexfollower.models.auth.AuthRequest
-import com.melonhead.mangadexfollower.models.auth.Chapter
+import com.melonhead.mangadexfollower.models.content.Chapter
 import com.melonhead.mangadexfollower.models.auth.PaginatedResponse
-import com.melonhead.mangadexfollower.services.TokenProviderService
+import com.melonhead.mangadexfollower.routes.HttpRoutes
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*

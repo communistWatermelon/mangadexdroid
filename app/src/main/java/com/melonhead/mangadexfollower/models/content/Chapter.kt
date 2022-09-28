@@ -1,4 +1,4 @@
-package com.melonhead.mangadexfollower.models.auth
+package com.melonhead.mangadexfollower.models.content
 
 @kotlinx.serialization.Serializable
 data class ChapterAttributes(val title: String?, val chapter: String?)

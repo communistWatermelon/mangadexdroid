@@ -1,4 +1,4 @@
-package com.melonhead.mangadexfollower.scenes
+package com.melonhead.mangadexfollower.ui.scenes
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,9 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.melonhead.mangadexfollower.models.auth.Chapter
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
-import com.melonhead.mangadexfollower.viewmodels.MainViewModel
+import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -49,8 +48,6 @@ fun Content(isLoggedIn: Boolean, chapters: List<String>, loginClicked: (username
 @Composable
 fun LoginScreen(loginClicked: (username: String, password: String) -> Unit) {
     Column {
-        val username = ""
-        val password = ""
         Button(onClick = { loginClicked(username, password) }) {
             Text(text = "Sign In")
         }
