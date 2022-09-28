@@ -13,16 +13,10 @@ class MainViewModel(
     private val mangaRepository: MangaRepository,
     private val authRepository: AuthRepository
 ): ViewModel() {
-    private val mutableIsLoggedIn = MutableLiveData(false)
-    val isLoggedIn = mutableIsLoggedIn.asLiveData()
-
-    private val mutableChapters = MutableLiveData<List<String>>(listOf())
-    val chapters = mutableChapters.asLiveData()
-
+    val isLoggedIn = authRepository.isLoggedIn.asLiveData()
     val manga = mangaRepository.manga.asLiveData()
 
     fun authenticate(email: String, password: String) = viewModelScope.launch {
         authRepository.authenticate(email, password)
-        mutableIsLoggedIn.value = authRepository.isLoggedIn.replayCache.firstOrNull() ?: false
     }
 }
