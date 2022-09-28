@@ -10,6 +10,7 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
@@ -54,7 +55,7 @@ val appModule = module {
         AuthRepository(get(), get())
     }
 
-    single(named("loginFlow")) {
+    single<Flow<Boolean>>(named("loginFlow")) {
         get<AuthRepository>().isLoggedIn
     }
 
