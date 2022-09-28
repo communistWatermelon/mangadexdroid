@@ -2,45 +2,27 @@ package com.melonhead.mangadexfollower.ui.viewmodels
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.melonhead.mangadexfollower.extensions.asLiveData
-import com.melonhead.mangadexfollower.routes.LoginService
-import com.melonhead.mangadexfollower.services.UserService
+import com.melonhead.mangadexfollower.repositories.AuthRepository
+import com.melonhead.mangadexfollower.repositories.MangaRepository
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val loginService: LoginService,
-    private val userService: UserService
+    private val mangaRepository: MangaRepository,
+    private val authRepository: AuthRepository
 ): ViewModel() {
-    private val mutableIsLoggedIn = MutableLiveData<Boolean>(false)
+    private val mutableIsLoggedIn = MutableLiveData(false)
     val isLoggedIn = mutableIsLoggedIn.asLiveData()
 
     private val mutableChapters = MutableLiveData<List<String>>(listOf())
     val chapters = mutableChapters.asLiveData()
 
-    init {
-        getChapters()
-    }
+    val manga = mangaRepository.manga.asLiveData()
 
-    fun authenticate(username: String, password: String) = viewModelScope.launch {
-        val result = loginService.authenticate(username, password)
-        mutableIsLoggedIn.value = result
-        if (result) getChapters()
-    }
-
-    private suspend fun checkLogin(): Boolean {
-        var validToken = loginService.isTokenValid()
-        if (!validToken) {
-            validToken = loginService.refreshToken()
-        }
-        mutableIsLoggedIn.value = validToken
-        return validToken
-    }
-
-    private fun getChapters() = viewModelScope.launch {
-        val loggedIn = checkLogin()
-        if (!loggedIn) return@launch
-        val chapters = userService.getFollowedChapters()
-        mutableChapters.value = chapters.data.map { "${it.attributes.title} - ${it.attributes.chapter}" }
+    fun authenticate(email: String, password: String) = viewModelScope.launch {
+        authRepository.authenticate(email, password)
+        mutableIsLoggedIn.value = authRepository.isLoggedIn.replayCache.firstOrNull() ?: false
     }
 }
