@@ -11,7 +11,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 
 interface LoginService {
-    suspend fun authenticate(username: String, password: String): Boolean
+    suspend fun authenticate(email: String, password: String): Boolean
     suspend fun isTokenValid(): Boolean
     suspend fun refreshToken(): Boolean
 }
@@ -20,12 +20,12 @@ class LoginServiceImpl(
     private val client: HttpClient,
     private val tokenProvider: TokenProviderService
 ) : LoginService {
-    override suspend fun authenticate(username: String, password: String): Boolean {
+    override suspend fun authenticate(email: String, password: String): Boolean {
         val result = client.post(HttpRoutes.LOGIN_URL) {
             headers {
                 contentType(ContentType.Application.Json)
             }
-            setBody(AuthRequest(username, password))
+            setBody(AuthRequest(email, password))
         }
 
         val body: AuthResponse = result.body()
