@@ -1,5 +1,6 @@
 package com.melonhead.mangadexfollower.repositories
 
+import android.util.Log
 import com.melonhead.mangadexfollower.db.chapter.ChapterDao
 import com.melonhead.mangadexfollower.db.chapter.ChapterEntity
 import com.melonhead.mangadexfollower.db.manga.MangaDao
@@ -13,6 +14,7 @@ import com.melonhead.mangadexfollower.services.UserService
 import com.melonhead.mangadexfollower.models.ui.LoginStatus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.datetime.Clock
 
 class MangaRepository(
     private val externalScope: CoroutineScope,
@@ -81,9 +83,15 @@ class MangaRepository(
             // make a copy with the readStatus set to true
             .map { it.copy(readStatus = true) }
 
-        // update the db with the new entities
-        for (chapterEntity in chaptersToUpdate) {
-            chapterDb.update(chapterEntity)
+        if (chaptersToUpdate.isEmpty()) {
+//            notifyOfNewChapters()
+            return@launch
         }
+
+        // update the db with the new entities
+        chapterDb.update(*chaptersToUpdate.toTypedArray())
+
+        // notify user of new chapters
+//        notifyOfNewChapters()
     }
 }

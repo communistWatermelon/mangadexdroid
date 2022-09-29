@@ -23,5 +23,5 @@ interface ChapterDao {
     fun delete(chapters: ChapterEntity)
 
     @Update
-    fun update(chapters: ChapterEntity)
+    fun update(vararg chapters: ChapterEntity)
 }
