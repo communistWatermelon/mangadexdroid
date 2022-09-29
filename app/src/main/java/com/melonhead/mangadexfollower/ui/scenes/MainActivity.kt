@@ -79,7 +79,7 @@ fun ChaptersList(manga: List<UIManga>) {
                         Text(text = "${it.chapter}", fontWeight = FontWeight.Light, fontSize = 16.sp)
                         // todo: display time instead of date if released today
                         if (it.read != true) {
-                            Text(text = "${it.createdDate.dateOrTimeString()}", fontWeight = FontWeight.Light, fontSize = 16.sp)
+                            Text(text = it.createdDate.dateOrTimeString(), fontWeight = FontWeight.Light, fontSize = 16.sp)
                         } else {
                             Text(text = "READ")
                         }
