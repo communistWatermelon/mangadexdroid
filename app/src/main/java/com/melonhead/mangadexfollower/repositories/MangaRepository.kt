@@ -22,7 +22,6 @@ class MangaRepository(
     val manga = mutableManga.shareIn(externalScope, replay = 1, started = SharingStarted.WhileSubscribed())
 
     init {
-        externalScope.launch { refreshManga() }
         externalScope.launch {
             loginFlow.collectLatest { if (it) refreshManga() }
         }
@@ -59,7 +58,7 @@ class MangaRepository(
         }
 
         jobs.awaitAll()
-        mangaList.forEach { it.chapters.sortedByDescending { it.attributes.readableAt?.epochSeconds ?: 0 } }
-        mutableManga.value = mangaList.sortedByDescending { it.chapters.first().attributes.readableAt?.epochSeconds }.toList()
+        mangaList.forEach { it.chapters.sortedBy { it.attributes.createdAt?.epochSeconds ?: 0 } }
+        mutableManga.value = mangaList.sortedByDescending { it.chapters.first().attributes.createdAt?.epochSeconds }.toList()
     }
 }

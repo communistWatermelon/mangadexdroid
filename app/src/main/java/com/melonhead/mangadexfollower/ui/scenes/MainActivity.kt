@@ -24,11 +24,9 @@ import com.melonhead.mangadexfollower.models.content.Chapter
 import com.melonhead.mangadexfollower.models.content.ChapterAttributes
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.time.format.DateTimeFormatter
 
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModel<MainViewModel>()
@@ -71,6 +69,17 @@ fun LoginScreen(loginClicked: (username: String, password: String) -> Unit) {
     }
 }
 
+fun Instant.dateOrTimeString(): String {
+    val dateTime = toLocalDateTime(TimeZone.currentSystemDefault())
+    val currentDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val format =  if (dateTime.dayOfYear == currentDate.dayOfYear) {
+        DateTimeFormatter.ofPattern("K:mm a")
+    } else {
+        DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    }
+    return format.format(dateTime.toJavaLocalDateTime())
+}
+
 @Composable
 fun ChaptersList(manga: List<UIManga>) {
     LazyColumn(contentPadding = PaddingValues(horizontal = 8.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -81,7 +90,7 @@ fun ChaptersList(manga: List<UIManga>) {
                     Row(modifier = Modifier.fillMaxWidth().height(44.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Text(text = "${it.attributes.chapter}", fontWeight = FontWeight.Light, fontSize = 16.sp)
                         // todo: display time instead of date if released today
-                        Text(text = "${it.attributes.readableAt?.toLocalDateTime(TimeZone.currentSystemDefault())?.date}", fontWeight = FontWeight.Light, fontSize = 16.sp)
+                        Text(text = "${it.attributes.createdAt?.dateOrTimeString()}", fontWeight = FontWeight.Light, fontSize = 16.sp)
                     }
                 }
             }
@@ -101,7 +110,7 @@ fun LoginPreview() {
 @Composable
 fun MangaListPreview() {
     MangadexFollowerTheme {
-        Content(isLoggedIn = true, listOf(UIManga("", "Test Manga", mutableListOf(Chapter("", ChapterAttributes(null, "33", readableAt = LocalDateTime(2022, 9, 28, 13, 30, 0, 0).toInstant(
+        Content(isLoggedIn = true, listOf(UIManga("", "Test Manga", mutableListOf(Chapter("", ChapterAttributes(null, "33", createdAt = LocalDateTime(2022, 9, 28, 13, 30, 0, 0).toInstant(
             TimeZone.UTC)), relationships = null)))), loginClicked = { _, _ -> })
     }
 }
