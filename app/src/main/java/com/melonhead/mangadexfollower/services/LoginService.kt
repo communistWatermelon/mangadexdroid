@@ -1,10 +1,12 @@
 package com.melonhead.mangadexfollower.services
 
+import android.util.Log
 import com.melonhead.mangadexfollower.models.auth.*
 import com.melonhead.mangadexfollower.routes.HttpRoutes
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 
 interface LoginService {
@@ -24,36 +26,55 @@ class LoginServiceImpl(
             setBody(AuthRequest(email, password))
         }
 
-        val body: AuthResponse = result.body()
-        return if (body.result == "ok") {
-            body.token
-        } else {
+        return try {
+            val body: AuthResponse = result.body()
+            if (body.result == "ok") {
+                body.token
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.w("", "authenticate: ${result.bodyAsText()}")
+            e.printStackTrace()
             null
         }
     }
 
     override suspend fun isTokenValid(token: AuthToken): Boolean {
-        val result: CheckTokenResponse = client.get(HttpRoutes.CHECK_TOKEN_URL ) {
+        val result = client.get(HttpRoutes.CHECK_TOKEN_URL ) {
             headers {
                 contentType(ContentType.Application.Json)
                 bearerAuth(token.session)
             }
-        }.body()
-        return result.isAuthenticated
+        }
+        return try {
+            result.body<CheckTokenResponse>().isAuthenticated
+        } catch (e: Exception) {
+            Log.w("", "isTokenValid: ${result.bodyAsText()}")
+            e.printStackTrace()
+            false
+        }
     }
 
     override suspend fun refreshToken(token: AuthToken): AuthToken? {
-        val body: AuthResponse = client.post(HttpRoutes.REFRESH_TOKEN_URL) {
+        val result = client.post(HttpRoutes.REFRESH_TOKEN_URL) {
             headers {
                 contentType(ContentType.Application.Json)
                 bearerAuth(token.session)
             }
             setBody(RefreshTokenRequest(token.refresh))
-        }.body()
+        }
 
-        return if (body.result == "ok") {
-            body.token
-        } else {
+        return try {
+            val body = result.body<AuthResponse>()
+            if (body.result == "ok") {
+                body.token
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.w("", "refreshToken: ${result.bodyAsText()}")
+            e.printStackTrace()
             null
         }
     }

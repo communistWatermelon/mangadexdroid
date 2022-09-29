@@ -10,6 +10,7 @@ import com.melonhead.mangadexfollower.models.UIManga
 import com.melonhead.mangadexfollower.services.AppDataService
 import com.melonhead.mangadexfollower.services.MangaService
 import com.melonhead.mangadexfollower.services.UserService
+import com.melonhead.mangadexfollower.models.ui.LoginStatus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -18,7 +19,7 @@ class MangaRepository(
     private val mangaService: MangaService,
     private val userService: UserService,
     private val appDataService: AppDataService,
-    private val loginFlow: Flow<Boolean>,
+    private val loginFlow: Flow<LoginStatus>,
     private val chapterDb: ChapterDao,
     private val mangaDb: MangaDao
 ) {
@@ -41,7 +42,7 @@ class MangaRepository(
     init {
         externalScope.launch {
             // refresh manga on login
-            loginFlow.collectLatest { if (it) refreshMangaThrottled(Unit) }
+            loginFlow.collectLatest { if (it is LoginStatus.LoggedIn) refreshMangaThrottled(Unit) }
         }
     }
 

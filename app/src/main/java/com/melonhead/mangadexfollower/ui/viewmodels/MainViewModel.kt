@@ -8,12 +8,11 @@ import com.melonhead.mangadexfollower.repositories.MangaRepository
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val mangaRepository: MangaRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    mangaRepository: MangaRepository
 ): ViewModel() {
-    val isLoggedIn = authRepository.isLoggedIn.asLiveData()
+    val loginStatus = authRepository.loginStatus.asLiveData()
     val manga = mangaRepository.manga.asLiveData()
-    // TODO: show loading status
 
     fun authenticate(email: String, password: String) = viewModelScope.launch {
         authRepository.authenticate(email, password)
