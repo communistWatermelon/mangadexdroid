@@ -27,33 +27,33 @@ class AppDataServiceImpl(
     private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
     private val LAST_REFRESH_MS = longPreferencesKey("last_refresh_ms")
 
-    private val authTokenFlow: Flow<String> = appContext.dataStore.data
-        .map { preferences ->
-            // No type safety.
-            preferences[AUTH_TOKEN] ?: ""
-        }
+    private val authTokenFlow: Flow<String> = appContext.dataStore.data.map { preferences ->
+        // No type safety.
+        preferences[AUTH_TOKEN] ?: ""
+    }.distinctUntilChanged()
 
-    private val refreshTokenFlow: Flow<String> = appContext.dataStore.data
-        .map { preferences ->
-            // No type safety.
-            preferences[REFRESH_TOKEN] ?: ""
-        }
+    private val refreshTokenFlow: Flow<String> = appContext.dataStore.data.map { preferences ->
+        // No type safety.
+        preferences[REFRESH_TOKEN] ?: ""
+    }.distinctUntilChanged()
 
-    override val lastRefreshMs: Flow<Long> = appContext.dataStore.data
-        .map { preferences ->
-            // No type safety.
-            preferences[LAST_REFRESH_MS] ?: 0L
-        }
+    override val lastRefreshMs: Flow<Long> = appContext.dataStore.data.map { preferences ->
+        // No type safety.
+        preferences[LAST_REFRESH_MS] ?: 0L
+    }.distinctUntilChanged()
 
     override var token: Flow<AuthToken?> = authTokenFlow.combine(refreshTokenFlow) { auth, refresh ->
         if (auth.isBlank() || refresh.isBlank()) return@combine null
         AuthToken(auth, refresh)
-    }
+    }.distinctUntilChanged()
 
     override suspend fun updateToken(token: AuthToken?) {
         appContext.dataStore.edit { settings ->
-            settings[AUTH_TOKEN] = token?.session ?: ""
-            settings[REFRESH_TOKEN] = token?.refresh ?: ""
+            if (settings[AUTH_TOKEN] != token?.session)
+                settings[AUTH_TOKEN] = token?.session ?: ""
+
+            if (settings[REFRESH_TOKEN] != token?.refresh)
+                settings[REFRESH_TOKEN] = token?.refresh ?: ""
         }
     }
 
