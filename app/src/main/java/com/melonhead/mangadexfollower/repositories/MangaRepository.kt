@@ -29,14 +29,16 @@ class MangaRepository(
     // combine all manga series and chapters
     val manga = mangaDb.allSeries().combine(chapterDb.allChapters()) { dbSeries, dbChapters ->
         // map the series and chapters into UIManga, sorted from most recent to least
-        dbSeries.map { manga ->
+        val uiManga = dbSeries.mapNotNull { manga ->
             val chapters = dbChapters.filter { it.mangaId == manga.id }.map { chapter ->
                 UIChapter(id = chapter.id, chapter = chapter.chapter, title = chapter.chapterTitle, createdDate = chapter.createdAt, read = chapter.readStatus)
             }
+            if (chapters.isEmpty()) return@mapNotNull null
             // refresh read status for series
             refreshReadSeriesThrottled(dbSeries to dbChapters)
             UIManga(id = manga.id, manga.mangaTitle ?: "", chapters = chapters)
-        }.sortedByDescending { it.chapters.first().createdDate }
+        }
+        if (uiManga.isNotEmpty()) uiManga.sortedByDescending { it.chapters.first().createdDate } else uiManga
     }.shareIn(externalScope, replay = 1, started = SharingStarted.WhileSubscribed())
 
     init {
@@ -46,7 +48,8 @@ class MangaRepository(
         }
     }
 
-    private fun refreshManga(unit: Unit) = externalScope.launch {
+    // note: unit needs to be included as a param for the throttleLatest call above
+    private fun refreshManga(@Suppress("UNUSED_PARAMETER") unit: Unit) = externalScope.launch {
         val token = appDataService.token.firstOrNull() ?: return@launch
 
         val prevRefreshMs = appDataService.lastRefreshMs.firstOrNull() ?: 0L
