@@ -73,11 +73,13 @@ fun ChaptersList(manga: List<UIManga>) {
             Column(verticalArrangement = Arrangement.SpaceEvenly) {
                 Text(text = it.title, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 it.chapters.forEach {
-                    Row(modifier = Modifier.fillMaxWidth().height(44.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 44.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Text(text = "${it.chapter}", fontWeight = FontWeight.Light, fontSize = 16.sp)
                         // todo: display time instead of date if released today
                         if (it.read != true) {
-                            Text(text = "${it.createdDate?.dateOrTimeString()}", fontWeight = FontWeight.Light, fontSize = 16.sp)
+                            Text(text = "${it.createdDate.dateOrTimeString()}", fontWeight = FontWeight.Light, fontSize = 16.sp)
                         } else {
                             Text(text = "READ")
                         }

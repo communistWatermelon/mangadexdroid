@@ -71,7 +71,7 @@ class MangaRepository(
                 // TODO: add some handling for too many chapters here, similar to read status below
 
                 // find the manga for the series
-                jobs.add(externalScope.async {
+                jobs.add(async {
                     // find the manga relationship for the chapter
                     val uiManga = chapter.relationships?.firstOrNull { it.type == "manga" } ?: return@async
                     val mangaId = uiManga.id
@@ -113,7 +113,7 @@ class MangaRepository(
                 // avoid slamming the server
                 if (jobs.count() > 15) break
 
-                jobs.add(externalScope.async {
+                jobs.add(async {
                     // get read status for chapters in manga
                     val readChapters = mangaService.getReadChapters(manga.id, token)
 

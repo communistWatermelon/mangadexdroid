@@ -15,8 +15,7 @@ data class ChapterEntity(
     @ColumnInfo(name = "manga_id") val mangaId: String,
     @ColumnInfo(name = "chapter_title") val chapterTitle: String?,
     @ColumnInfo(name = "chapter") val chapter: String?,
-
-    @ColumnInfo(name = "createdAt") val createdAt: Instant?,
+    @ColumnInfo(name = "createdAt") val createdAt: Instant,
     @ColumnInfo(name = "read_status") val readStatus: Boolean?
 ) {
     companion object {
