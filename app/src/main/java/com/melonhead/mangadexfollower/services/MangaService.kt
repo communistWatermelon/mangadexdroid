@@ -13,20 +13,22 @@ import io.ktor.http.*
 
 
 interface MangaService {
-    suspend fun getManga(id: String): Manga
+    suspend fun getManga(mangaIds: List<String>): List<Manga>
     suspend fun getReadChapters(mangaIds: List<String>, token: AuthToken): List<String>
 }
 
 class MangaServiceImpl(
     private val client: HttpClient,
 ): MangaService {
-    override suspend fun getManga(id: String): Manga {
+    override suspend fun getManga(mangaIds: List<String>): List<Manga> {
         val result = client.get(MANGA_URL) {
             headers {
                 contentType(ContentType.Application.Json)
             }
             url {
-                appendPathSegments(id)
+                mangaIds.forEach {
+                    encodedParameters.append("ids[]", it)
+                }
             }
         }
         return result.body<MangaResponse>().data

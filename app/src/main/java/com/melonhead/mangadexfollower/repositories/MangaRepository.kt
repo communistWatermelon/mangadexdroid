@@ -57,33 +57,12 @@ class MangaRepository(
         // add chapters to DB
         chapterDb.insertAll(*chapterEntities.toTypedArray())
 
-        // list of series fetch jobs
-        val jobs = mutableListOf<Deferred<Unit>>()
+        // map app chapters into the manga ids
+        val mangaIds = chapters.data.mapNotNull { it.relationships?.firstOrNull { it.type == "manga" }?.id }.toSet()
+        // fetch manga series
+        val newManga = mangaService.getManga(mangaIds.toList()).map { MangaEntity.from(it) }
 
-        val newManga = mutableSetOf<MangaEntity>()
-
-        for (chapter in chapters.data) {
-            // TODO: add some handling for too many chapters here, similar to read status below
-
-            // find the manga for the series
-            jobs.add(async {
-                // find the manga relationship for the chapter
-                val uiManga = chapter.relationships?.firstOrNull { it.type == "manga" } ?: return@async
-                val mangaId = uiManga.id
-
-                // ensure the db doesn't already contain this manga
-                if (mangaDb.containsManga(mangaId)) return@async
-
-                // fetch the manga from the server if it isn't cached
-                val manga = mangaService.getManga(mangaId)
-
-                // add all manga to list
-                val entity = MangaEntity.from(manga)
-                newManga.add(entity)
-            })
-        }
-
-        jobs.awaitAll()
+        // insert new series into local db
         mangaDb.insertAll(*newManga.toTypedArray())
         appDataService.updateLastRefreshMs(System.currentTimeMillis())
     }
