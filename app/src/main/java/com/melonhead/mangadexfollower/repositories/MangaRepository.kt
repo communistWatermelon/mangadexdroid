@@ -21,59 +21,118 @@ class MangaRepository(
     private val chapterDb: ChapterDao,
     private val mangaDb: MangaDao
 ) {
+    private var refreshReadStatusJob: Job? = null
+    private var refreshMangaJob: Job? = null
+
+    // combine all manga series and chapters
     val manga = mangaDb.allSeries().combine(chapterDb.allChapters()) { dbSeries, dbChapters ->
+        // map the series and chapters into UIManga, sorted from most recent to least
         dbSeries.map { manga ->
             val chapters = dbChapters.filter { it.mangaId == manga.id }.map { chapter ->
                 UIChapter(id = chapter.id, chapter = chapter.chapter, title = chapter.chapterTitle, createdDate = chapter.createdAt, read = chapter.readStatus)
             }
+            // refresh read status for series
+            refreshReadStatus(dbSeries, dbChapters)
             UIManga(id = manga.id, manga.mangaTitle ?: "", chapters = chapters)
         }.sortedByDescending { it.chapters.first().createdDate }
     }.shareIn(externalScope, replay = 1, started = SharingStarted.WhileSubscribed())
 
     init {
         externalScope.launch {
+            // refresh manga on login
             loginFlow.collectLatest { if (it) refreshManga() }
         }
     }
 
-    private suspend fun refreshManga() {
-        val token = appDataService.token.firstOrNull() ?: return
-        val prevRefreshMs = appDataService.lastRefreshMs.firstOrNull() ?: 0L
+    private fun refreshManga() {
+        if (refreshMangaJob != null) refreshMangaJob?.cancel()
+        refreshMangaJob = externalScope.launch {
+            val token = appDataService.token.firstOrNull()
+            if (token == null) {
+                refreshMangaJob = null
+                return@launch
+            }
 
-        // fetch chapters from server
-        val chapters = userService.getFollowedChapters(token, prevRefreshMs)
+            val prevRefreshMs = appDataService.lastRefreshMs.firstOrNull() ?: 0L
 
-        // add chapters to DB
-        chapterDb.insertAll(*chapters.data.map { ChapterEntity.from(it) }.toTypedArray())
+            // fetch chapters from server
+            val chapters = userService.getFollowedChapters(token, prevRefreshMs)
+            val chapterEntities = chapters.data.map { ChapterEntity.from(it) }
 
-        // list of series fetch jobs
-        val jobs = mutableListOf<Deferred<Unit>>()
+            // add chapters to DB
+            chapterDb.insertAll(*chapterEntities.toTypedArray())
 
-        val newManga = mutableSetOf<MangaEntity>()
+            // list of series fetch jobs
+            val jobs = mutableListOf<Deferred<Unit>>()
 
-        for (chapter in chapters.data) {
-            // find the manga for the series
-            jobs.add(externalScope.async {
-                // find the manga relationship for the chapter
-                val uiManga = chapter.relationships?.firstOrNull { it.type == "manga" } ?: return@async
-                val mangaId = uiManga.id
+            val newManga = mutableSetOf<MangaEntity>()
 
-                // ensure the db doesn't already contain this manga
-                if (mangaDb.containsManga(mangaId)) return@async
+            for (chapter in chapters.data) {
+                // TODO: add some handling for too many chapters here, similar to read status below
 
-                // fetch the manga from the server if it isn't cached
-                val manga = mangaService.getManga(mangaId)
+                // find the manga for the series
+                jobs.add(externalScope.async {
+                    // find the manga relationship for the chapter
+                    val uiManga = chapter.relationships?.firstOrNull { it.type == "manga" } ?: return@async
+                    val mangaId = uiManga.id
 
-                // add all manga to list
-                val entity = MangaEntity.from(manga)
-                newManga.add(entity)
-            })
+                    // ensure the db doesn't already contain this manga
+                    if (mangaDb.containsManga(mangaId)) return@async
+
+                    // fetch the manga from the server if it isn't cached
+                    val manga = mangaService.getManga(mangaId)
+
+                    // add all manga to list
+                    val entity = MangaEntity.from(manga)
+                    newManga.add(entity)
+                })
+            }
+
+            jobs.awaitAll()
+            mangaDb.insertAll(*newManga.toTypedArray())
+            appDataService.updateLastRefreshMs(System.currentTimeMillis())
+            refreshMangaJob = null
         }
+    }
 
-        jobs.awaitAll()
-        mangaDb.insertAll(*newManga.toTypedArray())
-        appDataService.updateLastRefreshMs(System.currentTimeMillis())
+    private fun refreshReadStatus(mangaSeries: List<MangaEntity>, chapters: List<ChapterEntity>) {
+        if (refreshReadStatusJob != null) refreshReadStatusJob?.cancel()
+        refreshReadStatusJob = externalScope.launch {
+            // make sure we have a token
+            val token = appDataService.token.firstOrNull()
+            if (token == null) {
+                refreshReadStatusJob = null
+                return@launch
+            }
 
-        // TODO: refresh read status for chapters
+            // list of read status fetch jobs
+            val jobs = mutableListOf<Deferred<Unit>>()
+
+            // loop through all manga
+            for (manga in mangaSeries) {
+                // avoid slamming the server
+                if (jobs.count() > 15) break
+
+                jobs.add(externalScope.async {
+                    // get read status for chapters in manga
+                    val readChapters = mangaService.getReadChapters(manga.id, token)
+
+                    // find all chapters that are unread and are contained in the readChapters list
+                    val chaptersToUpdate = chapters
+                        .filter { it.readStatus != true && readChapters.contains(it.id) }
+                        // make a copy with the readStatus set to true
+                        .map { it.copy(readStatus = true) }
+
+                    // update the db with the new entities
+                    for (chapterEntity in chaptersToUpdate) {
+                        chapterDb.update(chapterEntity)
+                    }
+                })
+            }
+
+            // wait for all jobs to complete
+            jobs.awaitAll()
+            refreshReadStatusJob = null
+        }
     }
 }
