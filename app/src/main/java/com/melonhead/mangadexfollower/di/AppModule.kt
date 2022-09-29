@@ -1,5 +1,8 @@
 package com.melonhead.mangadexfollower.di
 
+import androidx.room.Room
+import com.melonhead.mangadexfollower.db.chapter.ChapterDatabase
+import com.melonhead.mangadexfollower.db.manga.MangaDatabase
 import com.melonhead.mangadexfollower.repositories.AuthRepository
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.*
@@ -57,6 +60,28 @@ val appModule = module {
 
     single<Flow<Boolean>>(named("loginFlow")) {
         get<AuthRepository>().isLoggedIn
+    }
+
+    single(createdAtStart = true) {
+        Room.databaseBuilder(
+            get(),
+            ChapterDatabase::class.java, "chapter"
+        ).build()
+    }
+
+    single(createdAtStart = true) {
+        Room.databaseBuilder(
+            get(),
+            MangaDatabase::class.java, "manga"
+        ).build()
+    }
+
+    single {
+        get<MangaDatabase>().mangaDao()
+    }
+
+    single {
+        get<ChapterDatabase>().chapterDao()
     }
 
     viewModel {
