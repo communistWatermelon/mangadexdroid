@@ -30,7 +30,7 @@ class UserServiceImpl(
             url {
                 encodedParameters.append("translatedLanguage[]", "en")
                 parameters.append("order[createdAt]", "desc")
-                parameters.append("limit", "50")
+                parameters.append("limit", "500")
                 if (createdAtSince != 0L) {
                     val date = Date()
                     date.time = createdAtSince
