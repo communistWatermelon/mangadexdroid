@@ -8,3 +8,5 @@ data class Manga(val id: String, val attributes: MangaAttributes)
 
 @kotlinx.serialization.Serializable
 data class MangaResponse(val data: Manga)
+@kotlinx.serialization.Serializable
+data class MangaReadMarkersResponse(val data: List<String>)
