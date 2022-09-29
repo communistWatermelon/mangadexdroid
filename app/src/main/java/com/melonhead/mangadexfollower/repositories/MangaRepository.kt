@@ -95,8 +95,14 @@ class MangaRepository(
         }
     }
 
+    // list of read status fetch jobs
+    private val asyncReadJobs = mutableListOf<Deferred<Unit>>()
     private fun refreshReadStatus(mangaSeries: List<MangaEntity>, chapters: List<ChapterEntity>) {
-        if (refreshReadStatusJob != null) refreshReadStatusJob?.cancel()
+        if (refreshReadStatusJob?.isActive == true) {
+            refreshReadStatusJob?.cancel()
+            asyncReadJobs.forEach { it.cancel() }
+            asyncReadJobs.clear()
+        }
         refreshReadStatusJob = externalScope.launch {
             // make sure we have a token
             val token = appDataService.token.firstOrNull()
@@ -105,15 +111,11 @@ class MangaRepository(
                 return@launch
             }
 
-            // list of read status fetch jobs
-            val jobs = mutableListOf<Deferred<Unit>>()
-
             // loop through all manga
             for (manga in mangaSeries) {
                 // avoid slamming the server
-                if (jobs.count() > 15) break
-
-                jobs.add(async {
+                if (asyncReadJobs.count() > 10) break
+                asyncReadJobs.add(async {
                     // get read status for chapters in manga
                     val readChapters = mangaService.getReadChapters(manga.id, token)
 
@@ -131,7 +133,8 @@ class MangaRepository(
             }
 
             // wait for all jobs to complete
-            jobs.awaitAll()
+            asyncReadJobs.awaitAll()
+            asyncReadJobs.clear()
             refreshReadStatusJob = null
         }
     }
