@@ -3,7 +3,7 @@ package com.melonhead.mangadexfollower.repositories
 import com.melonhead.mangadexfollower.models.UIManga
 import com.melonhead.mangadexfollower.models.content.Manga
 import com.melonhead.mangadexfollower.services.MangaService
-import com.melonhead.mangadexfollower.services.TokenProviderService
+import com.melonhead.mangadexfollower.services.AppDataService
 import com.melonhead.mangadexfollower.services.UserService
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -12,8 +12,8 @@ class MangaRepository(
     private val externalScope: CoroutineScope,
     private val mangaService: MangaService,
     private val userService: UserService,
-    private val tokenProviderService: TokenProviderService,
-    private val loginFlow: Flow<Boolean>
+    private val appDataService: AppDataService,
+    private val loginFlow: Flow<Boolean>,
 ) {
     // TODO: move this into local db for more consistent caching
     private val cachedManga = hashMapOf<String, Manga>()
@@ -28,7 +28,9 @@ class MangaRepository(
     }
 
     private suspend fun refreshManga() {
-        val token = tokenProviderService.token.firstOrNull() ?: return
+        val token = appDataService.token.firstOrNull() ?: return
+        val prevRefreshMs = appDataService.lastRefreshMs.firstOrNull() ?: 0L
+
         // TODO: pass publishAtSince to reduce load
         val mangaList = manga.replayCache.firstOrNull()?.toMutableList() ?: mutableListOf()
 

@@ -29,8 +29,8 @@ val appModule = module {
         }
     }
 
-    single<TokenProviderService> {
-        SharedPreferencesTokenProvider(get())
+    single<AppDataService> {
+        AppDataServiceImpl(get())
     }
 
     single<LoginService> {
