@@ -1,10 +1,8 @@
 package com.melonhead.mangadexfollower.ui.viewmodels
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.melonhead.mangadexfollower.extensions.asLiveData
 import com.melonhead.mangadexfollower.repositories.AuthRepository
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import kotlinx.coroutines.launch
@@ -15,6 +13,7 @@ class MainViewModel(
 ): ViewModel() {
     val isLoggedIn = authRepository.isLoggedIn.asLiveData()
     val manga = mangaRepository.manga.asLiveData()
+    // TODO: show loading status
 
     fun authenticate(email: String, password: String) = viewModelScope.launch {
         authRepository.authenticate(email, password)
