@@ -12,7 +12,7 @@ object HttpRoutes {
     const val REFRESH_TOKEN_URL = "${AUTH_ROUTE}/refresh"
 
     const val MANGA_URL = "${MANGA_ROUTE}/"
-    const val MANGA_READ_MARKERS_URL = "${MANGA_ROUTE}/{id}/read"
+    const val MANGA_READ_MARKERS_URL = "${MANGA_ROUTE}/read"
 
     const val USER_FOLLOW_CHAPTERS_URL = "${USER_ROUTE}/follows/manga/feed"
 }

@@ -14,7 +14,7 @@ import io.ktor.http.*
 
 interface MangaService {
     suspend fun getManga(id: String): Manga
-    suspend fun getReadChapters(mangaId: String, token: AuthToken): List<String>
+    suspend fun getReadChapters(mangaIds: List<String>, token: AuthToken): List<String>
 }
 
 class MangaServiceImpl(
@@ -32,12 +32,17 @@ class MangaServiceImpl(
         return result.body<MangaResponse>().data
     }
 
-    override suspend fun getReadChapters(mangaId: String, token: AuthToken): List<String> {
+    override suspend fun getReadChapters(mangaIds: List<String>, token: AuthToken): List<String> {
         return try {
-            val result = client.get(MANGA_READ_MARKERS_URL.replace("{id}", mangaId)) {
+            val result = client.get(MANGA_READ_MARKERS_URL) {
                 headers {
                     contentType(ContentType.Application.Json)
                     bearerAuth(token.session)
+                }
+                url {
+                    mangaIds.forEach {
+                        encodedParameters.append("ids[]", it)
+                    }
                 }
             }
             result.body<MangaReadMarkersResponse>().data
