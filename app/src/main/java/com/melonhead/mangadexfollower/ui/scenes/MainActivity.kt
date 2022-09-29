@@ -1,7 +1,3 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class,
-    ExperimentalMaterial3Api::class
-)
-
 package com.melonhead.mangadexfollower.ui.scenes
 
 import android.os.Bundle
@@ -76,6 +72,7 @@ fun LoadingScreen() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
     var emailField by rememberSaveable { mutableStateOf("") }
@@ -106,33 +103,41 @@ fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Chapter(modifier: Modifier = Modifier, uiChapter: UIChapter, onChapterClicked: (UIChapter) -> Unit) {
     Card(modifier = modifier.fillMaxWidth(),
-    onClick = {
+        onClick = {
         onChapterClicked(uiChapter)
     }) {
         Row(modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 50.dp)
-            .padding(8.dp),
+            .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(1f),
+               verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 Text(text = "Chapter ${uiChapter.chapter}",
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp)
-                if (!uiChapter.title.isNullOrBlank()) {
-                    Text(text = uiChapter.title,
-                        fontWeight = FontWeight.Light,
-                        fontSize = 16.sp
-                    )
-                }
+                    fontSize = 18.sp)
+                Text(text = uiChapter.title ?: "",
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp
+                )
+                Text(text = uiChapter.createdDate.dateOrTimeString(),
+                    color = MaterialTheme.colorScheme.tertiary,
+                    fontWeight = FontWeight.Light,
+                    fontSize = 12.sp
+                )
             }
-            Text(modifier = Modifier.align(Alignment.CenterVertically) ,
-                text = if (uiChapter.read != true )uiChapter.createdDate.dateOrTimeString() else "☑",
-                fontWeight = FontWeight.Light,
-                fontSize = 16.sp)
+            Text(modifier = Modifier.align(Alignment.CenterVertically),
+                color = MaterialTheme.colorScheme.primary,
+                text = if (uiChapter.read != true) "NEW" else "",
+                fontWeight = FontWeight.Medium,
+                fontSize = 12.sp)
         }
     }
 
@@ -179,7 +184,9 @@ fun ChapterPreview() {
 @Composable
 fun MangaPreview() {
     MangadexFollowerTheme {
-        Manga(uiManga = UIManga("", "Test Manga", listOf()), onChapterClicked = { })
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Manga(uiManga = UIManga("", "Test Manga", listOf()), onChapterClicked = { })
+        }
     }
 }
 
