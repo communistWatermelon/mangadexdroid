@@ -35,7 +35,7 @@ class MangaRepository(
         val mangaList = manga.replayCache.firstOrNull()?.toMutableList() ?: mutableListOf()
 
         val jobs = mutableListOf<Deferred<Unit>>()
-        val chapters = userService.getFollowedChapters(token)
+        val chapters = userService.getFollowedChapters(token, prevRefreshMs)
         for (chapter in chapters.data) {
             jobs.add(externalScope.async {
                 val uiManga = chapter.relationships?.firstOrNull { it.type == "manga" } ?: return@async
@@ -62,5 +62,6 @@ class MangaRepository(
         jobs.awaitAll()
         mangaList.forEach { it.chapters.sortedBy { it.attributes.createdAt?.epochSeconds ?: 0 } }
         mutableManga.value = mangaList.sortedByDescending { it.chapters.first().attributes.createdAt?.epochSeconds }.toList()
+        appDataService.updateLastRefreshMs(System.currentTimeMillis())
     }
 }
