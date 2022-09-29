@@ -16,6 +16,9 @@ interface AppDataService {
 
     val lastRefreshMs: Flow<Long>
     suspend fun updateLastRefreshMs(timeMs: Long)
+
+    val lastNotifyMs: Flow<Long>
+    suspend fun updateLastNotifyMs(timeMs: Long)
 }
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth")
@@ -26,6 +29,7 @@ class AppDataServiceImpl(
     private val AUTH_TOKEN = stringPreferencesKey("auth_token")
     private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
     private val LAST_REFRESH_MS = longPreferencesKey("last_refresh_ms")
+    private val LAST_NOTIFY_MS = longPreferencesKey("last_notify_ms")
 
     private val authTokenFlow: Flow<String> = appContext.dataStore.data.map { preferences ->
         // No type safety.
@@ -40,6 +44,11 @@ class AppDataServiceImpl(
     override val lastRefreshMs: Flow<Long> = appContext.dataStore.data.map { preferences ->
         // No type safety.
         preferences[LAST_REFRESH_MS] ?: 0L
+    }.distinctUntilChanged()
+
+    override val lastNotifyMs: Flow<Long> = appContext.dataStore.data.map { preferences ->
+        // No type safety.
+        preferences[LAST_NOTIFY_MS] ?: 0L
     }.distinctUntilChanged()
 
     override var token: Flow<AuthToken?> = authTokenFlow.combine(refreshTokenFlow) { auth, refresh ->
@@ -58,6 +67,12 @@ class AppDataServiceImpl(
     }
 
     override suspend fun updateLastRefreshMs(timeMs: Long) {
+        appContext.dataStore.edit { settings ->
+            settings[LAST_REFRESH_MS] = timeMs
+        }
+    }
+
+    override suspend fun updateLastNotifyMs(timeMs: Long) {
         appContext.dataStore.edit { settings ->
             settings[LAST_REFRESH_MS] = timeMs
         }
