@@ -19,12 +19,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.melonhead.mangadexfollower.extensions.dateOrTimeString
 import com.melonhead.mangadexfollower.models.UIManga
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
-import kotlinx.datetime.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.time.format.DateTimeFormatter
 
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModel<MainViewModel>()
@@ -65,17 +64,6 @@ fun LoginScreen(loginClicked: (username: String, password: String) -> Unit) {
             Text(text = "Sign In")
         }
     }
-}
-
-fun Instant.dateOrTimeString(): String {
-    val dateTime = toLocalDateTime(TimeZone.currentSystemDefault())
-    val currentDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-    val format =  if (dateTime.dayOfYear == currentDate.dayOfYear) {
-        DateTimeFormatter.ofPattern("K:mm a")
-    } else {
-        DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    }
-    return format.format(dateTime.toJavaLocalDateTime())
 }
 
 @Composable
