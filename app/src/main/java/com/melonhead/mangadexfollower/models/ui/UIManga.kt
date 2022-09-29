@@ -1,4 +1,4 @@
-package com.melonhead.mangadexfollower.models
+package com.melonhead.mangadexfollower.models.ui
 
 import kotlinx.datetime.Instant
 

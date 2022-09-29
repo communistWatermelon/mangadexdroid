@@ -5,8 +5,8 @@ import com.melonhead.mangadexfollower.db.chapter.ChapterEntity
 import com.melonhead.mangadexfollower.db.manga.MangaDao
 import com.melonhead.mangadexfollower.db.manga.MangaEntity
 import com.melonhead.mangadexfollower.extensions.throttleLatest
-import com.melonhead.mangadexfollower.models.UIChapter
-import com.melonhead.mangadexfollower.models.UIManga
+import com.melonhead.mangadexfollower.models.ui.UIChapter
+import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.services.AppDataService
 import com.melonhead.mangadexfollower.services.MangaService
 import com.melonhead.mangadexfollower.services.UserService
