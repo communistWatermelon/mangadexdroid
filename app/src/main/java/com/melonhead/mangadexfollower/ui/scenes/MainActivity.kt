@@ -20,8 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.melonhead.mangadexfollower.models.UIManga
-import com.melonhead.mangadexfollower.models.content.Chapter
-import com.melonhead.mangadexfollower.models.content.ChapterAttributes
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
 import kotlinx.datetime.*
@@ -88,9 +86,9 @@ fun ChaptersList(manga: List<UIManga>) {
                 Text(text = it.title, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 it.chapters.forEach {
                     Row(modifier = Modifier.fillMaxWidth().height(44.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = "${it.attributes.chapter}", fontWeight = FontWeight.Light, fontSize = 16.sp)
+                        Text(text = "${it.chapter}", fontWeight = FontWeight.Light, fontSize = 16.sp)
                         // todo: display time instead of date if released today
-                        Text(text = "${it.attributes.createdAt?.dateOrTimeString()}", fontWeight = FontWeight.Light, fontSize = 16.sp)
+                        Text(text = "${it.createdDate?.dateOrTimeString()}", fontWeight = FontWeight.Light, fontSize = 16.sp)
                     }
                 }
             }
@@ -103,14 +101,5 @@ fun ChaptersList(manga: List<UIManga>) {
 fun LoginPreview() {
     MangadexFollowerTheme {
         Content(isLoggedIn = false, listOf(), loginClicked = { _, _ -> })
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MangaListPreview() {
-    MangadexFollowerTheme {
-        Content(isLoggedIn = true, listOf(UIManga("", "Test Manga", mutableListOf(Chapter("", ChapterAttributes(null, "33", createdAt = LocalDateTime(2022, 9, 28, 13, 30, 0, 0).toInstant(
-            TimeZone.UTC)), relationships = null)))), loginClicked = { _, _ -> })
     }
 }
