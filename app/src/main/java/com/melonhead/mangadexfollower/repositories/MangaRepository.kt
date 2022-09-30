@@ -31,7 +31,6 @@ class MangaRepository(
     private val mangaDb: MangaDao,
     private val appContext: Context
 ) {
-    private val refreshReadSeriesThrottled: (Pair<List<MangaEntity>, List<ChapterEntity>>) -> Unit = throttleLatest(300L, externalScope, ::refreshReadStatus)
     private val refreshMangaThrottled: (Unit) -> Unit = throttleLatest(300L, externalScope, ::refreshManga)
 
     // combine all manga series and chapters
@@ -50,17 +49,13 @@ class MangaRepository(
         if (loginFlow.first() is LoginStatus.LoggedIn) refreshMangaThrottled(Unit)
     }
 
-    private fun generateUIManga(dbSeries: List<MangaEntity>, dbChapters: List<ChapterEntity>, refreshReads: Boolean = true): List<UIManga> {
+    private fun generateUIManga(dbSeries: List<MangaEntity>, dbChapters: List<ChapterEntity>): List<UIManga> {
         // map the series and chapters into UIManga, sorted from most recent to least
         val uiManga = dbSeries.mapNotNull { manga ->
             val chapters = dbChapters.filter { it.mangaId == manga.id }.map { chapter ->
                 UIChapter(id = chapter.id, chapter = chapter.chapter, title = chapter.chapterTitle, createdDate = chapter.createdAt, read = chapter.readStatus)
             }
             if (chapters.isEmpty()) return@mapNotNull null
-            if (refreshReads) {
-                // refresh read status for series
-                refreshReadSeriesThrottled(dbSeries to dbChapters)
-            }
             UIManga(id = manga.id, manga.mangaTitle ?: "", chapters = chapters, manga.mangaCoverId)
         }
         return if (uiManga.isNotEmpty()) uiManga.sortedByDescending { it.chapters.first().createdDate } else uiManga
@@ -94,6 +89,9 @@ class MangaRepository(
 
         // insert new series into local db
         mangaDb.insertAll(*newManga.toTypedArray())
+
+        // refresh read status for series
+        refreshReadStatus(mangaDb.allSeries().first(), chapterDb.allChapters().first())
     }
 
     private suspend fun notifyOfNewChapters() {
@@ -103,18 +101,20 @@ class MangaRepository(
 
         chapterDb.allChapters().collectLatest { chapters ->
             val newChapters = chapters.filter { it.readStatus != true }
-            val notifyChapters = generateUIManga(mangaDb.allSeries().first(), newChapters, refreshReads = false)
+            val notifyChapters = generateUIManga(mangaDb.allSeries().first(), newChapters)
             NewChapterNotification.post(appContext, notifyChapters)
+            // TODO: mark chapter as notified so we can avoid duplicate notifications
+
         }
     }
 
-    private fun refreshReadStatus(contents: Pair<List<MangaEntity>, List<ChapterEntity>>) = externalScope.launch {
+    private fun refreshReadStatus(manga: List<MangaEntity>, chapters: List<ChapterEntity>) = externalScope.launch {
         // make sure we have a token
         val token = appDataService.token.firstOrNull() ?: return@launch
         Log.i(TAG, "refreshReadStatus")
 
-        val readChapters = mangaService.getReadChapters(contents.first.map { it.id }, token)
-        val chaptersToUpdate = contents.second
+        val readChapters = mangaService.getReadChapters(manga.map { it.id }, token)
+        val chaptersToUpdate = chapters
             .filter { it.readStatus != true && readChapters.contains(it.id) }
             // make a copy with the readStatus set to true
             .map { it.copy(readStatus = true) }
