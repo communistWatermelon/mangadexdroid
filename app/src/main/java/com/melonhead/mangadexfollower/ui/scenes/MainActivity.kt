@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -20,13 +21,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.melonhead.mangadexfollower.extensions.dateOrTimeString
@@ -170,22 +177,47 @@ fun Chapter(modifier: Modifier = Modifier, uiChapter: UIChapter, onChapterClicke
                 fontSize = 12.sp)
         }
     }
+}
 
+@Composable
+fun MangaCover(uiManga: UIManga) {
+    Row {
+        Box(Modifier.padding(horizontal = 10.dp)) {
+            AsyncImage(modifier = Modifier
+                .height(140.dp)
+                .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.FillHeight,
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(uiManga.coverAddress)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "${uiManga.title} cover"
+            )
+        }
+        Text(modifier = Modifier
+            .align(Alignment.Bottom)
+            .padding(top = 20.dp, bottom = 50.dp)
+            .fillMaxSize(1f),
+            text = uiManga.title,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.End,
+            fontSize = 20.sp)
+    }
 }
 
 @Composable
 fun Manga(uiManga: UIManga, onChapterClicked: (UIChapter) -> Unit) {
-    Column {
-        Text(modifier = Modifier.padding(bottom = 8.dp),
-            text = uiManga.title,
-            fontWeight = FontWeight.Bold,
-            fontSize = 22.sp)
-        uiManga.chapters.forEach {
-            Chapter(modifier = Modifier.padding(bottom = 8.dp),
-                uiChapter = it,
-                onChapterClicked = onChapterClicked)
+    Box {
+        MangaCover(uiManga = uiManga)
+        Column(modifier = Modifier.padding(top = 110.dp)) {
+            uiManga.chapters.forEach {
+                Chapter(modifier = Modifier.padding(bottom = 8.dp),
+                    uiChapter = it,
+                    onChapterClicked = onChapterClicked)
+            }
         }
     }
+
 }
 
 @Composable
@@ -194,7 +226,7 @@ fun ChaptersList(manga: List<UIManga>, onChapterClicked: (UIChapter) -> Unit, on
 
     SwipeRefresh(state = isRefreshing, onRefresh = { onSwipeRefresh() }) {
         LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            verticalArrangement = Arrangement.spacedBy(24.dp)) {
             items(manga) {
                 Column(verticalArrangement = Arrangement.SpaceEvenly) {
                     Manga(uiManga = it, onChapterClicked = onChapterClicked)
