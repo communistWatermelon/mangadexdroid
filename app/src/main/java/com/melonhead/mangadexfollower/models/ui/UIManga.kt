@@ -1,8 +1,5 @@
 package com.melonhead.mangadexfollower.models.ui
 
-import kotlinx.datetime.Instant
-
-data class UIChapter(val id: String, val chapter: String?, val title: String?, val createdDate: Instant, val read: Boolean?) {
-    val webAddress: String = "https://mangadex.org/chapter/$id"
+data class UIManga(val id: String, val title: String, val chapters: List<UIChapter>, val coverFilename: String?) {
+    val coverAddress: String? = if (coverFilename == null) null else "https://mangadex.org/covers/$id/$coverFilename"
 }
-data class UIManga(val id: String, val title: String, val chapters: List<UIChapter>)

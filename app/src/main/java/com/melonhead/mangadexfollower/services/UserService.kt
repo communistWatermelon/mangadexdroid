@@ -2,7 +2,7 @@ package com.melonhead.mangadexfollower.services
 
 import android.util.Log
 import com.melonhead.mangadexfollower.models.auth.AuthToken
-import com.melonhead.mangadexfollower.models.auth.PaginatedResponse
+import com.melonhead.mangadexfollower.models.shared.PaginatedResponse
 import com.melonhead.mangadexfollower.models.content.Chapter
 import com.melonhead.mangadexfollower.routes.HttpRoutes
 import io.ktor.client.*
@@ -30,7 +30,7 @@ class UserServiceImpl(
             url {
                 encodedParameters.append("translatedLanguage[]", "en")
                 parameters.append("order[createdAt]", "desc")
-                parameters.append("limit", "500")
+                parameters.append("limit", "100")
                 if (createdAtSince != 0L) {
                     val date = Date()
                     date.time = createdAtSince

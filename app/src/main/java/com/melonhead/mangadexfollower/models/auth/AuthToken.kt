@@ -1,5 +1,4 @@
 package com.melonhead.mangadexfollower.models.auth
 
 @kotlinx.serialization.Serializable
-data class AuthResponse(val result: String, val token: AuthToken)
-
+data class AuthToken(val session: String, val refresh: String)
