@@ -18,7 +18,6 @@ import com.melonhead.mangadexfollower.services.UserService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 
 class MangaRepository(
     private val externalScope: CoroutineScope,
@@ -70,10 +69,8 @@ class MangaRepository(
     private fun refreshManga(@Suppress("UNUSED_PARAMETER") unit: Unit) = externalScope.launch {
         val token = appDataService.token.firstOrNull() ?: return@launch
 
-        val prevRefreshMs = appDataService.lastRefreshMs.firstOrNull() ?: 0L
-
         // fetch chapters from server
-        val chaptersResponse = userService.getFollowedChapters(token, prevRefreshMs)
+        val chaptersResponse = userService.getFollowedChapters(token)
         val chapterEntities = chaptersResponse.data.map { ChapterEntity.from(it) }
 
         // add chapters to DB
@@ -95,22 +92,17 @@ class MangaRepository(
 
         // insert new series into local db
         mangaDb.insertAll(*newManga.toTypedArray())
-        appDataService.updateLastRefreshMs(System.currentTimeMillis())
     }
 
     private suspend fun notifyOfNewChapters() {
         val notificationManager = NotificationManagerCompat.from(appContext)
         if (!notificationManager.areNotificationsEnabled()) return
 
-        val prevNotifyMs = appDataService.lastNotifyMs.firstOrNull() ?: 0L
-
         chapterDb.allChapters().collectLatest { chapters ->
-            val newChapters = chapters.filter { it.readStatus != true && it.createdAt.toEpochMilliseconds() > prevNotifyMs }
+            val newChapters = chapters.filter { it.readStatus != true }
             val notifyChapters = generateUIManga(mangaDb.allSeries().first(), newChapters, refreshReads = false)
             NewChapterNotification.post(appContext, notifyChapters)
         }
-
-        appDataService.updateLastNotifyMs(Clock.System.now().toEpochMilliseconds())
     }
 
     private fun refreshReadStatus(contents: Pair<List<MangaEntity>, List<ChapterEntity>>) = externalScope.launch {
