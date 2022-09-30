@@ -44,7 +44,7 @@ object NewChapterNotification {
         return NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle(uiManga.title)
             .setContentText(text)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_notification_icon)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
