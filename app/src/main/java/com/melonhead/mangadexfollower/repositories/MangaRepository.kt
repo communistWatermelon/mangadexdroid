@@ -12,6 +12,7 @@ import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.notifications.NewChapterNotification
 import com.melonhead.mangadexfollower.services.AppDataService
+import com.melonhead.mangadexfollower.services.CoverService
 import com.melonhead.mangadexfollower.services.MangaService
 import com.melonhead.mangadexfollower.services.UserService
 import kotlinx.coroutines.CoroutineScope
@@ -24,6 +25,7 @@ class MangaRepository(
     private val mangaService: MangaService,
     private val userService: UserService,
     private val appDataService: AppDataService,
+    private val coverService: CoverService,
     private val loginFlow: Flow<LoginStatus>,
     private val chapterDb: ChapterDao,
     private val mangaDb: MangaDao,
@@ -59,7 +61,7 @@ class MangaRepository(
                 // refresh read status for series
                 refreshReadSeriesThrottled(dbSeries to dbChapters)
             }
-            UIManga(id = manga.id, manga.mangaTitle ?: "", chapters = chapters)
+            UIManga(id = manga.id, manga.mangaTitle ?: "", chapters = chapters, manga.mangaCoverId)
         }
         return if (uiManga.isNotEmpty()) uiManga.sortedByDescending { it.chapters.first().createdDate } else uiManga
     }
@@ -71,16 +73,25 @@ class MangaRepository(
         val prevRefreshMs = appDataService.lastRefreshMs.firstOrNull() ?: 0L
 
         // fetch chapters from server
-        val chapters = userService.getFollowedChapters(token, prevRefreshMs)
-        val chapterEntities = chapters.data.map { ChapterEntity.from(it) }
+        val chaptersResponse = userService.getFollowedChapters(token, prevRefreshMs)
+        val chapterEntities = chaptersResponse.data.map { ChapterEntity.from(it) }
 
         // add chapters to DB
         chapterDb.insertAll(*chapterEntities.toTypedArray())
 
         // map app chapters into the manga ids
-        val mangaIds = chapters.data.mapNotNull { chapters -> chapters.relationships?.firstOrNull { it.type == "manga" }?.id }.toSet()
+        val mangaIds = chaptersResponse.data.mapNotNull { chapters -> chapters.relationships?.firstOrNull { it.type == "manga" }?.id }.toSet()
         // fetch manga series
-        val newManga = mangaService.getManga(mangaIds.toList()).map { MangaEntity.from(it) }
+        val mangaSeries = mangaService.getManga(token, mangaIds.toList())
+
+        val newManga = mutableListOf<MangaEntity>()
+        // fetch all covers
+        val mangaCovers = coverService.getCovers(token, mangaSeries.map { it.id })
+
+        mangaSeries.forEach { manga ->
+            val coverFilename = mangaCovers.firstOrNull { it.mangaId == manga.id}?.fileName
+            newManga.add(MangaEntity.from(manga, coverFilename))
+        }
 
         // insert new series into local db
         mangaDb.insertAll(*newManga.toTypedArray())
