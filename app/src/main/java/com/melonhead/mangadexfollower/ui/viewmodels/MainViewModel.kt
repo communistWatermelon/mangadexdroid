@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val authRepository: AuthRepository,
-    mangaRepository: MangaRepository
+    private val mangaRepository: MangaRepository
 ): ViewModel() {
     val loginStatus = authRepository.loginStatus.asLiveData()
     val manga = mangaRepository.manga.asLiveData()
@@ -28,5 +28,9 @@ class MainViewModel(
             data = Uri.parse(uiChapter.webAddress)
         }
         context.startActivity(intent)
+    }
+
+    fun refreshContent() = viewModelScope.launch {
+        mangaRepository.forceRefresh()
     }
 }

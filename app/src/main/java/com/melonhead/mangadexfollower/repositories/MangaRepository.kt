@@ -44,6 +44,10 @@ class MangaRepository(
         }
     }
 
+    suspend fun forceRefresh() {
+        if (loginFlow.first() is LoginStatus.LoggedIn) refreshMangaThrottled(Unit)
+    }
+
     private fun generateUIManga(dbSeries: List<MangaEntity>, dbChapters: List<ChapterEntity>, refreshReads: Boolean = true): List<UIManga> {
         // map the series and chapters into UIManga, sorted from most recent to least
         val uiManga = dbSeries.mapNotNull { manga ->
