@@ -61,7 +61,7 @@ object NewChapterNotification {
             manga.chapters.forEachIndexed { index, uiChapter ->
                 val pendingIntent = pendingIntent(context, uiChapter) ?: return@forEachIndexed
                 val notification = buildNotification(context, pendingIntent, manga, uiChapter)
-                notificationManager.notify(index, notification)
+                notificationManager.notify(manga.id.hashCode() + uiChapter.id.hashCode(), notification)
             }
         }
     }
