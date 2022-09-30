@@ -27,6 +27,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.melonhead.mangadexfollower.extensions.dateOrTimeString
 import com.melonhead.mangadexfollower.models.ui.LoginStatus
 import com.melonhead.mangadexfollower.models.ui.UIChapter
@@ -64,7 +66,8 @@ class MainActivity : ComponentActivity() {
                     Content(loginStatus = loginStatus,
                         manga = manga,
                         loginClicked = { username, password -> viewModel.authenticate(username, password) },
-                        onChapterClicked = { viewModel.onChapterClicked(this, it) }
+                        onChapterClicked = { viewModel.onChapterClicked(this, it) },
+                        onSwipeRefresh = { viewModel.refreshContent() }
                     )
                 }
             }
@@ -78,9 +81,9 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Content(loginStatus: LoginStatus?, manga: List<UIManga>, loginClicked: (username: String, password: String) -> Unit, onChapterClicked: (UIChapter) -> Unit) {
+fun Content(loginStatus: LoginStatus?, manga: List<UIManga>, loginClicked: (username: String, password: String) -> Unit, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
     when (loginStatus) {
-        LoginStatus.LoggedIn -> if (manga.isEmpty()) LoadingScreen() else ChaptersList(manga, onChapterClicked = onChapterClicked)
+        LoginStatus.LoggedIn -> if (manga.isEmpty()) LoadingScreen() else ChaptersList(manga, onChapterClicked = onChapterClicked, onSwipeRefresh = onSwipeRefresh)
         LoginStatus.LoggedOut -> LoginScreen(loginClicked)
         LoginStatus.LoggingIn, null -> LoadingScreen()
     }
@@ -186,12 +189,16 @@ fun Manga(uiManga: UIManga, onChapterClicked: (UIChapter) -> Unit) {
 }
 
 @Composable
-fun ChaptersList(manga: List<UIManga>, onChapterClicked: (UIChapter) -> Unit) {
-    LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        items(manga) {
-            Column(verticalArrangement = Arrangement.SpaceEvenly) {
-                Manga(uiManga = it, onChapterClicked = onChapterClicked)
+fun ChaptersList(manga: List<UIManga>, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
+    val isRefreshing = rememberSwipeRefreshState(isRefreshing = false)
+
+    SwipeRefresh(state = isRefreshing, onRefresh = { onSwipeRefresh() }) {
+        LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(manga) {
+                Column(verticalArrangement = Arrangement.SpaceEvenly) {
+                    Manga(uiManga = it, onChapterClicked = onChapterClicked)
+                }
             }
         }
     }
@@ -212,7 +219,7 @@ fun ChapterPreview() {
 fun MangaPreview() {
     MangadexFollowerTheme {
         Column(modifier = Modifier.fillMaxWidth()) {
-            Manga(uiManga = UIManga("", "Test Manga", listOf()), onChapterClicked = { })
+            Manga(uiManga = UIManga("", "Test Manga", listOf(), null), onChapterClicked = { })
         }
     }
 }
