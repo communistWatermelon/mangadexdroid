@@ -9,6 +9,7 @@ import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
@@ -17,6 +18,7 @@ import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
 
 object NewChapterNotification {
+    private val TAG = NewChapterNotification::class.simpleName
     private const val CHANNEL_ID = "new_chapters"
     private const val CHANNEL_NAME = "New Chapter"
 
@@ -57,6 +59,7 @@ object NewChapterNotification {
 
         val notificationManager = NotificationManagerCompat.from(context)
 
+        Log.i(TAG, "post: New chapters for ${series.count()} manga")
         series.forEach { manga ->
             manga.chapters.forEachIndexed { index, uiChapter ->
                 val pendingIntent = pendingIntent(context, uiChapter) ?: return@forEachIndexed

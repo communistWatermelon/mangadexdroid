@@ -1,6 +1,7 @@
 package com.melonhead.mangadexfollower.repositories
 
 import android.content.Context
+import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import com.melonhead.mangadexfollower.db.chapter.ChapterDao
 import com.melonhead.mangadexfollower.db.chapter.ChapterEntity
@@ -68,6 +69,7 @@ class MangaRepository(
     // note: unit needs to be included as a param for the throttleLatest call above
     private fun refreshManga(@Suppress("UNUSED_PARAMETER") unit: Unit) = externalScope.launch {
         val token = appDataService.token.firstOrNull() ?: return@launch
+        Log.i(TAG, "refreshManga")
 
         // fetch chapters from server
         val chaptersResponse = userService.getFollowedChapters(token)
@@ -95,6 +97,7 @@ class MangaRepository(
     }
 
     private suspend fun notifyOfNewChapters() {
+        Log.i(TAG, "notifyOfNewChapters")
         val notificationManager = NotificationManagerCompat.from(appContext)
         if (!notificationManager.areNotificationsEnabled()) return
 
@@ -108,6 +111,7 @@ class MangaRepository(
     private fun refreshReadStatus(contents: Pair<List<MangaEntity>, List<ChapterEntity>>) = externalScope.launch {
         // make sure we have a token
         val token = appDataService.token.firstOrNull() ?: return@launch
+        Log.i(TAG, "refreshReadStatus")
 
         val readChapters = mangaService.getReadChapters(contents.first.map { it.id }, token)
         val chaptersToUpdate = contents.second
@@ -125,5 +129,9 @@ class MangaRepository(
 
         // notify user of new chapters
         notifyOfNewChapters()
+    }
+
+    companion object {
+        private val TAG = MangaRepository::class.simpleName
     }
 }
