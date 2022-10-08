@@ -3,6 +3,7 @@ package com.melonhead.mangadexfollower.repositories
 import android.content.Context
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
+import com.melonhead.mangadexfollower.App
 import com.melonhead.mangadexfollower.db.chapter.ChapterDao
 import com.melonhead.mangadexfollower.db.chapter.ChapterEntity
 import com.melonhead.mangadexfollower.db.manga.MangaDao
@@ -101,10 +102,11 @@ class MangaRepository(
     }
 
     private suspend fun notifyOfNewChapters() {
-        Log.i(TAG, "notifyOfNewChapters")
+        if ((appContext as App).inForeground) return
         val notificationManager = NotificationManagerCompat.from(appContext)
         if (!notificationManager.areNotificationsEnabled()) return
         val installDateSeconds = appDataService.installDateSeconds.firstOrNull() ?: 0L
+        Log.i(TAG, "notifyOfNewChapters")
 
         chapterDb.allChapters().collectLatest { chapters ->
             val newChapters = chapters.filter { it.readStatus != true }

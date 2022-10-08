@@ -26,6 +26,9 @@ class App: Application() {
     private val externalScope: CoroutineScope by inject()
     private val appDataService: AppDataService by inject()
 
+    var inForeground = false
+        private set
+
     override fun onCreate() {
         super.onCreate()
 
@@ -43,11 +46,13 @@ class App: Application() {
         ProcessLifecycleOwner.get().lifecycle.addObserver(object: DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 super.onStart(owner)
+                inForeground = true
                 externalScope.launch { mangaRepository.forceRefresh() }
             }
 
             override fun onStop(owner: LifecycleOwner) {
                 super.onStop(owner)
+                inForeground = false
                 Log.i(TAG, "onStop: Creating background task")
                 val refreshWorkRequest = PeriodicWorkRequestBuilder<RefreshWorker>(15.minutes.toJavaDuration()).build()
                 WorkManager.getInstance(this@App).enqueueUniquePeriodicWork("refresh-task", ExistingPeriodicWorkPolicy.KEEP, refreshWorkRequest)
