@@ -19,7 +19,7 @@ interface MangaDao {
     @Query("SELECT EXISTS(SELECT * FROM manga WHERE id = :mangaId)")
     fun containsManga(mangaId: String): Boolean
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg chapters: MangaEntity)
 
     @Delete
