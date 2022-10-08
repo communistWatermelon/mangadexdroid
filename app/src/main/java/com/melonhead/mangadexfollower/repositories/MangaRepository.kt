@@ -98,13 +98,13 @@ class MangaRepository(
         Log.i(TAG, "notifyOfNewChapters")
         val notificationManager = NotificationManagerCompat.from(appContext)
         if (!notificationManager.areNotificationsEnabled()) return
+        val installDateSeconds = appDataService.installDateSeconds.firstOrNull() ?: 0L
 
         chapterDb.allChapters().collectLatest { chapters ->
             val newChapters = chapters.filter { it.readStatus != true }
             val notifyChapters = generateUIManga(mangaDb.allSeries().first(), newChapters)
-            NewChapterNotification.post(appContext, notifyChapters)
+            NewChapterNotification.post(appContext, notifyChapters, installDateSeconds)
             // TODO: mark chapter as notified so we can avoid duplicate notifications
-
         }
     }
 

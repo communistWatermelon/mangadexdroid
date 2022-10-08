@@ -54,7 +54,7 @@ object NewChapterNotification {
             .build()
     }
 
-    suspend fun post(context: Context, series: List<UIManga>) {
+    suspend fun post(context: Context, series: List<UIManga>, installDateSeconds: Long) {
         // set up channel
         createNotificationChannel(context)
 
@@ -62,7 +62,7 @@ object NewChapterNotification {
 
         Log.i(TAG, "post: New chapters for ${series.count()} manga")
         series.forEach { manga ->
-            manga.chapters.forEachIndexed { index, uiChapter ->
+            manga.chapters.filter { it.createdDate.epochSeconds >= installDateSeconds }.forEachIndexed { index, uiChapter ->
                 val pendingIntent = pendingIntent(context, uiChapter) ?: return@forEachIndexed
                 val notification = buildNotification(context, pendingIntent, manga, uiChapter)
                 notificationManager.notify(manga.id.hashCode() + uiChapter.id.hashCode(), notification)
