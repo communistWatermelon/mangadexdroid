@@ -58,7 +58,13 @@ class MangaRepository(
             if (chapters.isEmpty()) return@mapNotNull null
             UIManga(id = manga.id, manga.mangaTitle ?: "", chapters = chapters, manga.mangaCoverId)
         }
-        return if (uiManga.isNotEmpty()) uiManga.sortedByDescending { it.chapters.first().createdDate } else uiManga
+        if (uiManga.isEmpty()) return emptyList()
+
+        // split into two categories, unread and read
+        val hasUnread = uiManga.filter { it.chapters.any { it.read != true } }.sortedByDescending { it.chapters.first().createdDate }
+        val allRead = uiManga.filter { it.chapters.all { it.read == true } }.sortedByDescending { it.chapters.first().createdDate }
+
+        return hasUnread + allRead
     }
 
     // note: unit needs to be included as a param for the throttleLatest call above
