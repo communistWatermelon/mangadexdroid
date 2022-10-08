@@ -201,7 +201,7 @@ fun MangaCover(uiManga: UIManga) {
                     .build(),
                 loading = {
                       Box(modifier = Modifier.width(100.dp)) {
-                          CircularProgressIndicator()
+                          CircularProgressIndicator(Modifier.align(Alignment.Center))
                       }
                 },
                 error = {
@@ -219,9 +219,9 @@ fun MangaCover(uiManga: UIManga) {
             )
         }
         Text(modifier = Modifier
-            .align(Alignment.Bottom)
-            .padding(top = 20.dp, bottom = 50.dp)
-            .fillMaxSize(1f),
+            .align(Alignment.Top)
+            .padding(top = 20.dp)
+            .fillMaxWidth(1f),
             text = uiManga.title,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.End,
@@ -234,6 +234,8 @@ fun Manga(uiManga: UIManga, onChapterClicked: (UIChapter) -> Unit) {
     Box {
         MangaCover(uiManga = uiManga)
         Column(modifier = Modifier.padding(top = 110.dp)) {
+            // todo: allow users to set a max chapters per series limit
+//            uiManga.chapters.take(5).forEach {
             uiManga.chapters.forEach {
                 Chapter(modifier = Modifier.padding(bottom = 8.dp),
                     uiChapter = it,
@@ -274,7 +276,7 @@ fun ChaptersList(manga: List<UIManga>, isLoading: Boolean, onChapterClicked: (UI
 fun ChapterPreview() {
     MangadexFollowerTheme {
         Column {
-            Chapter(uiChapter = UIChapter("", "101", "Test Title", Clock.System.now(), false), onChapterClicked = { })
+            Chapter(uiChapter = UIChapter("", "101", "Test Title with an extremely long title that may or may not wrap", Clock.System.now(), false), onChapterClicked = { })
             Chapter(uiChapter = UIChapter("", "102", "Test Title 2", Clock.System.now(), true), onChapterClicked = { })
         }
     }
@@ -283,9 +285,11 @@ fun ChapterPreview() {
 @Preview(showBackground = true)
 @Composable
 fun MangaPreview() {
+    val testChapters = listOf(UIChapter("", "101", "Test Title", Clock.System.now(), true), UIChapter("", "102", "Test Title 2", Clock.System.now(), false))
     MangadexFollowerTheme {
         Column(modifier = Modifier.fillMaxWidth()) {
-            Manga(uiManga = UIManga("", "Test Manga", listOf(), null), onChapterClicked = { })
+            Manga(uiManga = UIManga("", "Test Manga", testChapters, null), onChapterClicked = { })
+            Manga(uiManga = UIManga("", "Test Manga with a really long name that causes the name to clip a little", testChapters, null), onChapterClicked = { })
         }
     }
 }
