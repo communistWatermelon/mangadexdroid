@@ -6,7 +6,7 @@ import com.google.firebase.ktx.Firebase
 import com.melonhead.mangadexfollower.models.auth.AuthToken
 import com.melonhead.mangadexfollower.models.content.Manga
 import com.melonhead.mangadexfollower.models.content.MangaReadMarkersResponse
-import com.melonhead.mangadexfollower.models.content.MangaResponse
+import com.melonhead.mangadexfollower.models.shared.handlePagination
 import com.melonhead.mangadexfollower.routes.HttpRoutes.MANGA_READ_MARKERS_URL
 import com.melonhead.mangadexfollower.routes.HttpRoutes.MANGA_URL
 import io.ktor.client.*
@@ -27,30 +27,26 @@ class MangaServiceImpl(
 ): MangaService {
     override suspend fun getManga(token: AuthToken, mangaIds: List<String>): List<Manga> {
         Log.i("", "getManga: ${mangaIds.count()} $mangaIds")
-        val result = client.get(MANGA_URL) {
-            headers {
-                contentType(ContentType.Application.Json)
-                bearerAuth(token.session)
+        return handlePagination(mangaIds.count()) { offset ->
+            client.get(MANGA_URL) {
+                headers {
+                    contentType(ContentType.Application.Json)
+                    bearerAuth(token.session)
+                }
+                url {
+                    // TODO: prevent ids from being too long
+                    mangaIds.forEach { encodedParameters.append("ids[]", it) }
+                    parameters.append("offset", offset.toString())
+                }
             }
-            url {
-                mangaIds.forEach { encodedParameters.append("ids[]", it) }
-            }
-        }
-
-        return try {
-            result.body<MangaResponse>().data
-        } catch (e: Exception) {
-            Log.i("", "getManga: ${result.bodyAsText()}")
-            Firebase.crashlytics.recordException(e)
-            emptyList()
         }
     }
 
     override suspend fun getReadChapters(mangaIds: List<String>, token: AuthToken): List<String> {
-        Log.i("", "getReadChapters: total $mangaIds")
+        Log.i("", "getReadChapters: total ${mangaIds.count()} - $mangaIds")
         val allChapters = mutableListOf<String>()
         mangaIds.chunked(100).map { list ->
-            Log.i("", "getReadChapters: chunked ${list.count()}, ${list}")
+            Log.i("", "getReadChapters: chunked ${list.count()}, $list")
             val result = client.get(MANGA_READ_MARKERS_URL) {
                 headers {
                     contentType(ContentType.Application.Json)
@@ -72,7 +68,7 @@ class MangaServiceImpl(
             }
             allChapters.addAll(chapters)
             // prevents triggering the anti-spam
-            delay(1000)
+            delay(250L)
         }
         return allChapters
     }

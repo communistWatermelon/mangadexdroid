@@ -75,13 +75,13 @@ class MangaRepository(
 
         // fetch chapters from server
         val chaptersResponse = userService.getFollowedChapters(token)
-        val chapterEntities = chaptersResponse.data.map { ChapterEntity.from(it) }
+        val chapterEntities = chaptersResponse.map { ChapterEntity.from(it) }
 
         // add chapters to DB
         chapterDb.insertAll(*chapterEntities.toTypedArray())
 
         // map app chapters into the manga ids
-        val mangaIds = chaptersResponse.data.mapNotNull { chapters -> chapters.relationships?.firstOrNull { it.type == "manga" }?.id }.toSet()
+        val mangaIds = chaptersResponse.mapNotNull { chapters -> chapters.relationships?.firstOrNull { it.type == "manga" }?.id }.toSet()
         // fetch manga series
         val mangaSeries = mangaService.getManga(token, mangaIds.toList())
 
@@ -90,7 +90,7 @@ class MangaRepository(
         val mangaCovers = coverService.getCovers(token, mangaSeries.map { it.id })
 
         mangaSeries.forEach { manga ->
-            val coverFilename = mangaCovers.firstOrNull { it.mangaId == manga.id}?.fileName
+            val coverFilename = mangaCovers.firstOrNull { it.mangaId == manga.id }?.fileName
             newManga.add(MangaEntity.from(manga, coverFilename))
         }
 
