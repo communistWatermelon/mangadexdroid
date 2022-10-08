@@ -1,6 +1,8 @@
 package com.melonhead.mangadexfollower.services
 
 import android.util.Log
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.melonhead.mangadexfollower.models.auth.AuthToken
 import com.melonhead.mangadexfollower.models.content.Chapter
 import com.melonhead.mangadexfollower.models.shared.PaginatedResponse
@@ -19,6 +21,7 @@ class UserServiceImpl(
     private val client: HttpClient
 ): UserService {
     override suspend fun getFollowedChapters(token: AuthToken): PaginatedResponse<List<Chapter>> {
+        Log.i("TAG", "getFollowedChapters: ")
         val result = client.get(HttpRoutes.USER_FOLLOW_CHAPTERS_URL) {
             headers {
                 contentType(ContentType.Application.Json)
@@ -33,8 +36,8 @@ class UserServiceImpl(
         return try {
             result.body()
         } catch (e: Exception) {
-            Log.w("", "getFollowedChapters: ${result.bodyAsText()}")
-            e.printStackTrace()
+            Log.i("", "getFollowedChapters: ${result.bodyAsText()}")
+            Firebase.crashlytics.recordException(e)
             PaginatedResponse(0, 0, 0, listOf())
         }
     }

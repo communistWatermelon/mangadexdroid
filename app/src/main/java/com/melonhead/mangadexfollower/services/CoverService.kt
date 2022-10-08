@@ -1,6 +1,8 @@
 package com.melonhead.mangadexfollower.services
 
 import android.util.Log
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.melonhead.mangadexfollower.models.auth.AuthToken
 import com.melonhead.mangadexfollower.models.cover.Cover
 import com.melonhead.mangadexfollower.models.cover.CoverResponse
@@ -19,6 +21,7 @@ class CoverServiceImpl(
     private val client: HttpClient
 ): CoverService {
     override suspend fun getCovers(token: AuthToken, mangaIds: List<String>): List<Cover> {
+        Log.i("", "getFollowedChapters: ${mangaIds.count()} - $mangaIds")
         val result = client.get(HttpRoutes.COVER_URL) {
             headers {
                 contentType(ContentType.Application.Json)
@@ -32,8 +35,8 @@ class CoverServiceImpl(
         return try {
             result.body<CoverResponse>().data
         } catch (e: Exception) {
-            Log.w("", "getFollowedChapters: ${result.bodyAsText()}")
-            e.printStackTrace()
+            Log.i("", "getFollowedChapters: ${result.bodyAsText()}")
+            Firebase.crashlytics.recordException(e)
             emptyList()
         }
     }

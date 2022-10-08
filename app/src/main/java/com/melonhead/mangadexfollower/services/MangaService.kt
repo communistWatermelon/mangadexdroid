@@ -1,6 +1,8 @@
 package com.melonhead.mangadexfollower.services
 
 import android.util.Log
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.melonhead.mangadexfollower.models.auth.AuthToken
 import com.melonhead.mangadexfollower.models.content.Manga
 import com.melonhead.mangadexfollower.models.content.MangaReadMarkersResponse
@@ -24,6 +26,7 @@ class MangaServiceImpl(
     private val client: HttpClient,
 ): MangaService {
     override suspend fun getManga(token: AuthToken, mangaIds: List<String>): List<Manga> {
+        Log.i("", "getManga: ${mangaIds.count()} $mangaIds")
         val result = client.get(MANGA_URL) {
             headers {
                 contentType(ContentType.Application.Json)
@@ -37,15 +40,17 @@ class MangaServiceImpl(
         return try {
             result.body<MangaResponse>().data
         } catch (e: Exception) {
-            Log.w("", "getManga: ${result.bodyAsText()}")
-            e.printStackTrace()
+            Log.i("", "getManga: ${result.bodyAsText()}")
+            Firebase.crashlytics.recordException(e)
             emptyList()
         }
     }
 
     override suspend fun getReadChapters(mangaIds: List<String>, token: AuthToken): List<String> {
+        Log.i("", "getReadChapters: total $mangaIds")
         val allChapters = mutableListOf<String>()
         mangaIds.chunked(100).map { list ->
+            Log.i("", "getReadChapters: chunked ${list.count()}, ${list}")
             val result = client.get(MANGA_READ_MARKERS_URL) {
                 headers {
                     contentType(ContentType.Application.Json)
@@ -61,8 +66,8 @@ class MangaServiceImpl(
             val chapters = try {
                 result.body<MangaReadMarkersResponse>().data
             } catch (e: Exception) {
-                Log.w("", "getReadChapters: ${result.bodyAsText()}")
-                e.printStackTrace()
+                Log.i("", "getReadChapters: ${result.bodyAsText()}")
+                Firebase.crashlytics.recordException(e)
                 emptyList()
             }
             allChapters.addAll(chapters)
