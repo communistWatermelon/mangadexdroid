@@ -16,6 +16,7 @@ import androidx.core.app.TaskStackBuilder
 import com.melonhead.mangadexfollower.R
 import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
+import kotlinx.coroutines.delay
 
 object NewChapterNotification {
     private val TAG = NewChapterNotification::class.simpleName
@@ -53,7 +54,7 @@ object NewChapterNotification {
             .build()
     }
 
-    fun post(context: Context, series: List<UIManga>) {
+    suspend fun post(context: Context, series: List<UIManga>) {
         // set up channel
         createNotificationChannel(context)
 
@@ -65,6 +66,8 @@ object NewChapterNotification {
                 val pendingIntent = pendingIntent(context, uiChapter) ?: return@forEachIndexed
                 val notification = buildNotification(context, pendingIntent, manga, uiChapter)
                 notificationManager.notify(manga.id.hashCode() + uiChapter.id.hashCode(), notification)
+                // ensures android actually posts all notifications
+                delay(1000)
             }
         }
     }
