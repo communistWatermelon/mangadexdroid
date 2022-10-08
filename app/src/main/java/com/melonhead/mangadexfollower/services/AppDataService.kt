@@ -4,17 +4,18 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.melonhead.mangadexfollower.models.auth.AuthToken
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
+import kotlinx.datetime.Clock
 
 interface AppDataService {
     val token: Flow<AuthToken?>
+    val installDateSeconds: Flow<Long?>
     suspend fun updateToken(token: AuthToken?)
+    suspend fun updateInstallTime()
 }
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth")
@@ -24,6 +25,7 @@ class AppDataServiceImpl(
 ): AppDataService {
     private val AUTH_TOKEN = stringPreferencesKey("auth_token")
     private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
+    private val INSTALL_DATE_SECONDS = longPreferencesKey("install_epoch_seconds")
 
     private val authTokenFlow: Flow<String> = appContext.dataStore.data.map { preferences ->
         // No type safety.
@@ -33,6 +35,11 @@ class AppDataServiceImpl(
     private val refreshTokenFlow: Flow<String> = appContext.dataStore.data.map { preferences ->
         // No type safety.
         preferences[REFRESH_TOKEN] ?: ""
+    }.distinctUntilChanged()
+
+    override val installDateSeconds: Flow<Long?> = appContext.dataStore.data.map { preferences ->
+        // No type safety.
+        preferences[INSTALL_DATE_SECONDS]
     }.distinctUntilChanged()
 
     override var token: Flow<AuthToken?> = authTokenFlow.combine(refreshTokenFlow) { auth, refresh ->
@@ -47,6 +54,14 @@ class AppDataServiceImpl(
 
             if (settings[REFRESH_TOKEN] != token?.refresh)
                 settings[REFRESH_TOKEN] = token?.refresh ?: ""
+        }
+    }
+
+    override suspend fun updateInstallTime() {
+        if (installDateSeconds.firstOrNull() == null) {
+            appContext.dataStore.edit { settings ->
+                settings[INSTALL_DATE_SECONDS] = Clock.System.now().epochSeconds
+            }
         }
     }
 }

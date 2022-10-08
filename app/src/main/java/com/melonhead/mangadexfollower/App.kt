@@ -10,6 +10,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.melonhead.mangadexfollower.di.appModule
 import com.melonhead.mangadexfollower.repositories.MangaRepository
+import com.melonhead.mangadexfollower.services.AppDataService
 import com.melonhead.mangadexfollower.work_manager.RefreshWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -23,6 +24,7 @@ import kotlin.time.toJavaDuration
 class App: Application() {
     private val mangaRepository: MangaRepository by inject()
     private val externalScope: CoroutineScope by inject()
+    private val appDataService: AppDataService by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -35,6 +37,8 @@ class App: Application() {
             // Load modules
             modules(appModule)
         }
+
+        externalScope.launch { appDataService.updateInstallTime() }
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(object: DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
