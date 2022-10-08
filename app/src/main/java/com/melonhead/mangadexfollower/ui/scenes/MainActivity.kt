@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -192,6 +193,7 @@ fun MangaCover(uiManga: UIManga) {
     Row {
         Box(Modifier.padding(horizontal = 10.dp)) {
             SubcomposeAsyncImage(modifier = Modifier
+                .sizeIn(maxWidth = 95.dp)
                 .height(140.dp)
                 .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.FillHeight,
@@ -223,6 +225,8 @@ fun MangaCover(uiManga: UIManga) {
             .padding(top = 20.dp)
             .fillMaxWidth(1f),
             text = uiManga.title,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.End,
             fontSize = 20.sp)
@@ -250,10 +254,14 @@ fun Manga(uiManga: UIManga, onChapterClicked: (UIChapter) -> Unit) {
 fun ChaptersList(manga: List<UIManga>, isLoading: Boolean, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
     Column {
         if (isLoading) {
-            Box(Modifier.fillMaxWidth()
+            Box(
+                Modifier
+                    .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surfaceTint)
                     .padding(8.dp)) {
-                CircularProgressIndicator(modifier = Modifier.size(12.dp).align(Alignment.Center), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onSecondary)
+                CircularProgressIndicator(modifier = Modifier
+                    .size(12.dp)
+                    .align(Alignment.Center), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onSecondary)
             }
         }
 
