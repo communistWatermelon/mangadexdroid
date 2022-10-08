@@ -12,6 +12,7 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import kotlinx.coroutines.delay
 
 
 interface MangaService {
@@ -43,24 +44,31 @@ class MangaServiceImpl(
     }
 
     override suspend fun getReadChapters(mangaIds: List<String>, token: AuthToken): List<String> {
-        val result = client.get(MANGA_READ_MARKERS_URL) {
-            headers {
-                contentType(ContentType.Application.Json)
-                bearerAuth(token.session)
-            }
-            url {
-                mangaIds.forEach {
-                    encodedParameters.append("ids[]", it)
+        val allChapters = mutableListOf<String>()
+        mangaIds.chunked(100).map { list ->
+            val result = client.get(MANGA_READ_MARKERS_URL) {
+                headers {
+                    contentType(ContentType.Application.Json)
+                    bearerAuth(token.session)
+                }
+                url {
+                    list.forEach {
+                        encodedParameters.append("ids[]", it)
+                    }
                 }
             }
-        }
 
-        return try {
-            result.body<MangaReadMarkersResponse>().data
-        } catch (e: Exception) {
-            Log.w("", "getReadChapters: ${result.bodyAsText()}")
-            e.printStackTrace()
-            emptyList()
+            val chapters = try {
+                result.body<MangaReadMarkersResponse>().data
+            } catch (e: Exception) {
+                Log.w("", "getReadChapters: ${result.bodyAsText()}")
+                e.printStackTrace()
+                emptyList()
+            }
+            allChapters.addAll(chapters)
+            // prevents triggering the anti-spam
+            delay(1000)
         }
+        return allChapters
     }
 }
