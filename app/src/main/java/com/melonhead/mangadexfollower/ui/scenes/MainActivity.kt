@@ -71,8 +71,10 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val loginStatus by viewModel.loginStatus.observeAsState()
                     val manga by viewModel.manga.observeAsState(listOf())
+                    val isLoading by viewModel.isLoading.observeAsState(true)
 
                     Content(loginStatus = loginStatus,
+                        isLoading = isLoading,
                         manga = manga,
                         loginClicked = { username, password -> viewModel.authenticate(username, password) },
                         onChapterClicked = { viewModel.onChapterClicked(this, it) },
@@ -85,9 +87,18 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Content(loginStatus: LoginStatus?, manga: List<UIManga>, loginClicked: (username: String, password: String) -> Unit, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
+fun Content(loginStatus: LoginStatus?, isLoading: Boolean, manga: List<UIManga>, loginClicked: (username: String, password: String) -> Unit, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
     when (loginStatus) {
-        LoginStatus.LoggedIn -> if (manga.isEmpty()) LoadingScreen() else ChaptersList(manga, onChapterClicked = onChapterClicked, onSwipeRefresh = onSwipeRefresh)
+        LoginStatus.LoggedIn -> {
+            if (manga.isEmpty()) LoadingScreen() else {
+                ChaptersList(
+                    manga,
+                    isLoading = isLoading,
+                    onChapterClicked = onChapterClicked,
+                    onSwipeRefresh = onSwipeRefresh
+                )
+            }
+        }
         LoginStatus.LoggedOut -> LoginScreen(loginClicked)
         LoginStatus.LoggingIn, null -> LoadingScreen()
     }
@@ -194,7 +205,9 @@ fun MangaCover(uiManga: UIManga) {
                       }
                 },
                 error = {
-                    Box(Modifier.width(100.dp)
+                    Box(
+                        Modifier
+                            .width(100.dp)
                             .background(Color.DarkGray)) {
                         Text(text = "No Image",
                             color = Color.White,
@@ -232,15 +245,25 @@ fun Manga(uiManga: UIManga, onChapterClicked: (UIChapter) -> Unit) {
 }
 
 @Composable
-fun ChaptersList(manga: List<UIManga>, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
-    val isRefreshing = rememberSwipeRefreshState(isRefreshing = false)
+fun ChaptersList(manga: List<UIManga>, isLoading: Boolean, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
+    Column {
+        if (isLoading) {
+            Box(Modifier.fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surfaceTint)
+                    .padding(8.dp)) {
+                CircularProgressIndicator(modifier = Modifier.size(12.dp).align(Alignment.Center), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onSecondary)
+            }
+        }
 
-    SwipeRefresh(state = isRefreshing, onRefresh = { onSwipeRefresh() }) {
-        LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)) {
-            items(manga) {
-                Column(verticalArrangement = Arrangement.SpaceEvenly) {
-                    Manga(uiManga = it, onChapterClicked = onChapterClicked)
+        val isRefreshing = rememberSwipeRefreshState(isRefreshing = false)
+
+        SwipeRefresh(state = isRefreshing, onRefresh = { onSwipeRefresh() }, swipeEnabled = !isLoading && !isRefreshing.isRefreshing) {
+            LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                items(manga) {
+                    Column(verticalArrangement = Arrangement.SpaceEvenly) {
+                        Manga(uiManga = it, onChapterClicked = onChapterClicked)
+                    }
                 }
             }
         }
