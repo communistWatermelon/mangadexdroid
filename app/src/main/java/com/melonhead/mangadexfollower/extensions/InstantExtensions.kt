@@ -11,11 +11,11 @@ fun Instant.dateOrTimeString(useRelative: Boolean = false): String {
     val sameHour = sameDate && (dateTime.hour == currentDate.hour)
     val minuteDelta = abs(dateTime.minute - currentDate.minute)
     return when {
-        useRelative && sameHour && minuteDelta <= 2 -> {
+        useRelative && sameHour && minuteDelta <= 1 -> {
             "Just Now"
         }
-        useRelative && sameHour && abs(dateTime.minute - currentDate.minute) <= 16 -> {
-            "$minuteDelta mins ago"
+        useRelative && sameHour && abs(dateTime.minute - currentDate.minute) <= 60 -> {
+            "$minuteDelta minutes ago"
         }
         sameDate -> {
             val format = DateTimeFormatter.ofPattern("K:mm a")
