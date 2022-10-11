@@ -89,7 +89,6 @@ class MangaRepository(
         // fetch manga series
         val mangaSeries = mangaService.getManga(token, mangaIds.toList())
 
-
         mutableRefreshStatus.value = MangaCovers
 
         val newManga = mutableListOf<MangaEntity>()
@@ -107,7 +106,7 @@ class MangaRepository(
         mutableRefreshStatus.value = ReadStatus
 
         // refresh read status for series
-        refreshReadStatus(mangaDb.allSeries().first(), chapterDb.allChapters().first())
+        refreshReadStatus(mangaDb.getAllSync(), chapterDb.getAllSync())
 
         mutableRefreshStatus.value = None
 
@@ -121,12 +120,10 @@ class MangaRepository(
         val installDateSeconds = appDataService.installDateSeconds.firstOrNull() ?: 0L
         Log.i(TAG, "notifyOfNewChapters")
 
-        chapterDb.allChapters().collectLatest { chapters ->
-            val newChapters = chapters.filter { it.readStatus != true }
-            val notifyChapters = generateUIManga(mangaDb.allSeries().first(), newChapters)
-            NewChapterNotification.post(appContext, notifyChapters, installDateSeconds)
-            // TODO: mark chapter as notified so we can avoid duplicate notifications
-        }
+        val newChapters = chapterDb.getAllSync().filter { it.readStatus != true }
+        val manga = mangaDb.getAllSync()
+        val notifyChapters = generateUIManga(manga, newChapters)
+        NewChapterNotification.post(appContext, notifyChapters, installDateSeconds)
     }
 
     private suspend fun refreshReadStatus(manga: List<MangaEntity>, chapters: List<ChapterEntity>) {
