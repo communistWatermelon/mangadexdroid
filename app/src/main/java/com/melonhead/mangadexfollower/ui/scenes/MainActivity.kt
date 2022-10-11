@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -370,7 +371,7 @@ fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, lastRe
     val isRefreshing = rememberSwipeRefreshState(isRefreshing = false)
 
     Column {
-        if (refreshStatus !is None) {
+        AnimatedVisibility(visible = refreshStatus !is None || isRefreshing.isRefreshing) {
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -396,7 +397,9 @@ fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, lastRe
             "Never"
 
         Text(text = "Last Refresh: $refreshText",
-            modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 16.dp),
             fontSize = 11.sp,
             fontWeight = FontWeight.Normal)
 
