@@ -11,6 +11,7 @@ import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +24,7 @@ import org.koin.dsl.module
 val appModule = module {
     single {
         HttpClient(CIO) {
+            install(Logging) { level = LogLevel.INFO }
             install(ContentNegotiation) {
                 json(Json {
                     prettyPrint = true
