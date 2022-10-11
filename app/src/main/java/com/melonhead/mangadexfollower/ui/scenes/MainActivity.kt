@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,6 +35,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalAutofill
 import androidx.compose.ui.platform.LocalAutofillTree
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -47,6 +49,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.melonhead.mangadexfollower.R
 import com.melonhead.mangadexfollower.extensions.dateOrTimeString
 import com.melonhead.mangadexfollower.models.ui.*
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
@@ -132,7 +135,7 @@ fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
 
     Column(modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        
     ) {
         val emailNode = AutofillNode(
             autofillTypes = listOf(AutofillType.EmailAddress),
@@ -148,40 +151,50 @@ fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
         LocalAutofillTree.current += emailNode
         LocalAutofillTree.current += passwordNode
 
-        TextField(value = emailField,
+        Image(painter = painterResource(id = R.drawable.mangadex_v2_svgrepo_com), 
+            contentDescription = "Mangadex Logo", 
+            modifier = Modifier.padding(48.dp).size(250.dp))
+
+        OutlinedTextField(value = emailField,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             onValueChange = { emailField = it },
             label = { Text("Email") },
             singleLine = true,
-            modifier = Modifier.padding(bottom = 8.dp).onGloballyPositioned {
-                emailNode.boundingBox = it.boundsInWindow()
-            }.onFocusChanged { focusState ->
-                autoFill?.run {
-                    if (focusState.isFocused) {
-                        requestAutofillForNode(emailNode)
-                    } else {
-                        cancelAutofillForNode(emailNode)
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .onGloballyPositioned {
+                    emailNode.boundingBox = it.boundsInWindow()
+                }
+                .onFocusChanged { focusState ->
+                    autoFill?.run {
+                        if (focusState.isFocused) {
+                            requestAutofillForNode(emailNode)
+                        } else {
+                            cancelAutofillForNode(emailNode)
+                        }
                     }
                 }
-            }
         )
-        TextField(value = passwordField,
+        OutlinedTextField(value = passwordField,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             onValueChange = { passwordField = it },
             label = { Text("Password") },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.padding(bottom = 24.dp).onGloballyPositioned {
-                passwordNode.boundingBox = it.boundsInWindow()
-            }.onFocusChanged { focusState ->
-                autoFill?.run {
-                    if (focusState.isFocused) {
-                        requestAutofillForNode(passwordNode)
-                    } else {
-                        cancelAutofillForNode(passwordNode)
+            modifier = Modifier
+                .padding(bottom = 24.dp)
+                .onGloballyPositioned {
+                    passwordNode.boundingBox = it.boundsInWindow()
+                }
+                .onFocusChanged { focusState ->
+                    autoFill?.run {
+                        if (focusState.isFocused) {
+                            requestAutofillForNode(passwordNode)
+                        } else {
+                            cancelAutofillForNode(passwordNode)
+                        }
                     }
                 }
-            }
         )
         Button(enabled = !loggingIn, onClick = {
             if (emailField.isNotBlank() && passwordField.isNotBlank()) {
