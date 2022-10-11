@@ -40,11 +40,7 @@ import coil.request.ImageRequest
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.melonhead.mangadexfollower.extensions.dateOrTimeString
-import com.melonhead.mangadexfollower.models.ui.LoginStatus
-import com.melonhead.mangadexfollower.models.ui.UIChapter
-import com.melonhead.mangadexfollower.models.ui.UIManga
-import com.melonhead.mangadexfollower.models.ui.MangaRefreshStatus
-import com.melonhead.mangadexfollower.models.ui.None
+import com.melonhead.mangadexfollower.models.ui.*
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
 import kotlinx.datetime.Clock
@@ -113,9 +109,9 @@ fun LoadingScreen(refreshStatus: MangaRefreshStatus?) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        if (refreshStatus != null && refreshStatus !is None)
-            Text(text = refreshStatus.text, fontSize = 16.sp)
         CircularProgressIndicator()
+        if (refreshStatus != null && refreshStatus !is None)
+            Text(text = refreshStatus.text, fontSize = 16.sp, modifier = Modifier.padding(vertical = 8.dp))
     }
 }
 
@@ -324,8 +320,17 @@ fun LoginPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun LoadingPreview() {
+fun LoadingPreviewNoStatus() {
     MangadexFollowerTheme {
         LoadingScreen(null)
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun LoadingPreview() {
+    MangadexFollowerTheme {
+        LoadingScreen(ReadStatus)
     }
 }
