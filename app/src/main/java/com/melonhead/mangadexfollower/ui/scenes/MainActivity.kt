@@ -13,7 +13,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,18 +31,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.AutofillNode
 import androidx.compose.ui.autofill.AutofillType
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalAutofill
-import androidx.compose.ui.platform.LocalAutofillTree
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -132,10 +137,17 @@ fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
     var emailField by rememberSaveable { mutableStateOf("") }
     var passwordField by rememberSaveable { mutableStateOf("") }
     var loggingIn by rememberSaveable { mutableStateOf(false) }
+    var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    fun signIn() {
+        loginClicked(emailField, passwordField)
+        loggingIn = true
+        keyboardController?.hide()
+    }
 
     Column(modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        
     ) {
         val emailNode = AutofillNode(
             autofillTypes = listOf(AutofillType.EmailAddress),
@@ -151,12 +163,17 @@ fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
         LocalAutofillTree.current += emailNode
         LocalAutofillTree.current += passwordNode
 
+        val focusManager = LocalFocusManager.current
+
         Image(painter = painterResource(id = R.drawable.mangadex_v2_svgrepo_com), 
             contentDescription = "Mangadex Logo", 
             modifier = Modifier.padding(48.dp).size(250.dp))
 
         OutlinedTextField(value = emailField,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next, keyboardType = KeyboardType.Email),
+            keyboardActions = KeyboardActions(onNext = {
+                focusManager.moveFocus(FocusDirection.Down)
+            }),
             onValueChange = { emailField = it },
             label = { Text("Email") },
             singleLine = true,
@@ -176,11 +193,30 @@ fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
                 }
         )
         OutlinedTextField(value = passwordField,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done, keyboardType = KeyboardType.Password),
+            keyboardActions = KeyboardActions(onDone = {
+                signIn()
+            }),
             onValueChange = { passwordField = it },
             label = { Text("Password") },
             singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = if (isPasswordVisible)
+                VisualTransformation.None
+            else
+                PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = {
+                    isPasswordVisible = !isPasswordVisible
+                }) {
+                    Icon(
+                        imageVector = if (isPasswordVisible)
+                            Icons.Filled.Visibility
+                        else
+                            Icons.Filled.VisibilityOff,
+                        contentDescription = "Password Visibility"
+                    )
+                }
+            },
             modifier = Modifier
                 .padding(bottom = 24.dp)
                 .onGloballyPositioned {
@@ -198,8 +234,7 @@ fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
         )
         Button(enabled = !loggingIn, onClick = {
             if (emailField.isNotBlank() && passwordField.isNotBlank()) {
-                loginClicked(emailField, passwordField)
-                loggingIn = true
+                signIn()
             }
         }) {
             if (loggingIn) {
