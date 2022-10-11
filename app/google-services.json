@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "747351075086",
+    "project_id": "mangadex-follower",
+    "storage_bucket": "mangadex-follower.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:747351075086:android:28884fa440df4ee6c68f5f",
+        "android_client_info": {
+          "package_name": "com.melonhead.mangadexfollower"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "747351075086-a036im0hnmf1vd5trd5fsuji6imba5pq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXrzgohIMP_nq2h8puGpqrDlNM4xCAx8s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "747351075086-a036im0hnmf1vd5trd5fsuji6imba5pq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
