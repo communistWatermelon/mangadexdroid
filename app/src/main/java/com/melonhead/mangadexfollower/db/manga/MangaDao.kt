@@ -9,6 +9,9 @@ interface MangaDao {
     @Query("SELECT * FROM manga")
     fun getAll(): Flow<List<MangaEntity>>
 
+    @Query("SELECT * from manga")
+    suspend fun getAllSync(): List<MangaEntity>
+
     fun allSeries() = getAll().distinctUntilChanged()
 
     @Query("SELECT * FROM manga WHERE id IS :mangaId")

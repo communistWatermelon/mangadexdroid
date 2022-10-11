@@ -9,6 +9,9 @@ interface ChapterDao {
     @Query("SELECT * FROM chapter ORDER BY createdAt desc")
     fun getAll(): Flow<List<ChapterEntity>>
 
+    @Query("SELECT * FROM chapter ORDER BY createdAt desc")
+    suspend fun getAllSync(): List<ChapterEntity>
+
     fun allChapters() = getAll().distinctUntilChanged()
 
     @Query("SELECT * FROM chapter WHERE manga_id IS :mangaId")
