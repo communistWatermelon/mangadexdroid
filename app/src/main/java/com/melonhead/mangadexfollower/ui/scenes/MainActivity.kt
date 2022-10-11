@@ -21,10 +21,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.AutofillNode
+import androidx.compose.ui.autofill.AutofillType
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalAutofill
+import androidx.compose.ui.platform.LocalAutofillTree
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -115,22 +123,47 @@ fun LoadingScreen(refreshStatus: MangaRefreshStatus?) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
     var emailField by rememberSaveable { mutableStateOf("") }
     var passwordField by rememberSaveable { mutableStateOf("") }
+    var loggingIn by rememberSaveable { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        val emailNode = AutofillNode(
+            autofillTypes = listOf(AutofillType.EmailAddress),
+            onFill = { emailField = it }
+        )
+        val passwordNode = AutofillNode(
+            autofillTypes = listOf(AutofillType.Password),
+            onFill = { emailField = it }
+        )
+
+        val autoFill = LocalAutofill.current
+
+        LocalAutofillTree.current += emailNode
+        LocalAutofillTree.current += passwordNode
+
         TextField(value = emailField,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             onValueChange = { emailField = it },
             label = { Text("Email") },
             singleLine = true,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp).onGloballyPositioned {
+                emailNode.boundingBox = it.boundsInWindow()
+            }.onFocusChanged { focusState ->
+                autoFill?.run {
+                    if (focusState.isFocused) {
+                        requestAutofillForNode(emailNode)
+                    } else {
+                        cancelAutofillForNode(emailNode)
+                    }
+                }
+            }
         )
         TextField(value = passwordField,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -138,13 +171,32 @@ fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
             label = { Text("Password") },
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.padding(bottom = 24.dp)
+            modifier = Modifier.padding(bottom = 24.dp).onGloballyPositioned {
+                passwordNode.boundingBox = it.boundsInWindow()
+            }.onFocusChanged { focusState ->
+                autoFill?.run {
+                    if (focusState.isFocused) {
+                        requestAutofillForNode(passwordNode)
+                    } else {
+                        cancelAutofillForNode(passwordNode)
+                    }
+                }
+            }
         )
-        Button(onClick = {
-            if (emailField.isNotBlank() && passwordField.isNotBlank())
+        Button(enabled = !loggingIn, onClick = {
+            if (emailField.isNotBlank() && passwordField.isNotBlank()) {
                 loginClicked(emailField, passwordField)
+                loggingIn = true
+            }
         }) {
-            Text(text = "Sign In")
+            if (loggingIn) {
+                CircularProgressIndicator(modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .size(12.dp),
+                    strokeWidth = 2.dp)
+            } else {
+                Text(text = "Sign In")
+            }
         }
     }
 }
