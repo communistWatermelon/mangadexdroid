@@ -110,6 +110,8 @@ class MangaRepository(
         refreshReadStatus(mangaDb.allSeries().first(), chapterDb.allChapters().first())
 
         mutableRefreshStatus.value = None
+
+        appDataService.updateLastRefreshDate()
     }
 
     private suspend fun notifyOfNewChapters() {

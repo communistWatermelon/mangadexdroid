@@ -14,8 +14,11 @@ import kotlinx.datetime.Clock
 interface AppDataService {
     val token: Flow<AuthToken?>
     val installDateSeconds: Flow<Long?>
+    val lastRefreshDateSeconds: Flow<Long?>
+
     suspend fun updateToken(token: AuthToken?)
     suspend fun updateInstallTime()
+    suspend fun updateLastRefreshDate()
 }
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth")
@@ -26,6 +29,7 @@ class AppDataServiceImpl(
     private val AUTH_TOKEN = stringPreferencesKey("auth_token")
     private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
     private val INSTALL_DATE_SECONDS = longPreferencesKey("install_epoch_seconds")
+    private val REFRESH_DATE_SECONDS = longPreferencesKey("last_refresh_epoch_seconds")
 
     private val authTokenFlow: Flow<String> = appContext.dataStore.data.map { preferences ->
         // No type safety.
@@ -40,6 +44,11 @@ class AppDataServiceImpl(
     override val installDateSeconds: Flow<Long?> = appContext.dataStore.data.map { preferences ->
         // No type safety.
         preferences[INSTALL_DATE_SECONDS]
+    }.distinctUntilChanged()
+
+    override val lastRefreshDateSeconds: Flow<Long?> = appContext.dataStore.data.map { preferences ->
+        // No type safety.
+        preferences[REFRESH_DATE_SECONDS]
     }.distinctUntilChanged()
 
     override var token: Flow<AuthToken?> = authTokenFlow.combine(refreshTokenFlow) { auth, refresh ->
@@ -62,6 +71,11 @@ class AppDataServiceImpl(
             appContext.dataStore.edit { settings ->
                 settings[INSTALL_DATE_SECONDS] = Clock.System.now().epochSeconds
             }
+        }
+    }
+    override suspend fun updateLastRefreshDate() {
+        appContext.dataStore.edit { settings ->
+            settings[REFRESH_DATE_SECONDS] = Clock.System.now().epochSeconds
         }
     }
 }
