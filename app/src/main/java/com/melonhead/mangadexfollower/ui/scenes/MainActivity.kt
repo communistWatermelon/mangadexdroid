@@ -43,6 +43,8 @@ import com.melonhead.mangadexfollower.extensions.dateOrTimeString
 import com.melonhead.mangadexfollower.models.ui.LoginStatus
 import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
+import com.melonhead.mangadexfollower.models.ui.MangaRefreshStatus
+import com.melonhead.mangadexfollower.models.ui.None
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
 import kotlinx.datetime.Clock
@@ -72,10 +74,10 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val loginStatus by viewModel.loginStatus.observeAsState()
                     val manga by viewModel.manga.observeAsState(listOf())
-                    val isLoading by viewModel.isLoading.observeAsState(true)
+                    val refreshStatus by viewModel.refreshStatus.observeAsState(None)
 
                     Content(loginStatus = loginStatus,
-                        isLoading = isLoading,
+                        refreshStatus = refreshStatus,
                         manga = manga,
                         loginClicked = { username, password -> viewModel.authenticate(username, password) },
                         onChapterClicked = { viewModel.onChapterClicked(this, it) },
@@ -88,29 +90,31 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Content(loginStatus: LoginStatus?, isLoading: Boolean, manga: List<UIManga>, loginClicked: (username: String, password: String) -> Unit, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
+fun Content(loginStatus: LoginStatus?, refreshStatus: MangaRefreshStatus, manga: List<UIManga>, loginClicked: (username: String, password: String) -> Unit, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
     when (loginStatus) {
         LoginStatus.LoggedIn -> {
-            if (manga.isEmpty()) LoadingScreen() else {
+            if (manga.isEmpty()) LoadingScreen(refreshStatus) else {
                 ChaptersList(
                     manga,
-                    isLoading = isLoading,
+                    refreshStatus = refreshStatus,
                     onChapterClicked = onChapterClicked,
                     onSwipeRefresh = onSwipeRefresh
                 )
             }
         }
         LoginStatus.LoggedOut -> LoginScreen(loginClicked)
-        LoginStatus.LoggingIn, null -> LoadingScreen()
+        LoginStatus.LoggingIn, null -> LoadingScreen(null)
     }
 }
 
 @Composable
-fun LoadingScreen() {
+fun LoadingScreen(refreshStatus: MangaRefreshStatus?) {
     Column(modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        if (refreshStatus != null && refreshStatus !is None)
+            Text(text = refreshStatus.text, fontSize = 16.sp)
         CircularProgressIndicator()
     }
 }
@@ -251,23 +255,31 @@ fun Manga(uiManga: UIManga, onChapterClicked: (UIChapter) -> Unit) {
 }
 
 @Composable
-fun ChaptersList(manga: List<UIManga>, isLoading: Boolean, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
+fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
     Column {
-        if (isLoading) {
-            Box(
+        if (refreshStatus !is None) {
+            Row(
                 Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surfaceTint)
-                    .padding(8.dp)) {
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
                 CircularProgressIndicator(modifier = Modifier
-                    .size(12.dp)
-                    .align(Alignment.Center), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onSecondary)
+                    .padding(horizontal = 8.dp)
+                    .size(12.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.onSecondary)
+                Text(text = refreshStatus.text,
+                    color = MaterialTheme.colorScheme.onSecondary,
+                    fontSize = 14.sp)
             }
         }
 
         val isRefreshing = rememberSwipeRefreshState(isRefreshing = false)
 
-        SwipeRefresh(state = isRefreshing, onRefresh = { onSwipeRefresh() }, swipeEnabled = !isLoading && !isRefreshing.isRefreshing) {
+        SwipeRefresh(state = isRefreshing, onRefresh = { onSwipeRefresh() }, swipeEnabled = (refreshStatus is None) && !isRefreshing.isRefreshing) {
             LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)) {
                 items(manga) {
@@ -314,6 +326,6 @@ fun LoginPreview() {
 @Composable
 fun LoadingPreview() {
     MangadexFollowerTheme {
-        LoadingScreen()
+        LoadingScreen(null)
     }
 }
