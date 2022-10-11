@@ -390,16 +390,21 @@ fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, refres
             }
         }
 
-        Text(text = "Last Refresh: $refreshText",
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 16.dp),
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Normal)
-
         SwipeRefresh(state = isRefreshing, onRefresh = { onSwipeRefresh() }, swipeEnabled = (refreshStatus is None) && !isRefreshing.isRefreshing) {
-            LazyColumn(contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
+            LazyColumn(modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                item {
+                    AnimatedVisibility(visible = refreshStatus is None && !isRefreshing.isRefreshing) {
+                        Text(text = "Last Refresh: $refreshText",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.CenterHorizontally),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Normal,
+                            textAlign = TextAlign.Center)
+                    }
+                }
                 items(manga) {
                     Column(verticalArrangement = Arrangement.SpaceEvenly) {
                         Manga(uiManga = it, refreshStatus = refreshStatus, onChapterClicked = onChapterClicked)
