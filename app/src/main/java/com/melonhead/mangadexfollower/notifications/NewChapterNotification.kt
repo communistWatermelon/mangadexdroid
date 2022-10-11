@@ -62,8 +62,8 @@ object NewChapterNotification {
 
         Log.i(TAG, "post: New chapters for ${series.count()} manga")
         series.forEach { manga ->
-            manga.chapters.filter { it.createdDate.epochSeconds >= installDateSeconds }.forEachIndexed { index, uiChapter ->
-                val pendingIntent = pendingIntent(context, uiChapter) ?: return@forEachIndexed
+            manga.chapters.filter { it.createdDate.epochSeconds >= installDateSeconds }.forEach chapters@{ uiChapter ->
+                val pendingIntent = pendingIntent(context, uiChapter) ?: return@chapters
                 val notification = buildNotification(context, pendingIntent, manga, uiChapter)
                 notificationManager.notify(manga.id.hashCode() + uiChapter.id.hashCode(), notification)
                 // ensures android actually posts all notifications
