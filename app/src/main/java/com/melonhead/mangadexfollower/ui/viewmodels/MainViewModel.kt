@@ -3,25 +3,57 @@ package com.melonhead.mangadexfollower.ui.viewmodels
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.melonhead.mangadexfollower.extensions.asLiveData
+import com.melonhead.mangadexfollower.extensions.dateOrTimeString
 import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.repositories.AuthRepository
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.AppDataService
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 
 class MainViewModel(
     private val authRepository: AuthRepository,
     private val mangaRepository: MangaRepository,
-    userAppDataService: AppDataService
+    private val userAppDataService: AppDataService
 ): ViewModel() {
     val loginStatus = authRepository.loginStatus.asLiveData()
     val manga = mangaRepository.manga.asLiveData()
     val refreshStatus = mangaRepository.refreshStatus.asLiveData()
-    val lastRefreshDateSeconds = userAppDataService.lastRefreshDateSeconds.asLiveData()
+
+    private val mutableRefreshText = MutableLiveData<String>()
+    val refreshText = mutableRefreshText.asLiveData()
+
+    init {
+        viewModelScope.launch {
+            while (isActive) {
+                updateRefreshText()
+                delay(60000)
+            }
+        }
+
+        viewModelScope.launch {
+            userAppDataService.lastRefreshDateSeconds.collectLatest {
+                updateRefreshText()
+            }
+        }
+    }
+
+    private suspend fun updateRefreshText() {
+        val lastRefreshDateSecond = userAppDataService.lastRefreshDateSeconds.first()
+        mutableRefreshText.value = if (lastRefreshDateSecond != null)
+            Instant.fromEpochSeconds(lastRefreshDateSecond).dateOrTimeString(useRelative = true)
+        else
+            "Never"
+    }
 
     fun authenticate(email: String, password: String) = viewModelScope.launch {
         authRepository.authenticate(email, password)

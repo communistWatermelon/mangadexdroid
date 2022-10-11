@@ -61,7 +61,6 @@ import com.melonhead.mangadexfollower.models.ui.*
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -89,11 +88,11 @@ class MainActivity : ComponentActivity() {
                     val loginStatus by viewModel.loginStatus.observeAsState()
                     val manga by viewModel.manga.observeAsState(listOf())
                     val refreshStatus by viewModel.refreshStatus.observeAsState(None)
-                    val lastRefreshDateSeconds by viewModel.lastRefreshDateSeconds.observeAsState()
+                    val refreshText by viewModel.refreshText.observeAsState("")
 
                     Content(loginStatus = loginStatus,
                         refreshStatus = refreshStatus,
-                        lastRefreshDateSecond = lastRefreshDateSeconds,
+                        refreshText = refreshText,
                         manga = manga,
                         loginClicked = { username, password -> viewModel.authenticate(username, password) },
                         onChapterClicked = { viewModel.onChapterClicked(this, it) },
@@ -106,13 +105,13 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Content(loginStatus: LoginStatus?, refreshStatus: MangaRefreshStatus, lastRefreshDateSecond: Long?, manga: List<UIManga>, loginClicked: (username: String, password: String) -> Unit, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
+fun Content(loginStatus: LoginStatus?, refreshStatus: MangaRefreshStatus, refreshText: String, manga: List<UIManga>, loginClicked: (username: String, password: String) -> Unit, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
     when (loginStatus) {
         LoginStatus.LoggedIn -> {
             if (manga.isEmpty()) LoadingScreen(refreshStatus) else {
                 ChaptersList(
                     manga,
-                    lastRefreshDateSecond = lastRefreshDateSecond,
+                    refreshText = refreshText,
                     refreshStatus = refreshStatus,
                     onChapterClicked = onChapterClicked,
                     onSwipeRefresh = onSwipeRefresh
@@ -367,7 +366,7 @@ fun Manga(uiManga: UIManga, refreshStatus: MangaRefreshStatus, onChapterClicked:
 }
 
 @Composable
-fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, lastRefreshDateSecond: Long?, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
+fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, refreshText: String, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
     val isRefreshing = rememberSwipeRefreshState(isRefreshing = false)
 
     Column {
@@ -390,11 +389,6 @@ fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, lastRe
                     fontSize = 14.sp)
             }
         }
-
-        val refreshText = if (lastRefreshDateSecond != null)
-            Instant.fromEpochSeconds(lastRefreshDateSecond).dateOrTimeString(useRelative = true)
-        else
-            "Never"
 
         Text(text = "Last Refresh: $refreshText",
             modifier = Modifier
