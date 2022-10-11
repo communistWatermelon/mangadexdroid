@@ -390,7 +390,10 @@ fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, lastRe
             }
         }
 
-        val refreshText = if (lastRefreshDateSecond != null) Instant.fromEpochSeconds(lastRefreshDateSecond).dateOrTimeString() else "Never"
+        val refreshText = if (lastRefreshDateSecond != null)
+            Instant.fromEpochSeconds(lastRefreshDateSecond).dateOrTimeString(useRelative = true)
+        else
+            "Never"
 
         Text(text = "Last Refresh: $refreshText",
             modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp),
