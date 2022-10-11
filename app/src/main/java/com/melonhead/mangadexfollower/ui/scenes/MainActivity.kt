@@ -111,7 +111,7 @@ fun LoadingScreen(refreshStatus: MangaRefreshStatus?) {
     ) {
         CircularProgressIndicator()
         if (refreshStatus != null && refreshStatus !is None)
-            Text(text = refreshStatus.text, fontSize = 16.sp, modifier = Modifier.padding(vertical = 8.dp))
+            Text(text = refreshStatus.text, fontSize = 16.sp, modifier = Modifier.padding(vertical = 16.dp))
     }
 }
 
@@ -151,7 +151,7 @@ fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Chapter(modifier: Modifier = Modifier, uiChapter: UIChapter, onChapterClicked: (UIChapter) -> Unit) {
+fun Chapter(modifier: Modifier = Modifier, uiChapter: UIChapter, refreshStatus: MangaRefreshStatus, onChapterClicked: (UIChapter) -> Unit) {
     Card(modifier = modifier.fillMaxWidth(),
         onClick = {
         onChapterClicked(uiChapter)
@@ -179,11 +179,19 @@ fun Chapter(modifier: Modifier = Modifier, uiChapter: UIChapter, onChapterClicke
                     fontSize = 12.sp
                 )
             }
-            Text(modifier = Modifier.align(Alignment.CenterVertically),
-                color = MaterialTheme.colorScheme.primary,
-                text = if (uiChapter.read != true) "NEW" else "",
-                fontWeight = FontWeight.Medium,
-                fontSize = 12.sp)
+            if (refreshStatus !is None && uiChapter.read != true) {
+                CircularProgressIndicator(modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .size(12.dp),
+                    strokeWidth = 2.dp)
+            } else {
+                Text(modifier = Modifier.align(Alignment.CenterVertically),
+                    color = MaterialTheme.colorScheme.primary,
+                    text = if (uiChapter.read != true) "NEW" else "",
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 12.sp)
+            }
+
         }
     }
 }
@@ -234,7 +242,7 @@ fun MangaCover(uiManga: UIManga) {
 }
 
 @Composable
-fun Manga(uiManga: UIManga, onChapterClicked: (UIChapter) -> Unit) {
+fun Manga(uiManga: UIManga, refreshStatus: MangaRefreshStatus, onChapterClicked: (UIChapter) -> Unit) {
     Box {
         MangaCover(uiManga = uiManga)
         Column(modifier = Modifier.padding(top = 110.dp)) {
@@ -243,6 +251,7 @@ fun Manga(uiManga: UIManga, onChapterClicked: (UIChapter) -> Unit) {
             uiManga.chapters.forEach {
                 Chapter(modifier = Modifier.padding(bottom = 8.dp),
                     uiChapter = it,
+                    refreshStatus = refreshStatus,
                     onChapterClicked = onChapterClicked)
             }
         }
@@ -280,7 +289,7 @@ fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, onChap
                 verticalArrangement = Arrangement.spacedBy(24.dp)) {
                 items(manga) {
                     Column(verticalArrangement = Arrangement.SpaceEvenly) {
-                        Manga(uiManga = it, onChapterClicked = onChapterClicked)
+                        Manga(uiManga = it, refreshStatus = refreshStatus, onChapterClicked = onChapterClicked)
                     }
                 }
             }
@@ -292,8 +301,8 @@ fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, onChap
 fun ChapterPreview() {
     MangadexFollowerTheme {
         Column {
-            Chapter(uiChapter = UIChapter("", "101", "Test Title with an extremely long title that may or may not wrap", Clock.System.now(), false), onChapterClicked = { })
-            Chapter(uiChapter = UIChapter("", "102", "Test Title 2", Clock.System.now(), true), onChapterClicked = { })
+            Chapter(uiChapter = UIChapter("", "101", "Test Title with an extremely long title that may or may not wrap", Clock.System.now(), false), refreshStatus = ReadStatus, onChapterClicked = { })
+            Chapter(uiChapter = UIChapter("", "102", "Test Title 2", Clock.System.now(), true), refreshStatus = ReadStatus, onChapterClicked = { })
         }
     }
 }
@@ -304,8 +313,8 @@ fun MangaPreview() {
     val testChapters = listOf(UIChapter("", "101", "Test Title", Clock.System.now(), true), UIChapter("", "102", "Test Title 2", Clock.System.now(), false))
     MangadexFollowerTheme {
         Column(modifier = Modifier.fillMaxWidth()) {
-            Manga(uiManga = UIManga("", "Test Manga", testChapters, null), onChapterClicked = { })
-            Manga(uiManga = UIManga("", "Test Manga with a really long name that causes the name to clip a little", testChapters, null), onChapterClicked = { })
+            Manga(uiManga = UIManga("", "Test Manga", testChapters, null), refreshStatus = ReadStatus, onChapterClicked = { })
+            Manga(uiManga = UIManga("", "Test Manga with a really long name that causes the name to clip a little", testChapters, null), refreshStatus = ReadStatus, onChapterClicked = { })
         }
     }
 }
