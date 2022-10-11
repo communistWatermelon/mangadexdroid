@@ -9,9 +9,7 @@ import com.melonhead.mangadexfollower.db.chapter.ChapterEntity
 import com.melonhead.mangadexfollower.db.manga.MangaDao
 import com.melonhead.mangadexfollower.db.manga.MangaEntity
 import com.melonhead.mangadexfollower.extensions.throttleLatest
-import com.melonhead.mangadexfollower.models.ui.LoginStatus
-import com.melonhead.mangadexfollower.models.ui.UIChapter
-import com.melonhead.mangadexfollower.models.ui.UIManga
+import com.melonhead.mangadexfollower.models.ui.*
 import com.melonhead.mangadexfollower.notifications.NewChapterNotification
 import com.melonhead.mangadexfollower.services.AppDataService
 import com.melonhead.mangadexfollower.services.CoverService
@@ -38,6 +36,9 @@ class MangaRepository(
     val manga = mangaDb.allSeries().combine(chapterDb.allChapters()) { dbSeries, dbChapters ->
         generateUIManga(dbSeries, dbChapters)
     }.shareIn(externalScope, replay = 1, started = SharingStarted.WhileSubscribed())
+
+    private val mutableRefreshStatus = MutableStateFlow<MangaRefreshStatus>(None)
+    val refreshStatus = mutableRefreshStatus.shareIn(externalScope, replay = 1, started = SharingStarted.WhileSubscribed())
 
     init {
         externalScope.launch {
@@ -73,6 +74,7 @@ class MangaRepository(
         val token = appDataService.token.firstOrNull() ?: return@launch
         Log.i(TAG, "refreshManga")
 
+        mutableRefreshStatus.value = Following
         // fetch chapters from server
         val chaptersResponse = userService.getFollowedChapters(token)
         val chapterEntities = chaptersResponse.map { ChapterEntity.from(it) }
@@ -80,10 +82,15 @@ class MangaRepository(
         // add chapters to DB
         chapterDb.insertAll(*chapterEntities.toTypedArray())
 
+        mutableRefreshStatus.value = MangaSeries
+
         // map app chapters into the manga ids
         val mangaIds = chaptersResponse.mapNotNull { chapters -> chapters.relationships?.firstOrNull { it.type == "manga" }?.id }.toSet()
         // fetch manga series
         val mangaSeries = mangaService.getManga(token, mangaIds.toList())
+
+
+        mutableRefreshStatus.value = MangaCovers
 
         val newManga = mutableListOf<MangaEntity>()
         // fetch all covers
@@ -97,8 +104,12 @@ class MangaRepository(
         // insert new series into local db
         mangaDb.insertAll(*newManga.toTypedArray())
 
+        mutableRefreshStatus.value = ReadStatus
+
         // refresh read status for series
         refreshReadStatus(mangaDb.allSeries().first(), chapterDb.allChapters().first())
+
+        mutableRefreshStatus.value = None
     }
 
     private suspend fun notifyOfNewChapters() {
@@ -116,9 +127,9 @@ class MangaRepository(
         }
     }
 
-    private fun refreshReadStatus(manga: List<MangaEntity>, chapters: List<ChapterEntity>) = externalScope.launch {
+    private suspend fun refreshReadStatus(manga: List<MangaEntity>, chapters: List<ChapterEntity>) {
         // make sure we have a token
-        val token = appDataService.token.firstOrNull() ?: return@launch
+        val token = appDataService.token.firstOrNull() ?: return
         Log.i(TAG, "refreshReadStatus")
 
         val readChapters = mangaService.getReadChapters(manga.map { it.id }, token)
@@ -129,7 +140,7 @@ class MangaRepository(
 
         if (chaptersToUpdate.isEmpty()) {
             notifyOfNewChapters()
-            return@launch
+            return
         }
 
         // update the db with the new entities
