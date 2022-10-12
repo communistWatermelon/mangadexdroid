@@ -20,14 +20,14 @@ interface MangaDao {
     fun mangaById(mangaId: String) = getMangaById(mangaId).distinctUntilChanged()
 
     @Query("SELECT EXISTS(SELECT * FROM manga WHERE id = :mangaId)")
-    fun containsManga(mangaId: String): Boolean
+    suspend fun containsManga(mangaId: String): Boolean
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg chapters: MangaEntity)
+    suspend fun insertAll(vararg chapters: MangaEntity)
 
     @Delete
-    fun delete(chapters: MangaEntity)
+    suspend fun delete(chapters: MangaEntity)
 
     @Update
-    fun update(chapters: MangaEntity)
+    suspend fun update(chapters: MangaEntity)
 }

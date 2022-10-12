@@ -78,40 +78,44 @@ class MangaRepository(
         // fetch chapters from server
         val chaptersResponse = userService.getFollowedChapters(token)
         val chapterEntities = chaptersResponse.map { ChapterEntity.from(it) }
+        val newChapters = chapterEntities.filter { !chapterDb.containsChapter(it.id) }
 
-        // add chapters to DB
-        chapterDb.insertAll(*chapterEntities.toTypedArray())
+        Clog.i("New chapters: ${newChapters.count()}")
 
-        mutableRefreshStatus.value = MangaSeries
+        if (newChapters.isNotEmpty()) {
+            mutableRefreshStatus.value = MangaSeries
+            // add chapters to DB
+            chapterDb.insertAll(*newChapters.toTypedArray())
 
-        // TODO: reduce duplicated work here, only fetch manga info + covers for chapters of unknown series
+            // map app chapters into the manga ids
+            val mangaIds = chaptersResponse.mapNotNull { chapters -> chapters.relationships?.firstOrNull { it.type == "manga" }?.id }.toSet()
 
-        // map app chapters into the manga ids
-        val mangaIds = chaptersResponse.mapNotNull { chapters -> chapters.relationships?.firstOrNull { it.type == "manga" }?.id }.toSet()
-        // fetch manga series
-        val mangaSeries = mangaService.getManga(token, mangaIds.toList())
+            // fetch manga series
+            val newMangaIds = mangaIds.filter { !mangaDb.containsManga(it) }
+            Clog.i("New manga: ${newMangaIds.count()}")
 
-        mutableRefreshStatus.value = MangaCovers
+            if (newMangaIds.isNotEmpty()) {
+                mutableRefreshStatus.value = MangaCovers
 
-        val newManga = mutableListOf<MangaEntity>()
-        // fetch all covers
-        val mangaCovers = coverService.getCovers(token, mangaSeries.map { it.id })
+                val newMangaSeries = mangaService.getManga(token, newMangaIds.toList())
+                val newManga = mutableListOf<MangaEntity>()
+                // fetch all covers for the new series
+                val mangaCovers = coverService.getCovers(token, newMangaSeries.map { it.id })
 
-        mangaSeries.forEach { manga ->
-            val coverFilename = mangaCovers.firstOrNull { it.mangaId == manga.id }?.fileName
-            newManga.add(MangaEntity.from(manga, coverFilename))
+                newMangaSeries.forEach { manga ->
+                    val coverFilename = mangaCovers.firstOrNull { it.mangaId == manga.id }?.fileName
+                    newManga.add(MangaEntity.from(manga, coverFilename))
+                }
+                // insert new series into local db
+                mangaDb.insertAll(*newManga.toTypedArray())
+            }
         }
 
-        // insert new series into local db
-        mangaDb.insertAll(*newManga.toTypedArray())
-
         mutableRefreshStatus.value = ReadStatus
-
         // refresh read status for series
         refreshReadStatus(mangaDb.getAllSync(), chapterDb.getAllSync())
 
         mutableRefreshStatus.value = None
-
         appDataService.updateLastRefreshDate()
     }
 

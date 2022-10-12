@@ -20,11 +20,14 @@ interface ChapterDao {
     fun chaptersForManga(mangaId: String) = getChaptersForManga(mangaId).distinctUntilChanged()
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertAll(vararg chapters: ChapterEntity)
+    suspend fun insertAll(vararg chapters: ChapterEntity)
+
+    @Query("SELECT EXISTS(SELECT * FROM chapter WHERE id = :chapterId)")
+    suspend fun containsChapter(chapterId: String): Boolean
 
     @Delete
-    fun delete(chapters: ChapterEntity)
+    suspend fun delete(chapters: ChapterEntity)
 
     @Update
-    fun update(vararg chapters: ChapterEntity)
+    suspend fun update(vararg chapters: ChapterEntity)
 }
