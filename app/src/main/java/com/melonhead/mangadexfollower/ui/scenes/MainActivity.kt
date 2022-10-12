@@ -3,6 +3,7 @@ package com.melonhead.mangadexfollower.ui.scenes
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -10,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -55,6 +57,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.melonhead.mangadexfollower.BuildConfig
 import com.melonhead.mangadexfollower.R
 import com.melonhead.mangadexfollower.extensions.dateOrTimeString
 import com.melonhead.mangadexfollower.models.ui.*
@@ -368,6 +371,7 @@ fun Manga(uiManga: UIManga, refreshStatus: MangaRefreshStatus, onChapterClicked:
 @Composable
 fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, refreshText: String, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
     val isRefreshing = rememberSwipeRefreshState(isRefreshing = false)
+    val context = LocalContext.current
 
     Column {
         AnimatedVisibility(visible = refreshStatus !is None || isRefreshing.isRefreshing) {
@@ -375,7 +379,10 @@ fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, refres
                 Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surfaceTint)
-                    .padding(8.dp),
+                    .padding(8.dp)
+                    .clickable {
+                        Toast.makeText(context, "Version ${BuildConfig.VERSION_NAME}.${BuildConfig.VERSION_CODE}", Toast.LENGTH_SHORT).show()
+                    },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -399,7 +406,10 @@ fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, refres
                         Text(text = "Last Refresh: $refreshText",
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .align(Alignment.CenterHorizontally),
+                                .align(Alignment.CenterHorizontally)
+                                .clickable {
+                                    Toast.makeText(context, "Version ${BuildConfig.VERSION_NAME}.${BuildConfig.VERSION_CODE}", Toast.LENGTH_SHORT).show()
+                                },
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Normal,
                             textAlign = TextAlign.Center)
