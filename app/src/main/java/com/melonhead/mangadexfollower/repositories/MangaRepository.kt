@@ -113,7 +113,7 @@ class MangaRepository(
 
         mutableRefreshStatus.value = ReadStatus
         // refresh read status for series
-        refreshReadStatus(mangaDb.getAllSync(), chapterDb.getAllSync())
+        refreshReadStatus()
 
         mutableRefreshStatus.value = None
         appDataService.updateLastRefreshDate()
@@ -132,10 +132,12 @@ class MangaRepository(
         NewChapterNotification.post(appContext, notifyChapters, installDateSeconds)
     }
 
-    private suspend fun refreshReadStatus(manga: List<MangaEntity>, chapters: List<ChapterEntity>) {
+    private suspend fun refreshReadStatus() {
         // make sure we have a token
         val token = appDataService.token.firstOrNull() ?: return
         Clog.i("refreshReadStatus")
+        val manga = mangaDb.getAllSync()
+        val chapters = chapterDb.getAllSync()
 
         val readChapters = mangaService.getReadChapters(manga.map { it.id }, token)
         val chaptersToUpdate = chapters
