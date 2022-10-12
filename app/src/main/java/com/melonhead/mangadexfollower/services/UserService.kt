@@ -17,8 +17,8 @@ class UserServiceImpl(
     private val client: HttpClient
 ): UserService {
     override suspend fun getFollowedChapters(token: AuthToken): List<Chapter> {
-        Clog.i("getFollowedChapters: ")
-        return handlePagination(100, fetchAll = false) { offset ->
+        Clog.i("getFollowedChapters: $token")
+        return handlePagination(50, fetchAll = false) { offset ->
             client.get(HttpRoutes.USER_FOLLOW_CHAPTERS_URL) {
                 headers {
                     contentType(ContentType.Application.Json)

@@ -49,6 +49,7 @@ class LoginServiceImpl(
             }
         }
         return try {
+            Clog.i(result.bodyAsText())
             result.body<CheckTokenResponse>().isAuthenticated
         } catch (e: Exception) {
             Clog.e("isTokenValid: ${result.bodyAsText()}", e)
@@ -67,6 +68,7 @@ class LoginServiceImpl(
         }
 
         return try {
+            Clog.i(result.bodyAsText())
             val body = result.body<AuthResponse>()
             if (body.result == "ok") {
                 body.token

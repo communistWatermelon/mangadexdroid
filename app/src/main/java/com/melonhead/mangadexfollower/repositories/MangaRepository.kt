@@ -84,6 +84,8 @@ class MangaRepository(
 
         mutableRefreshStatus.value = MangaSeries
 
+        // TODO: reduce duplicated work here, only fetch manga info + covers for chapters of unknown series
+
         // map app chapters into the manga ids
         val mangaIds = chaptersResponse.mapNotNull { chapters -> chapters.relationships?.firstOrNull { it.type == "manga" }?.id }.toSet()
         // fetch manga series

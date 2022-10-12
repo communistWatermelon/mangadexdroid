@@ -24,7 +24,7 @@ class MangaServiceImpl(
     private val client: HttpClient,
 ): MangaService {
     override suspend fun getManga(token: AuthToken, mangaIds: List<String>): List<Manga> {
-        Clog.i("getManga: ${mangaIds.count()} $mangaIds")
+        Clog.i("getManga: ${mangaIds.count()} $token")
         return handlePagination(mangaIds.count()) { offset ->
             client.get(MANGA_URL) {
                 headers {
@@ -41,10 +41,10 @@ class MangaServiceImpl(
     }
 
     override suspend fun getReadChapters(mangaIds: List<String>, token: AuthToken): List<String> {
-        Clog.i("getReadChapters: total ${mangaIds.count()} - $mangaIds")
+        Clog.i("getReadChapters: total ${mangaIds.count()} $token")
         val allChapters = mutableListOf<String>()
         mangaIds.chunked(100).map { list ->
-            Clog.i("getReadChapters: chunked ${list.count()}, $list")
+            Clog.i("getReadChapters: chunked ${list.count()}")
             val result = client.get(MANGA_READ_MARKERS_URL) {
                 headers {
                     contentType(ContentType.Application.Json)

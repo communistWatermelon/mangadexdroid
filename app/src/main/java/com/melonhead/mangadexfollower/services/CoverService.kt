@@ -17,7 +17,7 @@ class CoverServiceImpl(
     private val client: HttpClient
 ): CoverService {
     override suspend fun getCovers(token: AuthToken, mangaIds: List<String>): List<Cover> {
-        Clog.i("getCovers: ${mangaIds.count()} - $mangaIds")
+        Clog.i("getCovers: ${mangaIds.count()} $token")
 
         return handlePagination(mangaIds.count()) { offset ->
             client.get(HttpRoutes.COVER_URL) {
