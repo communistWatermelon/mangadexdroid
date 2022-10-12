@@ -1,7 +1,6 @@
 package com.melonhead.mangadexfollower.repositories
 
 import android.content.Context
-import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import com.melonhead.mangadexfollower.App
 import com.melonhead.mangadexfollower.db.chapter.ChapterDao
@@ -9,6 +8,7 @@ import com.melonhead.mangadexfollower.db.chapter.ChapterEntity
 import com.melonhead.mangadexfollower.db.manga.MangaDao
 import com.melonhead.mangadexfollower.db.manga.MangaEntity
 import com.melonhead.mangadexfollower.extensions.throttleLatest
+import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.models.ui.*
 import com.melonhead.mangadexfollower.notifications.NewChapterNotification
 import com.melonhead.mangadexfollower.services.AppDataService
@@ -72,7 +72,7 @@ class MangaRepository(
     // note: unit needs to be included as a param for the throttleLatest call above
     private fun refreshManga(@Suppress("UNUSED_PARAMETER") unit: Unit) = externalScope.launch {
         val token = appDataService.token.firstOrNull() ?: return@launch
-        Log.i(TAG, "refreshManga")
+        Clog.i(TAG, "refreshManga")
 
         mutableRefreshStatus.value = Following
         // fetch chapters from server
@@ -118,7 +118,7 @@ class MangaRepository(
         val notificationManager = NotificationManagerCompat.from(appContext)
         if (!notificationManager.areNotificationsEnabled()) return
         val installDateSeconds = appDataService.installDateSeconds.firstOrNull() ?: 0L
-        Log.i(TAG, "notifyOfNewChapters")
+        Clog.i(TAG, "notifyOfNewChapters")
 
         val newChapters = chapterDb.getAllSync().filter { it.readStatus != true }
         val manga = mangaDb.getAllSync()
@@ -129,7 +129,7 @@ class MangaRepository(
     private suspend fun refreshReadStatus(manga: List<MangaEntity>, chapters: List<ChapterEntity>) {
         // make sure we have a token
         val token = appDataService.token.firstOrNull() ?: return
-        Log.i(TAG, "refreshReadStatus")
+        Clog.i(TAG, "refreshReadStatus")
 
         val readChapters = mangaService.getReadChapters(manga.map { it.id }, token)
         val chaptersToUpdate = chapters
@@ -150,6 +150,6 @@ class MangaRepository(
     }
 
     companion object {
-        private val TAG = MangaRepository::class.simpleName
+        private val TAG = MangaRepository::class.simpleName!!
     }
 }

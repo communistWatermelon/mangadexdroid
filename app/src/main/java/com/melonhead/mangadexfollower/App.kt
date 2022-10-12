@@ -1,7 +1,6 @@
 package com.melonhead.mangadexfollower
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -9,6 +8,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.melonhead.mangadexfollower.di.appModule
+import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.AppDataService
 import com.melonhead.mangadexfollower.work_manager.RefreshWorker
@@ -53,7 +53,7 @@ class App: Application() {
             override fun onStop(owner: LifecycleOwner) {
                 super.onStop(owner)
                 inForeground = false
-                Log.i(TAG, "onStop: Creating background task")
+                Clog.i(TAG, "onStop: Creating background task")
                 val refreshWorkRequest = PeriodicWorkRequestBuilder<RefreshWorker>(15.minutes.toJavaDuration()).build()
                 WorkManager.getInstance(this@App).enqueueUniquePeriodicWork("refresh-task", ExistingPeriodicWorkPolicy.KEEP, refreshWorkRequest)
             }
@@ -61,6 +61,6 @@ class App: Application() {
     }
 
     companion object {
-        private val TAG = App::class.simpleName
+        private val TAG = App::class.simpleName!!
     }
 }

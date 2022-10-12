@@ -1,8 +1,8 @@
 package com.melonhead.mangadexfollower.services
 
-import android.util.Log
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
+import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.models.auth.*
 import com.melonhead.mangadexfollower.routes.HttpRoutes
 import io.ktor.client.*
@@ -21,7 +21,7 @@ class LoginServiceImpl(
     private val client: HttpClient,
 ) : LoginService {
     override suspend fun authenticate(email: String, password: String): AuthToken? {
-        Log.i("", "authenticate: ")
+        Clog.i("", "authenticate: ")
         val result = client.post(HttpRoutes.LOGIN_URL) {
             headers {
                 contentType(ContentType.Application.Json)
@@ -37,14 +37,14 @@ class LoginServiceImpl(
                 null
             }
         } catch (e: Exception) {
-            Log.i("", "authenticate: ${result.bodyAsText()}")
+            Clog.i("", "authenticate: ${result.bodyAsText()}")
             Firebase.crashlytics.recordException(e)
             null
         }
     }
 
     override suspend fun isTokenValid(token: AuthToken): Boolean {
-        Log.i("", "isTokenValid: ")
+        Clog.i("", "isTokenValid: ")
         val result = client.get(HttpRoutes.CHECK_TOKEN_URL ) {
             headers {
                 contentType(ContentType.Application.Json)
@@ -54,14 +54,14 @@ class LoginServiceImpl(
         return try {
             result.body<CheckTokenResponse>().isAuthenticated
         } catch (e: Exception) {
-            Log.i("", "isTokenValid: ${result.bodyAsText()}")
+            Clog.i("", "isTokenValid: ${result.bodyAsText()}")
             Firebase.crashlytics.recordException(e)
             false
         }
     }
 
     override suspend fun refreshToken(token: AuthToken): AuthToken? {
-        Log.i("", "refreshToken: ")
+        Clog.i("", "refreshToken: ")
         val result = client.post(HttpRoutes.REFRESH_TOKEN_URL) {
             headers {
                 contentType(ContentType.Application.Json)
@@ -78,7 +78,7 @@ class LoginServiceImpl(
                 null
             }
         } catch (e: Exception) {
-            Log.i("", "refreshToken: ${result.bodyAsText()}")
+            Clog.i("", "refreshToken: ${result.bodyAsText()}")
             Firebase.crashlytics.recordException(e)
             null
         }

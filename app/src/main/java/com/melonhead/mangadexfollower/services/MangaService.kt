@@ -1,8 +1,8 @@
 package com.melonhead.mangadexfollower.services
 
-import android.util.Log
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
+import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.models.auth.AuthToken
 import com.melonhead.mangadexfollower.models.content.Manga
 import com.melonhead.mangadexfollower.models.content.MangaReadMarkersResponse
@@ -26,7 +26,7 @@ class MangaServiceImpl(
     private val client: HttpClient,
 ): MangaService {
     override suspend fun getManga(token: AuthToken, mangaIds: List<String>): List<Manga> {
-        Log.i("", "getManga: ${mangaIds.count()} $mangaIds")
+        Clog.i("", "getManga: ${mangaIds.count()} $mangaIds")
         return handlePagination(mangaIds.count()) { offset ->
             client.get(MANGA_URL) {
                 headers {
@@ -43,10 +43,10 @@ class MangaServiceImpl(
     }
 
     override suspend fun getReadChapters(mangaIds: List<String>, token: AuthToken): List<String> {
-        Log.i("", "getReadChapters: total ${mangaIds.count()} - $mangaIds")
+        Clog.i("", "getReadChapters: total ${mangaIds.count()} - $mangaIds")
         val allChapters = mutableListOf<String>()
         mangaIds.chunked(100).map { list ->
-            Log.i("", "getReadChapters: chunked ${list.count()}, $list")
+            Clog.i("", "getReadChapters: chunked ${list.count()}, $list")
             val result = client.get(MANGA_READ_MARKERS_URL) {
                 headers {
                     contentType(ContentType.Application.Json)
@@ -62,7 +62,7 @@ class MangaServiceImpl(
             val chapters = try {
                 result.body<MangaReadMarkersResponse>().data
             } catch (e: Exception) {
-                Log.i("", "getReadChapters: ${result.bodyAsText()}")
+                Clog.i("", "getReadChapters: ${result.bodyAsText()}")
                 Firebase.crashlytics.recordException(e)
                 emptyList()
             }

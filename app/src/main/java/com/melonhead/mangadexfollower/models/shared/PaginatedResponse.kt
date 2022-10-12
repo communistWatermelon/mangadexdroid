@@ -1,8 +1,8 @@
 package com.melonhead.mangadexfollower.models.shared
 
-import android.util.Log
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
+import com.melonhead.mangadexfollower.logs.Clog
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.delay
@@ -20,7 +20,7 @@ suspend inline fun <reified T> handlePagination(expectedCount: Int = Int.MAX_VAL
             if (fetchAll) total = response.total
             response.data
         } catch (e: Exception) {
-            Log.i("", "handlePagination: ${result.bodyAsText()}")
+            Clog.i("", "handlePagination: ${result.bodyAsText()}")
             Firebase.crashlytics.recordException(e)
             break
         }

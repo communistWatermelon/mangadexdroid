@@ -1,6 +1,6 @@
 package com.melonhead.mangadexfollower.services
 
-import android.util.Log
+import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.models.auth.AuthToken
 import com.melonhead.mangadexfollower.models.cover.Cover
 import com.melonhead.mangadexfollower.models.shared.handlePagination
@@ -17,7 +17,7 @@ class CoverServiceImpl(
     private val client: HttpClient
 ): CoverService {
     override suspend fun getCovers(token: AuthToken, mangaIds: List<String>): List<Cover> {
-        Log.i("", "getCovers: ${mangaIds.count()} - $mangaIds")
+        Clog.i("", "getCovers: ${mangaIds.count()} - $mangaIds")
 
         return handlePagination(mangaIds.count()) { offset ->
             client.get(HttpRoutes.COVER_URL) {
