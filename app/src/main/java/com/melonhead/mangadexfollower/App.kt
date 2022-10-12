@@ -53,14 +53,10 @@ class App: Application() {
             override fun onStop(owner: LifecycleOwner) {
                 super.onStop(owner)
                 inForeground = false
-                Clog.i(TAG, "onStop: Creating background task")
+                Clog.i("onStop: Creating background task")
                 val refreshWorkRequest = PeriodicWorkRequestBuilder<RefreshWorker>(15.minutes.toJavaDuration()).build()
                 WorkManager.getInstance(this@App).enqueueUniquePeriodicWork("refresh-task", ExistingPeriodicWorkPolicy.KEEP, refreshWorkRequest)
             }
         })
-    }
-
-    companion object {
-        private val TAG = App::class.simpleName!!
     }
 }

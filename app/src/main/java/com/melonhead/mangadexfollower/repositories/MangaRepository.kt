@@ -72,7 +72,7 @@ class MangaRepository(
     // note: unit needs to be included as a param for the throttleLatest call above
     private fun refreshManga(@Suppress("UNUSED_PARAMETER") unit: Unit) = externalScope.launch {
         val token = appDataService.token.firstOrNull() ?: return@launch
-        Clog.i(TAG, "refreshManga")
+        Clog.i("refreshManga")
 
         mutableRefreshStatus.value = Following
         // fetch chapters from server
@@ -118,7 +118,7 @@ class MangaRepository(
         val notificationManager = NotificationManagerCompat.from(appContext)
         if (!notificationManager.areNotificationsEnabled()) return
         val installDateSeconds = appDataService.installDateSeconds.firstOrNull() ?: 0L
-        Clog.i(TAG, "notifyOfNewChapters")
+        Clog.i("notifyOfNewChapters")
 
         val newChapters = chapterDb.getAllSync().filter { it.readStatus != true }
         val manga = mangaDb.getAllSync()
@@ -129,7 +129,7 @@ class MangaRepository(
     private suspend fun refreshReadStatus(manga: List<MangaEntity>, chapters: List<ChapterEntity>) {
         // make sure we have a token
         val token = appDataService.token.firstOrNull() ?: return
-        Clog.i(TAG, "refreshReadStatus")
+        Clog.i("refreshReadStatus")
 
         val readChapters = mangaService.getReadChapters(manga.map { it.id }, token)
         val chaptersToUpdate = chapters
@@ -147,9 +147,5 @@ class MangaRepository(
 
         // notify user of new chapters
         notifyOfNewChapters()
-    }
-
-    companion object {
-        private val TAG = MangaRepository::class.simpleName!!
     }
 }

@@ -19,7 +19,6 @@ import com.melonhead.mangadexfollower.models.ui.UIManga
 import kotlinx.coroutines.delay
 
 object NewChapterNotification {
-    private val TAG = NewChapterNotification::class.simpleName!!
     private const val CHANNEL_ID = "new_chapters"
     private const val CHANNEL_NAME = "New Chapter"
 
@@ -60,7 +59,7 @@ object NewChapterNotification {
 
         val notificationManager = NotificationManagerCompat.from(context)
 
-        Clog.i(TAG, "post: New chapters for ${series.count()} manga")
+        Clog.i("post: New chapters for ${series.count()} manga")
         series.forEach { manga ->
             manga.chapters.filter { it.createdDate.epochSeconds >= installDateSeconds }.forEach chapters@{ uiChapter ->
                 val pendingIntent = pendingIntent(context, uiChapter) ?: return@chapters
