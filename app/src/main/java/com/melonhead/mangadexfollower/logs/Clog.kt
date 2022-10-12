@@ -28,13 +28,12 @@ object Clog: KoinComponent {
 
     suspend fun e(message: String, exception: Exception) {
         i(message)
-        if (message.contains("User not found", ignoreCase = true) && message.contains("unauthorized_http_exception", ignoreCase = true)) {
-            authRepository.checkCurrentAuthentication()
-            return
-        }
         when (exception) {
             is ConnectTimeoutException -> return
         }
         Firebase.crashlytics.recordException(exception)
+        if (message.contains("User not found", ignoreCase = true) && message.contains("unauthorized_http_exception", ignoreCase = true)) {
+            authRepository.checkCurrentAuthentication()
+        }
     }
 }
