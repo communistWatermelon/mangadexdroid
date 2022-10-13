@@ -22,12 +22,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -371,10 +368,13 @@ fun Manga(uiManga: UIManga, refreshStatus: MangaRefreshStatus, onChapterClicked:
 @Composable
 fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, refreshText: String, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
     val isRefreshing = rememberSwipeRefreshState(isRefreshing = false)
+    var justPulledRefresh by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
+    LaunchedEffect(refreshStatus) { justPulledRefresh = false }
+
     Column {
-        AnimatedVisibility(visible = refreshStatus !is None || isRefreshing.isRefreshing) {
+        AnimatedVisibility(visible = refreshStatus !is None || isRefreshing.isRefreshing || justPulledRefresh) {
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -397,7 +397,12 @@ fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, refres
             }
         }
 
-        SwipeRefresh(state = isRefreshing, onRefresh = { onSwipeRefresh() }, swipeEnabled = (refreshStatus is None) && !isRefreshing.isRefreshing) {
+        SwipeRefresh(state = isRefreshing,
+            onRefresh = {
+                justPulledRefresh = true
+                onSwipeRefresh()
+            },
+            swipeEnabled = (refreshStatus is None) && !isRefreshing.isRefreshing && !justPulledRefresh) {
             LazyColumn(modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)) {
