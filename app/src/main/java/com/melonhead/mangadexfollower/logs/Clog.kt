@@ -26,7 +26,7 @@ object Clog {
     fun e(message: String, exception: Exception) {
         i(message)
         when (exception) {
-            is ConnectTimeoutException -> return
+            is ConnectTimeoutException, is IOException, is EOFException -> return
         }
         Firebase.crashlytics.recordException(exception)
     }
