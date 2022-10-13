@@ -18,6 +18,8 @@ import com.melonhead.mangadexfollower.services.UserService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 class MangaRepository(
     private val externalScope: CoroutineScope,
@@ -29,7 +31,8 @@ class MangaRepository(
     private val chapterDb: ChapterDao,
     private val mangaDb: MangaDao,
     private val appContext: Context
-) {
+): KoinComponent {
+    private val authRepository: AuthRepository by inject()
     private val refreshMangaThrottled: (Unit) -> Unit = throttleLatest(300L, externalScope, ::refreshManga)
 
     // combine all manga series and chapters
@@ -72,6 +75,7 @@ class MangaRepository(
     // note: unit needs to be included as a param for the throttleLatest call above
     private fun refreshManga(@Suppress("UNUSED_PARAMETER") unit: Unit) = externalScope.launch {
         val token = appDataService.token.firstOrNull() ?: return@launch
+        if (!authRepository.isTokenValid(token)) return@launch // return, refresh will be called automatically on token refresh
         Clog.i("refreshManga")
 
         mutableRefreshStatus.value = Following
