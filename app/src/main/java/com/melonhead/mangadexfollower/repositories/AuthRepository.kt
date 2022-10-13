@@ -31,6 +31,11 @@ class AuthRepository(
         checkAuthentication(token)
     }
 
+    suspend fun isTokenValid(token: AuthToken?): Boolean {
+        token ?: return false
+        return loginService.isTokenValid(token)
+    }
+
     private suspend fun checkAuthentication(token: AuthToken?) {
         Clog.i("checkAuthentication")
         mutableIsLoggedIn.value = LoginStatus.LoggingIn
@@ -40,7 +45,7 @@ class AuthRepository(
             appDataService.updateToken(null)
             return
         }
-        val validToken = loginService.isTokenValid(currentToken)
+        val validToken = isTokenValid(currentToken)
         if (!validToken) {
             Clog.i("Token isn't valid, refreshing")
             currentToken = loginService.refreshToken(currentToken)
