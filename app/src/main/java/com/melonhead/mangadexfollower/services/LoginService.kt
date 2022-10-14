@@ -1,6 +1,7 @@
 package com.melonhead.mangadexfollower.services
 
 import com.melonhead.mangadexfollower.extensions.catching
+import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.models.auth.*
 import com.melonhead.mangadexfollower.routes.HttpRoutes
 import io.ktor.client.*
@@ -37,7 +38,10 @@ class LoginServiceImpl(
                 }
             }
         }
-        return response?.isAuthenticated ?: false
+
+        val tokenIsValid = response?.isAuthenticated ?: false
+        Clog.i("Token is valid: $tokenIsValid")
+        return tokenIsValid
     }
 
     override suspend fun refreshToken(token: AuthToken): AuthToken? {
