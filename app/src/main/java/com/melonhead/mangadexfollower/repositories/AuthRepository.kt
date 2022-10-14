@@ -15,7 +15,7 @@ class AuthRepository(
     externalScope: CoroutineScope,
 ) {
     private val mutableIsLoggedIn = MutableStateFlow<LoginStatus>(LoginStatus.LoggedOut)
-    val loginStatus = mutableIsLoggedIn.shareIn(externalScope, replay = 1, started = SharingStarted.WhileSubscribed())
+    val loginStatus = mutableIsLoggedIn.shareIn(externalScope, replay = 1, started = SharingStarted.WhileSubscribed()).distinctUntilChanged()
 
     init {
         externalScope.launch {
@@ -38,7 +38,6 @@ class AuthRepository(
 
     private suspend fun checkAuthentication(token: AuthToken?) {
         Clog.i("checkAuthentication")
-        mutableIsLoggedIn.value = LoginStatus.LoggingIn
         var currentToken: AuthToken? = token
         if (currentToken == null) {
             mutableIsLoggedIn.value = LoginStatus.LoggedOut
@@ -47,6 +46,7 @@ class AuthRepository(
         }
         val validToken = isTokenValid(currentToken)
         if (!validToken) {
+            mutableIsLoggedIn.value = LoginStatus.LoggingIn
             Clog.i("Token isn't valid, refreshing")
             currentToken = loginService.refreshToken(currentToken)
         }
