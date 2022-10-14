@@ -46,7 +46,8 @@ class AuthRepository(
         }
         val validToken = isTokenValid(currentToken)
         if (!validToken) {
-            mutableIsLoggedIn.value = LoginStatus.LoggingIn
+            // don't set to logging in if already logged in, just attempt login silently
+            mutableIsLoggedIn.value = if (mutableIsLoggedIn.value is LoginStatus.LoggedIn) LoginStatus.LoggedIn else LoginStatus.LoggingIn
             Clog.i("Token isn't valid, refreshing")
             currentToken = loginService.refreshToken(currentToken)
         }
