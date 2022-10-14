@@ -75,7 +75,12 @@ class MangaRepository(
     // note: unit needs to be included as a param for the throttleLatest call above
     private fun refreshManga(@Suppress("UNUSED_PARAMETER") unit: Unit) = externalScope.launch {
         val token = appDataService.token.firstOrNull() ?: return@launch
-        if (!authRepository.isTokenValid(token)) return@launch // return, refresh will be called automatically on token refresh
+        if (!authRepository.isTokenValid(token)) {
+            // refresh auth
+            authRepository.checkCurrentAuthentication()
+            return@launch // return, refresh will be called automatically on token refresh
+        }
+
         Clog.i("refreshManga")
 
         mutableRefreshStatus.value = Following
