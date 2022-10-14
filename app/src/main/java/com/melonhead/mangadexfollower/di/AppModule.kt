@@ -6,7 +6,6 @@ import com.melonhead.mangadexfollower.db.manga.MangaDatabase
 import com.melonhead.mangadexfollower.repositories.AuthRepository
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.*
-import com.melonhead.mangadexfollower.models.ui.LoginStatus
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -15,10 +14,8 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.json.Json
 import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val appModule = module {
@@ -58,15 +55,11 @@ val appModule = module {
     factory { CoroutineScope(Dispatchers.IO) }
 
     single {
-        MangaRepository(get(), get(), get(), get(), get(), get(named("loginFlow")), get(), get(), get())
+        MangaRepository(get(), get(), get(), get(), get(), get(), get(), get())
     }
 
     single(createdAtStart = true) {
         AuthRepository(get(), get(), get())
-    }
-
-    single<Flow<LoginStatus>>(named("loginFlow")) {
-        get<AuthRepository>().loginStatus
     }
 
     single(createdAtStart = true) {

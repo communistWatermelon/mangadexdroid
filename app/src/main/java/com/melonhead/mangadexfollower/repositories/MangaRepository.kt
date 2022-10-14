@@ -27,7 +27,6 @@ class MangaRepository(
     private val userService: UserService,
     private val appDataService: AppDataService,
     private val coverService: CoverService,
-    private val loginFlow: Flow<LoginStatus>,
     private val chapterDb: ChapterDao,
     private val mangaDb: MangaDao,
     private val appContext: Context
@@ -46,12 +45,12 @@ class MangaRepository(
     init {
         externalScope.launch {
             // refresh manga on login
-            loginFlow.collectLatest { if (it is LoginStatus.LoggedIn) refreshMangaThrottled(Unit) }
+            authRepository.loginStatus.collectLatest { if (it is LoginStatus.LoggedIn) { refreshMangaThrottled(Unit) } }
         }
     }
 
     suspend fun forceRefresh() {
-        if (loginFlow.first() is LoginStatus.LoggedIn) refreshMangaThrottled(Unit)
+        if (authRepository.loginStatus.first() is LoginStatus.LoggedIn) refreshMangaThrottled(Unit)
     }
 
     private fun generateUIManga(dbSeries: List<MangaEntity>, dbChapters: List<ChapterEntity>): List<UIManga> {
