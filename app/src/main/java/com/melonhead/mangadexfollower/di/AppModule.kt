@@ -3,6 +3,7 @@ package com.melonhead.mangadexfollower.di
 import androidx.room.Room
 import com.melonhead.mangadexfollower.db.chapter.ChapterDatabase
 import com.melonhead.mangadexfollower.db.manga.MangaDatabase
+import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.repositories.AuthRepository
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.*
@@ -21,7 +22,14 @@ import org.koin.dsl.module
 val appModule = module {
     single {
         HttpClient(CIO) {
-            install(Logging) { level = LogLevel.INFO }
+            install(Logging) {
+                level = LogLevel.INFO
+                logger = object: Logger {
+                    override fun log(message: String) {
+                        Clog.i(message)
+                    }
+                }
+            }
             install(ContentNegotiation) {
                 json(Json {
                     prettyPrint = true
