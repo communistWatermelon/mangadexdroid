@@ -19,45 +19,23 @@ class AuthRepository(
 
     init {
         externalScope.launch {
-            appDataService.token.collectLatest {
-                if (it != null) {
-                    checkAuthentication(it)
-                }
-            }
+            mutableIsLoggedIn.value = if (appDataService.token.firstOrNull() != null) LoginStatus.LoggedIn else LoginStatus.LoggedOut
+            refreshToken()
         }
-    }
-    suspend fun checkCurrentAuthentication() {
-        val token = appDataService.token.firstOrNull()
-        checkAuthentication(token)
     }
 
-    suspend fun isTokenValid(token: AuthToken?): Boolean {
-        token ?: return false
-        return loginService.isTokenValid(token)
-    }
-
-    private suspend fun checkAuthentication(token: AuthToken?) {
-        Clog.i("checkAuthentication")
-        var currentToken: AuthToken? = token
-        if (currentToken == null) {
-            mutableIsLoggedIn.value = LoginStatus.LoggedOut
-            appDataService.updateToken(null)
-            return
-        }
-        val validToken = isTokenValid(currentToken)
-        if (!validToken) {
-            // don't set to logging in if already logged in, just attempt login silently
-            mutableIsLoggedIn.value = if (mutableIsLoggedIn.value is LoginStatus.LoggedIn) LoginStatus.LoggedIn else LoginStatus.LoggingIn
-            Clog.i("Token isn't valid, refreshing")
-            currentToken = loginService.refreshToken(currentToken)
-        }
+    suspend fun refreshToken(): AuthToken? {
+        val currentToken = appDataService.token.firstOrNull() ?: return null
+        val newToken = loginService.refreshToken(currentToken)
         appDataService.updateToken(currentToken)
-        mutableIsLoggedIn.value = LoginStatus.LoggedIn
+        if (newToken == null) mutableIsLoggedIn.value = LoginStatus.LoggedOut
+        return newToken
     }
-
     suspend fun authenticate(email: String, password: String) {
         Clog.i("authenticate")
+        mutableIsLoggedIn.value = LoginStatus.LoggingIn
         val token = loginService.authenticate(email, password)
-        checkAuthentication(token)
+        appDataService.updateToken(token)
+        mutableIsLoggedIn.value = LoginStatus.LoggedIn
     }
 }
