@@ -52,11 +52,7 @@ class AuthRepository(
             currentToken = loginService.refreshToken(currentToken)
         }
         appDataService.updateToken(currentToken)
-        mutableIsLoggedIn.value = if (validToken) LoginStatus.LoggedIn else LoginStatus.LoggedOut
-
-        if (!validToken) {
-            Clog.e("initialToken: $token, currentToken $currentToken", Exception("Token is not valid after refresh"))
-        }
+        mutableIsLoggedIn.value = LoginStatus.LoggedIn
     }
 
     suspend fun authenticate(email: String, password: String) {
