@@ -10,8 +10,12 @@ import com.melonhead.mangadexfollower.services.*
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.network.sockets.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
+import io.ktor.http.*
+import io.ktor.serialization.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +40,15 @@ val appModule = module {
                     isLenient = true
                     ignoreUnknownKeys = true
                 })
+            }
+            install(HttpRequestRetry) {
+                retryIf { request, response ->
+                    !response.status.isSuccess()
+                }
+                retryOnExceptionIf { request, cause ->
+                    cause is ConnectTimeoutException || cause is JsonConvertException
+                }
+                exponentialDelay()
             }
         }
     }
