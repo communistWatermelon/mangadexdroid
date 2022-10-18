@@ -27,7 +27,7 @@ class AuthRepository(
     suspend fun refreshToken(): AuthToken? {
         val currentToken = appDataService.token.firstOrNull() ?: return null
         val newToken = loginService.refreshToken(currentToken)
-        appDataService.updateToken(currentToken)
+        appDataService.updateToken(newToken)
         if (newToken == null) mutableIsLoggedIn.value = LoginStatus.LoggedOut
         return newToken
     }
