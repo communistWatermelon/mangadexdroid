@@ -115,4 +115,6 @@ dependencies {
     def lifecycle_version = "2.5.1"
     implementation "androidx.lifecycle:lifecycle-process:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-common:$lifecycle_version"
+
+    implementation "com.github.punkhomov:ktor-client-rate-limit:-SNAPSHOT"
 }
