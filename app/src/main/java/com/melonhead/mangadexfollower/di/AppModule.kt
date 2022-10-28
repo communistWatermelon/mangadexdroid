@@ -22,10 +22,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
+import punkhomov.ktor.client.ratelimit.RateLimit
+import punkhomov.ktor.client.ratelimit.impl.default
+import punkhomov.ktor.client.ratelimit.impl.rate
+import kotlin.time.DurationUnit
 
 val appModule = module {
     single {
         HttpClient(CIO) {
+            install(RateLimit) {
+                // globally set a 5 permit per 1 second rate-limiting
+                default().rate(5, 1, DurationUnit.SECONDS)
+            }
             install(Logging) {
                 level = LogLevel.INFO
                 logger = object: Logger {
