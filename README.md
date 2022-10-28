@@ -1,7 +1,7 @@
 # mangadexdroid
 
 Latest release APK can be downloaded [here](https://github.com/communistWatermelon/mangadexdroid/releases). 
-New commits on `main` are built using Github Actions, but there's no auto-incrementing set-up for the version code, so it must be incremented manually.
+New commits on `main` are built using Github Actions.
 
 ## Preview
 
