@@ -65,8 +65,7 @@ object NewChapterNotification {
                 val pendingIntent = pendingIntent(context, uiChapter) ?: return@chapters
                 val notification = buildNotification(context, pendingIntent, manga, uiChapter)
                 notificationManager.notify(manga.id.hashCode() + uiChapter.id.hashCode(), notification)
-                // ensures android actually posts all notifications
-                delay(1000)
+                delay(1000) // ensures android actually posts all notifications
             }
         }
     }

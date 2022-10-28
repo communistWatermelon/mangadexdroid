@@ -36,7 +36,7 @@ class MainViewModel(
         viewModelScope.launch {
             while (isActive) {
                 updateRefreshText()
-                delay(60000)
+                delay(60000) // refresh update text every minute
             }
         }
 
@@ -68,7 +68,6 @@ class MainViewModel(
 
     fun refreshContent() = viewModelScope.launch {
         mangaRepository.forceRefresh()
-        // this sucks, but the current architecture isn't great for
-        delay(5000)
+        delay(5000) // prevent another refresh for 5 second
     }
 }

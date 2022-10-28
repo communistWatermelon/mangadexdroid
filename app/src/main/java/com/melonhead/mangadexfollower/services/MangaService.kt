@@ -11,7 +11,6 @@ import com.melonhead.mangadexfollower.routes.HttpRoutes.MANGA_URL
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import kotlinx.coroutines.delay
 
 
 interface MangaService {
@@ -61,9 +60,6 @@ class MangaServiceImpl(
             }
             val chapters = result?.data ?: emptyList()
             allChapters.addAll(chapters)
-            // prevents triggering the anti-spam
-            delay(250L)
-
         }
         return allChapters
     }
