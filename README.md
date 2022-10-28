@@ -1,5 +1,8 @@
 # mangadexdroid
 
+Latest release APK can be downloaded [here](https://github.com/communistWatermelon/mangadexdroid/releases). 
+New commits on `main` are built using Github Actions, but there's no auto-incrementing set-up for the version code, so it must be incremented manually.
+
 ## Summary
 Simple Android project that notifies you of new chapters to manga series followed on mangadex.org. Mostly created so I could avoid using third-party RSS feeds, but also as a quick review of Android.
 Mostly only maintained for my own use, feel free to fork the project and build on it if necessary. I will likely not be adding any more features, and will not build an iOS version.
