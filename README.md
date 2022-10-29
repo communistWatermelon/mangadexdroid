@@ -5,8 +5,9 @@ New commits on `main` are built using Github Actions.
 
 ## Preview
 
-<img src="https://user-images.githubusercontent.com/3271813/198726818-79539afe-564a-4d87-8ecd-116853d9481a.png" width="200">
-
+Main Screen             |  Notification
+:-------------------------:|:-------------------------:
+<img src="https://user-images.githubusercontent.com/3271813/198726818-79539afe-564a-4d87-8ecd-116853d9481a.png" width="200">  |  <img src="https://user-images.githubusercontent.com/3271813/198822770-9a124ecb-5215-4dc2-9029-50a5909eb014.png" width="200">
 
 ## Summary
 Simple Android project that notifies you of new chapters to manga series followed on mangadex.org. Mostly created so I could avoid using third-party RSS feeds, but also as a quick review of Android.
