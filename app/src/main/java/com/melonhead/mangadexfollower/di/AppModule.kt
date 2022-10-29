@@ -77,14 +77,10 @@ val appModule = module {
         MangaServiceImpl(get())
     }
 
-    single<CoverService> {
-        CoverServiceImpl(get())
-    }
-
     factory { CoroutineScope(Dispatchers.IO) }
 
     single {
-        MangaRepository(get(), get(), get(), get(), get(), get(), get(), get())
+        MangaRepository(get(), get(), get(), get(), get(), get(), get())
     }
 
     single(createdAtStart = true) {
