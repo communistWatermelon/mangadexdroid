@@ -12,11 +12,11 @@ data class MangaEntity(
     @ColumnInfo(name = "manga_cover_id") val mangaCoverId: String? = null,
 ) {
     companion object {
-        fun from(manga: Manga, coverFilename: String?): MangaEntity {
+        fun from(manga: Manga): MangaEntity {
             return MangaEntity(
                 id = manga.id,
                 mangaTitle = manga.attributes.title.values.first(),
-                mangaCoverId = coverFilename
+                mangaCoverId = manga.fileName
             )
         }
     }
