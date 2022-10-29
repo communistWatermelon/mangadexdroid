@@ -101,8 +101,6 @@ class MangaRepository(
             Clog.i("New manga: ${newMangaIds.count()}")
 
             if (newMangaIds.isNotEmpty()) {
-                mutableRefreshStatus.value = MangaCovers
-
                 val newMangaSeries = mangaService.getManga(token, newMangaIds.toList())
                 val newManga = newMangaSeries.map { MangaEntity.from(it) }
 
