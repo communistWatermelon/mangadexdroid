@@ -51,7 +51,7 @@ val appModule = module {
             }
             install(HttpRequestRetry) {
                 retryIf { request, response ->
-                    !response.status.isSuccess() && response.status.value != 301
+                    !response.status.isSuccess() && response.status.value != 301 && response.status.value != 429
                 }
                 retryOnExceptionIf { request, cause ->
                     cause is ConnectTimeoutException || cause is JsonConvertException
