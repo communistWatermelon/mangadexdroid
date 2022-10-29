@@ -4,6 +4,9 @@ import androidx.room.Room
 import com.melonhead.mangadexfollower.db.chapter.ChapterDatabase
 import com.melonhead.mangadexfollower.db.manga.MangaDatabase
 import com.melonhead.mangadexfollower.logs.Clog
+import com.melonhead.mangadexfollower.ratelimit.RateLimit
+import com.melonhead.mangadexfollower.ratelimit.impl.default
+import com.melonhead.mangadexfollower.ratelimit.impl.rate
 import com.melonhead.mangadexfollower.repositories.AuthRepository
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.*
@@ -22,9 +25,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import punkhomov.ktor.client.ratelimit.RateLimit
-import punkhomov.ktor.client.ratelimit.impl.default
-import punkhomov.ktor.client.ratelimit.impl.rate
 import kotlin.time.DurationUnit
 
 val appModule = module {
