@@ -12,7 +12,6 @@ import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.models.ui.*
 import com.melonhead.mangadexfollower.notifications.NewChapterNotification
 import com.melonhead.mangadexfollower.services.AppDataService
-import com.melonhead.mangadexfollower.services.CoverService
 import com.melonhead.mangadexfollower.services.MangaService
 import com.melonhead.mangadexfollower.services.UserService
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +25,6 @@ class MangaRepository(
     private val mangaService: MangaService,
     private val userService: UserService,
     private val appDataService: AppDataService,
-    private val coverService: CoverService,
     private val chapterDb: ChapterDao,
     private val mangaDb: MangaDao,
     private val appContext: Context
@@ -103,17 +101,9 @@ class MangaRepository(
             Clog.i("New manga: ${newMangaIds.count()}")
 
             if (newMangaIds.isNotEmpty()) {
-                mutableRefreshStatus.value = MangaCovers
-
                 val newMangaSeries = mangaService.getManga(token, newMangaIds.toList())
-                val newManga = mutableListOf<MangaEntity>()
-                // fetch all covers for the new series
-                val mangaCovers = coverService.getCovers(token, newMangaSeries.map { it.id })
+                val newManga = newMangaSeries.map { MangaEntity.from(it) }
 
-                newMangaSeries.forEach { manga ->
-                    val coverFilename = mangaCovers.firstOrNull { it.mangaId == manga.id }?.fileName
-                    newManga.add(MangaEntity.from(manga, coverFilename))
-                }
                 // insert new series into local db
                 mangaDb.insertAll(*newManga.toTypedArray())
             }

@@ -34,6 +34,7 @@ class MangaServiceImpl(
                         // TODO: prevent ids from being too long
                         mangaIds.forEach { encodedParameters.append("ids[]", it) }
                         parameters.append("offset", offset.toString())
+                        parameters.append("includes[]", "cover_art")
                     }
                 }
             }!!
