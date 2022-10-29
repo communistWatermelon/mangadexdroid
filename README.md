@@ -37,9 +37,7 @@ App architecture is modelled after Google's recommended approach: Model-View-Vie
 
 ## API
 Working directly with the MangaDex API. 
-
-There are a number of places with `delay(X)` calls to try to prevent the API from rate-limiting the app during use.
-
+Using global rate-limiting in Ktor, matching MangaDex's 5 per second limit.
 
 ## Analytics/Logging
 
