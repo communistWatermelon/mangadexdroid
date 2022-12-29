@@ -9,9 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -96,6 +94,7 @@ class MainActivity : ComponentActivity() {
                         manga = manga,
                         loginClicked = { username, password -> viewModel.authenticate(username, password) },
                         onChapterClicked = { viewModel.onChapterClicked(this, it) },
+                        onChapterLongPressed = { uiManga, chapter -> viewModel.toggleChapterRead(uiManga, chapter) },
                         onSwipeRefresh = { viewModel.refreshContent() }
                     )
                 }
@@ -105,7 +104,37 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Content(loginStatus: LoginStatus?, refreshStatus: MangaRefreshStatus, refreshText: String, manga: List<UIManga>, loginClicked: (username: String, password: String) -> Unit, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
+fun Content(loginStatus: LoginStatus?, refreshStatus: MangaRefreshStatus, refreshText: String, manga: List<UIManga>, loginClicked: (username: String, password: String) -> Unit, onChapterClicked: (UIChapter) -> Unit, onChapterLongPressed: (UIManga, UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
+    var chapterReadStatusDialog by remember { mutableStateOf<Pair<UIManga, UIChapter>?>(null) }
+    val currentReadStatusDialog = chapterReadStatusDialog
+
+    if (currentReadStatusDialog != null) {
+        AlertDialog(
+            onDismissRequest = { chapterReadStatusDialog = null },
+            title = {
+                Text(text = currentReadStatusDialog.first.title)
+            },
+            text = {
+               Text(text = "Mark chapter ${currentReadStatusDialog.second.chapter} as ${if (currentReadStatusDialog.second.read == true) "unread" else "read"}?")
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    onChapterLongPressed(currentReadStatusDialog.first, currentReadStatusDialog.second)
+                    chapterReadStatusDialog = null
+                }) {
+                    Text("Okay")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    chapterReadStatusDialog = null
+                }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     when (loginStatus) {
         LoginStatus.LoggedIn -> {
             if (manga.isEmpty()) LoadingScreen(refreshStatus) else {
@@ -114,6 +143,9 @@ fun Content(loginStatus: LoginStatus?, refreshStatus: MangaRefreshStatus, refres
                     refreshText = refreshText,
                     refreshStatus = refreshStatus,
                     onChapterClicked = onChapterClicked,
+                    onChapterLongPressed = { uiManga, uiChapter ->
+                        chapterReadStatusDialog = uiManga to uiChapter
+                    },
                     onSwipeRefresh = onSwipeRefresh
                 )
             }
@@ -150,7 +182,8 @@ fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
         keyboardController?.hide()
     }
 
-    Column(modifier = Modifier.fillMaxSize(),
+    Column(
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         val emailNode = AutofillNode(
@@ -255,13 +288,20 @@ fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Chapter(modifier: Modifier = Modifier, uiChapter: UIChapter, refreshStatus: MangaRefreshStatus, onChapterClicked: (UIChapter) -> Unit) {
-    Card(modifier = modifier.fillMaxWidth(),
-        onClick = {
-        onChapterClicked(uiChapter)
-    }) {
+fun Chapter(modifier: Modifier = Modifier,
+            uiChapter: UIChapter,
+            uiManga: UIManga,
+            refreshStatus: MangaRefreshStatus,
+            onChapterClicked: (UIChapter) -> Unit,
+            onChapterLongPressed: (UIManga, UIChapter) -> Unit) {
+    Card(modifier = modifier
+        .fillMaxWidth()
+        .combinedClickable(
+            onClick = { onChapterClicked(uiChapter) },
+            onLongClick = { onChapterLongPressed(uiManga, uiChapter) }
+        )) {
         Row(modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 50.dp)
@@ -348,7 +388,7 @@ fun MangaCover(uiManga: UIManga) {
 }
 
 @Composable
-fun Manga(uiManga: UIManga, refreshStatus: MangaRefreshStatus, onChapterClicked: (UIChapter) -> Unit) {
+fun Manga(uiManga: UIManga, refreshStatus: MangaRefreshStatus, onChapterClicked: (UIChapter) -> Unit, onChapterLongPressed: (UIManga, UIChapter) -> Unit) {
     Box {
         MangaCover(uiManga = uiManga)
         Column(modifier = Modifier.padding(top = 110.dp)) {
@@ -357,8 +397,11 @@ fun Manga(uiManga: UIManga, refreshStatus: MangaRefreshStatus, onChapterClicked:
             uiManga.chapters.forEach {
                 Chapter(modifier = Modifier.padding(bottom = 8.dp),
                     uiChapter = it,
+                    uiManga = uiManga,
                     refreshStatus = refreshStatus,
-                    onChapterClicked = onChapterClicked)
+                    onChapterClicked = onChapterClicked,
+                    onChapterLongPressed = onChapterLongPressed
+                )
             }
         }
     }
@@ -366,7 +409,7 @@ fun Manga(uiManga: UIManga, refreshStatus: MangaRefreshStatus, onChapterClicked:
 }
 
 @Composable
-fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, refreshText: String, onChapterClicked: (UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
+fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, refreshText: String, onChapterClicked: (UIChapter) -> Unit, onChapterLongPressed: (UIManga, UIChapter) -> Unit, onSwipeRefresh: () -> Unit) {
     val isRefreshing = rememberSwipeRefreshState(isRefreshing = false)
     var justPulledRefresh by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -381,7 +424,13 @@ fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, refres
                     .background(MaterialTheme.colorScheme.surfaceTint)
                     .padding(8.dp)
                     .clickable {
-                        Toast.makeText(context, "Version ${BuildConfig.VERSION_NAME}.${BuildConfig.VERSION_CODE}", Toast.LENGTH_SHORT).show()
+                        Toast
+                            .makeText(
+                                context,
+                                "Version ${BuildConfig.VERSION_NAME}.${BuildConfig.VERSION_CODE}",
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
                     },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
@@ -413,7 +462,13 @@ fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, refres
                                 .fillMaxWidth()
                                 .align(Alignment.CenterHorizontally)
                                 .clickable {
-                                    Toast.makeText(context, "Version ${BuildConfig.VERSION_NAME}.${BuildConfig.VERSION_CODE}", Toast.LENGTH_SHORT).show()
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "Version ${BuildConfig.VERSION_NAME}.${BuildConfig.VERSION_CODE}",
+                                            Toast.LENGTH_SHORT
+                                        )
+                                        .show()
                                 },
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Normal,
@@ -422,7 +477,7 @@ fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, refres
                 }
                 items(manga) {
                     Column(verticalArrangement = Arrangement.SpaceEvenly) {
-                        Manga(uiManga = it, refreshStatus = refreshStatus, onChapterClicked = onChapterClicked)
+                        Manga(uiManga = it, refreshStatus = refreshStatus, onChapterClicked = onChapterClicked, onChapterLongPressed = onChapterLongPressed)
                     }
                 }
             }
@@ -433,9 +488,10 @@ fun ChaptersList(manga: List<UIManga>, refreshStatus: MangaRefreshStatus, refres
 @Composable
 fun ChapterPreview() {
     MangadexFollowerTheme {
+        val manga = UIManga("", "Test Manga", listOf(), null)
         Column {
-            Chapter(uiChapter = UIChapter("", "101", "Test Title with an extremely long title that may or may not wrap", Clock.System.now(), false), refreshStatus = ReadStatus, onChapterClicked = { })
-            Chapter(uiChapter = UIChapter("", "102", "Test Title 2", Clock.System.now(), true), refreshStatus = ReadStatus, onChapterClicked = { })
+            Chapter(uiChapter = UIChapter("", "101", "Test Title with an extremely long title that may or may not wrap", Clock.System.now(), false), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { }, onChapterLongPressed = { _, _ -> })
+            Chapter(uiChapter = UIChapter("", "102", "Test Title 2", Clock.System.now(), true), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { }, onChapterLongPressed = { _, _ -> })
         }
     }
 }
@@ -446,8 +502,8 @@ fun MangaPreview() {
     val testChapters = listOf(UIChapter("", "101", "Test Title", Clock.System.now(), true), UIChapter("", "102", "Test Title 2", Clock.System.now(), false))
     MangadexFollowerTheme {
         Column(modifier = Modifier.fillMaxWidth()) {
-            Manga(uiManga = UIManga("", "Test Manga", testChapters, null), refreshStatus = ReadStatus, onChapterClicked = { })
-            Manga(uiManga = UIManga("", "Test Manga with a really long name that causes the name to clip a little", testChapters, null), refreshStatus = ReadStatus, onChapterClicked = { })
+            Manga(uiManga = UIManga("", "Test Manga", testChapters, null), refreshStatus = ReadStatus, onChapterClicked = { }, onChapterLongPressed = { _, _ -> })
+            Manga(uiManga = UIManga("", "Test Manga with a really long name that causes the name to clip a little", testChapters, null), refreshStatus = ReadStatus, onChapterClicked = { }, onChapterLongPressed = { _, _ -> })
         }
     }
 }

@@ -171,4 +171,9 @@ class MangaRepository(
         // notify user of new chapters
         notifyOfNewChapters()
     }
+
+    suspend fun toggleChapterRead(uiManga: UIManga, uiChapter: UIChapter) {
+        val entity = readMarkerDb.getEntity(uiManga.id, uiChapter.chapter) ?: return
+        readMarkerDb.update(entity.copy(readStatus = !(entity.readStatus ?: false)))
+    }
 }

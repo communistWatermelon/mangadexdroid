@@ -10,9 +10,11 @@ import androidx.lifecycle.viewModelScope
 import com.melonhead.mangadexfollower.extensions.asLiveData
 import com.melonhead.mangadexfollower.extensions.dateOrTimeString
 import com.melonhead.mangadexfollower.models.ui.UIChapter
+import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.repositories.AuthRepository
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.AppDataService
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
@@ -64,6 +66,10 @@ class MainViewModel(
             data = Uri.parse(uiChapter.webAddress)
         }
         context.startActivity(intent)
+    }
+
+    fun toggleChapterRead(uiManga: UIManga, uiChapter: UIChapter) = viewModelScope.launch(Dispatchers.IO) {
+        mangaRepository.toggleChapterRead(uiManga, uiChapter)
     }
 
     fun refreshContent() = viewModelScope.launch {
