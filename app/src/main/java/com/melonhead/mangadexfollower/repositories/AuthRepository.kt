@@ -1,8 +1,10 @@
 package com.melonhead.mangadexfollower.repositories
 
+import android.content.Context
 import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.models.auth.AuthToken
 import com.melonhead.mangadexfollower.models.ui.LoginStatus
+import com.melonhead.mangadexfollower.notifications.AuthFailedNotification
 import com.melonhead.mangadexfollower.services.AppDataService
 import com.melonhead.mangadexfollower.services.LoginService
 import kotlinx.coroutines.CoroutineScope
@@ -10,6 +12,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class AuthRepository(
+    private val appContext: Context,
     private val appDataService: AppDataService,
     private val loginService: LoginService,
     externalScope: CoroutineScope,
@@ -28,7 +31,10 @@ class AuthRepository(
         val currentToken = appDataService.token.firstOrNull() ?: return null
         val newToken = loginService.refreshToken(currentToken)
         appDataService.updateToken(newToken)
-        if (newToken == null) mutableIsLoggedIn.value = LoginStatus.LoggedOut
+        if (newToken == null) {
+            mutableIsLoggedIn.value = LoginStatus.LoggedOut
+            AuthFailedNotification.postAuthFailed(appContext)
+        }
         return newToken
     }
     suspend fun authenticate(email: String, password: String) {

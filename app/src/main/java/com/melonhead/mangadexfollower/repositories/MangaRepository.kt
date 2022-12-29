@@ -78,7 +78,7 @@ class MangaRepository(
         // refresh auth
         val token = authRepository.refreshToken()
         if (token == null) {
-            Clog.e("", Exception("Failed to refresh token"))
+            Clog.i("Failed to refresh token")
             return@launch
         }
 
