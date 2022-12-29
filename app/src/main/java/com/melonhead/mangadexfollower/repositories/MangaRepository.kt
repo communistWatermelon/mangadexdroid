@@ -7,6 +7,8 @@ import com.melonhead.mangadexfollower.db.chapter.ChapterDao
 import com.melonhead.mangadexfollower.db.chapter.ChapterEntity
 import com.melonhead.mangadexfollower.db.manga.MangaDao
 import com.melonhead.mangadexfollower.db.manga.MangaEntity
+import com.melonhead.mangadexfollower.db.readmarkers.ReadMarkerDao
+import com.melonhead.mangadexfollower.db.readmarkers.ReadMarkerEntity
 import com.melonhead.mangadexfollower.extensions.throttleLatest
 import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.models.ui.*
@@ -27,6 +29,7 @@ class MangaRepository(
     private val appDataService: AppDataService,
     private val chapterDb: ChapterDao,
     private val mangaDb: MangaDao,
+    private val readMarkerDao: ReadMarkerDao,
     private val appContext: Context
 ): KoinComponent {
     private val authRepository: AuthRepository by inject()
@@ -136,6 +139,9 @@ class MangaRepository(
         Clog.i("refreshReadStatus")
         val manga = mangaDb.getAllSync()
         val chapters = chapterDb.getAllSync()
+
+        val readMarkers = chapters.map { ReadMarkerEntity.from(it, it.readStatus == true) }
+        readMarkerDao.insertAll(*readMarkers.toTypedArray())
 
         val readChapters = mangaService.getReadChapters(manga.map { it.id }, token)
         val chaptersToUpdate = chapters

@@ -81,7 +81,7 @@ val appModule = module {
     factory { CoroutineScope(Dispatchers.IO) }
 
     single {
-        MangaRepository(get(), get(), get(), get(), get(), get(), get())
+        MangaRepository(get(), get(), get(), get(), get(), get(), get(), get())
     }
 
     single(createdAtStart = true) {
