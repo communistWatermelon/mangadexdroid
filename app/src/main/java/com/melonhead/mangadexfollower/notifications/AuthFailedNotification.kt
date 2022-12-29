@@ -3,13 +3,17 @@ package com.melonhead.mangadexfollower.notifications
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.melonhead.mangadexfollower.R
 import com.melonhead.mangadexfollower.logs.Clog
+import com.melonhead.mangadexfollower.ui.scenes.MainActivity
 import kotlin.random.Random
+
 
 object AuthFailedNotification {
     private const val CHANNEL_ID = "auth_failed"
@@ -24,11 +28,16 @@ object AuthFailedNotification {
     }
 
     private fun buildNotification(context: Context): Notification {
+        val contentIntent = PendingIntent.getActivity(
+            context, 0, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         return NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle("Authentication Failed")
             .setContentText("Tap to sign in again.")
             .setSmallIcon(R.drawable.ic_notification_icon)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(contentIntent)
             .setAutoCancel(true)
             .build()
     }

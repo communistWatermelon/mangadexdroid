@@ -1,6 +1,8 @@
 package com.melonhead.mangadexfollower.repositories
 
 import android.content.Context
+import androidx.core.app.NotificationManagerCompat
+import com.melonhead.mangadexfollower.App
 import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.models.auth.AuthToken
 import com.melonhead.mangadexfollower.models.ui.LoginStatus
@@ -28,12 +30,23 @@ class AuthRepository(
     }
 
     suspend fun refreshToken(): AuthToken? {
-        val currentToken = appDataService.token.firstOrNull() ?: return null
+        fun signOut() {
+            mutableIsLoggedIn.value = LoginStatus.LoggedOut
+            if ((appContext as App).inForeground) return
+            val notificationManager = NotificationManagerCompat.from(appContext)
+            if (!notificationManager.areNotificationsEnabled()) return
+            AuthFailedNotification.postAuthFailed(appContext)
+        }
+
+        val currentToken = appDataService.token.firstOrNull()
+        if (currentToken == null) {
+            signOut()
+            return null
+        }
         val newToken = loginService.refreshToken(currentToken)
         appDataService.updateToken(newToken)
         if (newToken == null) {
-            mutableIsLoggedIn.value = LoginStatus.LoggedOut
-            AuthFailedNotification.postAuthFailed(appContext)
+            signOut()
         }
         return newToken
     }
