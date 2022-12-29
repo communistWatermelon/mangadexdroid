@@ -177,4 +177,9 @@ class MangaRepository(
         val entity = readMarkerDb.getEntity(uiManga.id, uiChapter.chapter) ?: return
         readMarkerDb.update(entity.copy(readStatus = !(entity.readStatus ?: false)))
     }
+
+    suspend fun markChapterRead(uiManga: UIManga, uiChapter: UIChapter) {
+        val entity = readMarkerDb.getEntity(uiManga.id, uiChapter.chapter) ?: return
+        readMarkerDb.update(entity.copy(readStatus = true))
+    }
 }

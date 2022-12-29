@@ -61,11 +61,12 @@ class MainViewModel(
         authRepository.authenticate(email, password)
     }
 
-    fun onChapterClicked(context: Context, uiChapter: UIChapter) {
+    fun onChapterClicked(context: Context, uiManga: UIManga, uiChapter: UIChapter) = viewModelScope.launch(Dispatchers.IO) {
         val intent = Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse(uiChapter.webAddress)
         }
         context.startActivity(intent)
+        mangaRepository.markChapterRead(uiManga, uiChapter)
     }
 
     fun toggleChapterRead(uiManga: UIManga, uiChapter: UIChapter) = viewModelScope.launch(Dispatchers.IO) {
