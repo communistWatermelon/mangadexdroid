@@ -92,21 +92,21 @@ val appModule = module {
         Room.databaseBuilder(
             get(),
             ChapterDatabase::class.java, "chapter"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     single(createdAtStart = true) {
         Room.databaseBuilder(
             get(),
             MangaDatabase::class.java, "manga"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     single(createdAtStart = true) {
         Room.databaseBuilder(
             get(),
             ReadMarkerDatabase::class.java, "readmarker"
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     single {
