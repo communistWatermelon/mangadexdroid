@@ -16,7 +16,6 @@ data class ChapterEntity(
     @ColumnInfo(name = "chapter_title") val chapterTitle: String?,
     @ColumnInfo(name = "chapter") val chapter: String?,
     @ColumnInfo(name = "createdAt") val createdAt: Instant,
-    @ColumnInfo(name = "read_status") val readStatus: Boolean?
 ) {
     companion object {
         fun from(chapter: Chapter): ChapterEntity {
@@ -26,7 +25,6 @@ data class ChapterEntity(
                 chapterTitle = chapter.attributes.title,
                 chapter = chapter.attributes.chapter,
                 createdAt = chapter.attributes.createdAt,
-                readStatus = null
             )
         }
     }

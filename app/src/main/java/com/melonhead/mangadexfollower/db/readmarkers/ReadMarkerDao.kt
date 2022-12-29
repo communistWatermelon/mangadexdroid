@@ -14,7 +14,10 @@ interface ReadMarkerDao {
     @Query("SELECT * FROM readmarker WHERE manga_id = :mangaId AND chapter = :chapter")
     fun getEntity(mangaId: String, chapter: String?): ReadMarkerEntity?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Query("SELECT read_status FROM readmarker WHERE manga_id = :mangaId AND chapter = :chapter")
+    fun isRead(mangaId: String, chapter: String?): Boolean?
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAll(vararg readMarker: ReadMarkerEntity)
 
     @Update

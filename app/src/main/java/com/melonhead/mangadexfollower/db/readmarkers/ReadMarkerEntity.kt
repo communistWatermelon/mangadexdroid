@@ -19,7 +19,7 @@ data class ReadMarkerEntity(
     @ColumnInfo(name = "createdAt") val createdAt: Instant,
 ) {
     companion object {
-        fun from(chapter: ChapterEntity, read: Boolean): ReadMarkerEntity {
+        fun from(chapter: ChapterEntity, read: Boolean?): ReadMarkerEntity {
             return ReadMarkerEntity(
                 id = "${chapter.mangaId}_${chapter.chapter}",
                 mangaId = chapter.mangaId,

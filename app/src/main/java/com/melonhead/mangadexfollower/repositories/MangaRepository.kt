@@ -128,7 +128,7 @@ class MangaRepository(
         val installDateSeconds = appDataService.installDateSeconds.firstOrNull() ?: 0L
         Clog.i("notifyOfNewChapters")
 
-        val newChapters = chapterDb.getAllSync().filter { it.readStatus != true }
+        val newChapters = chapterDb.getAllSync().filter { readMarkerDb.isRead(it.mangaId, it.chapter) != true }
         val manga = mangaDb.getAllSync()
         val notifyChapters = generateUIManga(manga, newChapters)
         NewChapterNotification.post(appContext, notifyChapters, installDateSeconds)
@@ -141,19 +141,17 @@ class MangaRepository(
         val manga = mangaDb.getAllSync()
         val chapters = chapterDb.getAllSync()
 
-        val readMarkers = chapters.map {
-            val readStatus = readMarkerDb.getEntity(it.mangaId, it.chapter)?.readStatus
-            ReadMarkerEntity.from(it, readStatus ?: (it.readStatus == true))
-        }
+        // ensure all chapters have read markers
+        val readMarkers = chapters.map { ReadMarkerEntity.from(it, null) }
         readMarkerDb.insertAll(*readMarkers.toTypedArray())
 
         val readChapters = mangaService.getReadChapters(manga.map { it.id }, token)
         val chaptersToUpdate = chapters
-            .filter { it.readStatus != true && readChapters.contains(it.id) }
             // filter out chapters already marked as read in the db
-            .filter { readMarkerDb.getEntity(it.mangaId, it.chapter)?.readStatus != true }
-            // make a copy with the readStatus set to true
-            .map { it.copy(readStatus = true) }
+            .filter {
+                val readStatus = readMarkerDb.isRead(it.mangaId, it.chapter)
+                readStatus == null && readChapters.contains(it.id)
+            }
 
         if (chaptersToUpdate.isEmpty()) {
             notifyOfNewChapters()
@@ -164,7 +162,10 @@ class MangaRepository(
         chapterDb.update(*chaptersToUpdate.toTypedArray())
 
         val readMarkersToUpdate = chaptersToUpdate
-            .filter { it.readStatus == true }
+            .filter {
+                val readStatus = readMarkerDb.isRead(it.mangaId, it.chapter)
+                readStatus == null
+            }
             .map { ReadMarkerEntity.from(it, true) }
         readMarkerDb.update(*readMarkersToUpdate.toTypedArray())
 
