@@ -3,6 +3,7 @@ package com.melonhead.mangadexfollower.di
 import androidx.room.Room
 import com.melonhead.mangadexfollower.db.chapter.ChapterDatabase
 import com.melonhead.mangadexfollower.db.manga.MangaDatabase
+import com.melonhead.mangadexfollower.db.readmarkers.ReadMarkerDatabase
 import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.ratelimit.RateLimit
 import com.melonhead.mangadexfollower.ratelimit.impl.default
@@ -101,12 +102,23 @@ val appModule = module {
         ).build()
     }
 
+    single(createdAtStart = true) {
+        Room.databaseBuilder(
+            get(),
+            ReadMarkerDatabase::class.java, "readmarker"
+        ).build()
+    }
+
     single {
         get<MangaDatabase>().mangaDao()
     }
 
     single {
         get<ChapterDatabase>().chapterDao()
+    }
+
+    single {
+        get<ReadMarkerDatabase>().readMarkersDao()
     }
 
     viewModel {
