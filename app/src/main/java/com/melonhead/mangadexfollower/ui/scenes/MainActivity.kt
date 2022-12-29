@@ -1,6 +1,7 @@
 package com.melonhead.mangadexfollower.ui.scenes
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
@@ -56,9 +57,12 @@ import com.melonhead.mangadexfollower.BuildConfig
 import com.melonhead.mangadexfollower.R
 import com.melonhead.mangadexfollower.extensions.dateOrTimeString
 import com.melonhead.mangadexfollower.models.ui.*
+import com.melonhead.mangadexfollower.notifications.NewChapterNotification
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
 import kotlinx.datetime.Clock
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -100,6 +104,17 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        onNewIntent(intent)
+    }
+    @Suppress("DEPRECATION")
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        val mangaJson = intent?.getStringExtra(NewChapterNotification.MANGA_EXTRA) ?: return
+        val chapterJson = intent.getStringExtra(NewChapterNotification.CHAPTER_EXTRA) ?: return
+        val manga: UIManga = Json.decodeFromString(mangaJson)
+        val chapter: UIChapter = Json.decodeFromString(chapterJson)
+        viewModel.onChapterClicked(this, manga, chapter)
     }
 }
 

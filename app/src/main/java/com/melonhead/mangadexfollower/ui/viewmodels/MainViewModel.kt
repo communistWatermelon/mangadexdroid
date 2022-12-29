@@ -62,11 +62,11 @@ class MainViewModel(
     }
 
     fun onChapterClicked(context: Context, uiManga: UIManga, uiChapter: UIChapter) = viewModelScope.launch(Dispatchers.IO) {
+        mangaRepository.markChapterRead(uiManga, uiChapter)
         val intent = Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse(uiChapter.webAddress)
         }
         context.startActivity(intent)
-        mangaRepository.markChapterRead(uiManga, uiChapter)
     }
 
     fun toggleChapterRead(uiManga: UIManga, uiChapter: UIChapter) = viewModelScope.launch(Dispatchers.IO) {
