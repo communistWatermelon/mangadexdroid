@@ -146,6 +146,8 @@ class MangaRepository(
         val readChapters = mangaService.getReadChapters(manga.map { it.id }, token)
         val chaptersToUpdate = chapters
             .filter { it.readStatus != true && readChapters.contains(it.id) }
+            // filter out chapters already marked as read in the db
+            .filter { !readMarkerDao.isRead(it.mangaId, it.chapter) }
             // make a copy with the readStatus set to true
             .map { it.copy(readStatus = true) }
 
