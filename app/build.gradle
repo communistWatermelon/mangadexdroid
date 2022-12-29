@@ -15,7 +15,7 @@ android {
         applicationId "com.melonhead.mangadexfollower"
         minSdk 24
         targetSdk 33
-        versionCode 19
+        versionCode 20
         versionName "1." + versionCode
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -71,20 +71,20 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
 
     implementation 'androidx.activity:activity-compose:1.6.1'
-    implementation "androidx.compose.ui:ui:1.3.0"
-    implementation "androidx.compose.ui:ui-tooling-preview:1.3.0"
-    implementation "androidx.compose.runtime:runtime-livedata:1.3.0"
+    implementation "androidx.compose.ui:ui:1.3.2"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.3.2"
+    implementation "androidx.compose.runtime:runtime-livedata:1.3.2"
 
-    implementation 'androidx.compose.material3:material3:1.0.0'
-    implementation "androidx.compose.material:material-icons-extended:1.3.0"
-    implementation 'com.google.firebase:firebase-crashlytics-ktx:18.3.1'
+    implementation 'androidx.compose.material3:material3:1.0.1'
+    implementation "androidx.compose.material:material-icons-extended:1.3.1"
+    implementation 'com.google.firebase:firebase-crashlytics-ktx:18.3.2'
     implementation 'com.google.firebase:firebase-analytics-ktx:21.2.0'
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.3.0"
-    debugImplementation "androidx.compose.ui:ui-tooling:1.3.0"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:1.3.0"
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.3.2"
+    debugImplementation "androidx.compose.ui:ui-tooling:1.3.2"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:1.3.2"
 
     implementation "io.insert-koin:koin-android:3.3.0"
     implementation "io.insert-koin:koin-androidx-compose:3.3.0"
