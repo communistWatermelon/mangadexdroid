@@ -29,14 +29,14 @@ class MangaRepository(
     private val appDataService: AppDataService,
     private val chapterDb: ChapterDao,
     private val mangaDb: MangaDao,
-    private val readMarkerDao: ReadMarkerDao,
+    private val readMarkerDb: ReadMarkerDao,
     private val appContext: Context
 ): KoinComponent {
     private val authRepository: AuthRepository by inject()
     private val refreshMangaThrottled: (Unit) -> Unit = throttleLatest(300L, externalScope, ::refreshManga)
 
     // combine all manga series and chapters
-    val manga = mangaDb.allSeries().combine(chapterDb.allChapters()) { dbSeries, dbChapters ->
+    val manga = combine(mangaDb.allSeries(), chapterDb.allChapters(), readMarkerDb.allMarkers()) { dbSeries, dbChapters, _ ->
         generateUIManga(dbSeries, dbChapters)
     }.shareIn(externalScope, replay = 1, started = SharingStarted.WhileSubscribed())
 
@@ -58,7 +58,8 @@ class MangaRepository(
         // map the series and chapters into UIManga, sorted from most recent to least
         val uiManga = dbSeries.mapNotNull { manga ->
             val chapters = dbChapters.filter { it.mangaId == manga.id }.map { chapter ->
-                UIChapter(id = chapter.id, chapter = chapter.chapter, title = chapter.chapterTitle, createdDate = chapter.createdAt, read = chapter.readStatus)
+                val read = readMarkerDb.getEntity(chapter.mangaId, chapter.chapter)?.readStatus
+                UIChapter(id = chapter.id, chapter = chapter.chapter, title = chapter.chapterTitle, createdDate = chapter.createdAt, read = read)
             }
             if (chapters.isEmpty()) return@mapNotNull null
             UIManga(id = manga.id, manga.mangaTitle ?: "", chapters = chapters, manga.mangaCoverId)
@@ -140,14 +141,17 @@ class MangaRepository(
         val manga = mangaDb.getAllSync()
         val chapters = chapterDb.getAllSync()
 
-        val readMarkers = chapters.map { ReadMarkerEntity.from(it, it.readStatus == true) }
-        readMarkerDao.insertAll(*readMarkers.toTypedArray())
+        val readMarkers = chapters.map {
+            val readStatus = readMarkerDb.getEntity(it.mangaId, it.chapter)?.readStatus
+            ReadMarkerEntity.from(it, readStatus ?: (it.readStatus == true))
+        }
+        readMarkerDb.insertAll(*readMarkers.toTypedArray())
 
         val readChapters = mangaService.getReadChapters(manga.map { it.id }, token)
         val chaptersToUpdate = chapters
             .filter { it.readStatus != true && readChapters.contains(it.id) }
             // filter out chapters already marked as read in the db
-            .filter { !readMarkerDao.isRead(it.mangaId, it.chapter) }
+            .filter { readMarkerDb.getEntity(it.mangaId, it.chapter)?.readStatus != true }
             // make a copy with the readStatus set to true
             .map { it.copy(readStatus = true) }
 
@@ -158,6 +162,11 @@ class MangaRepository(
 
         // update the db with the new entities
         chapterDb.update(*chaptersToUpdate.toTypedArray())
+
+        val readMarkersToUpdate = chaptersToUpdate
+            .filter { it.readStatus == true }
+            .map { ReadMarkerEntity.from(it, true) }
+        readMarkerDb.update(*readMarkersToUpdate.toTypedArray())
 
         // notify user of new chapters
         notifyOfNewChapters()
