@@ -31,6 +31,7 @@ class AuthRepository(
 
     suspend fun refreshToken(): AuthToken? {
         fun signOut() {
+            Clog.e("Signing out, refresh failed", Exception())
             mutableIsLoggedIn.value = LoginStatus.LoggedOut
             if ((appContext as App).inForeground) return
             val notificationManager = NotificationManagerCompat.from(appContext)
