@@ -23,7 +23,7 @@ data class ChapterEntity(
                 id = chapter.id,
                 mangaId = chapter.relationships?.firstOrNull { it.type == "manga" }!!.id,
                 chapterTitle = chapter.attributes.title,
-                chapter = chapter.attributes.chapter,
+                chapter = chapter.attributes.chapter ?: "1",
                 createdAt = chapter.attributes.createdAt,
             )
         }
