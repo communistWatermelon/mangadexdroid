@@ -23,7 +23,7 @@ class MangaServiceImpl(
 ): MangaService {
     override suspend fun getManga(token: AuthToken, mangaIds: List<String>): List<Manga> {
         Clog.i("getManga: ${mangaIds.count()}")
-        return handlePagination(mangaIds.count()) { offset ->
+        val result: List<Manga?> = handlePagination(mangaIds.count()) { offset ->
             client.catching("getManga") {
                 client.get(MANGA_URL) {
                     headers {
@@ -37,8 +37,9 @@ class MangaServiceImpl(
                         parameters.append("includes[]", "cover_art")
                     }
                 }
-            }!!
+            }
         }
+        return result.filterNotNull()
     }
 
     override suspend fun getReadChapters(mangaIds: List<String>, token: AuthToken): List<String> {

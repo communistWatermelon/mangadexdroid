@@ -10,12 +10,12 @@ data class PaginatedResponse<T>(val limit: Int, val offset: Int, val total: Int,
 suspend inline fun <reified T> handlePagination(
     expectedCount: Int = Int.MAX_VALUE,
     fetchAll: Boolean = true,
-    request: (offset: Int) -> HttpResponse
+    request: (offset: Int) -> HttpResponse?
 ): List<T> {
     var total = expectedCount
     val allItems = mutableSetOf<T>()
     while (allItems.count() < total) {
-        val result = request(allItems.count())
+        val result = request(allItems.count()) ?: continue
         val items = try {
             val response = result.body<PaginatedResponse<T>>()
             if (fetchAll) total = response.total
