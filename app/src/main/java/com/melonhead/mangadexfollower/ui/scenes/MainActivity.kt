@@ -422,7 +422,7 @@ fun ChaptersList(
     var justPulledRefresh by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    val itemState = rememberSaveable(inputs = manga.toTypedArray()) {
+    val itemState = remember(manga.size) {
         val items = mutableListOf<Any>()
         manga.forEach { manga ->
             items.add(manga)
@@ -495,7 +495,13 @@ fun ChaptersList(
                     }
                 }
 
-                items(itemState) {
+                items(itemState, {
+                    when {
+                        it is UIManga -> it.id
+                        it is Pair<*, *> && it.first == UIChapter -> (it.first as UIChapter).id
+                        else -> it.hashCode()
+                    }
+                }) {
                     if (it is UIManga) {
                         MangaCover(modifier = Modifier.padding(top = if (itemState.first() == it) 0.dp else 12.dp), uiManga = it)
                     }
