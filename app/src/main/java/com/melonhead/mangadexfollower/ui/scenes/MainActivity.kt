@@ -422,7 +422,7 @@ fun ChaptersList(
     var justPulledRefresh by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
-    val itemState = remember(manga.size) {
+    val itemState = remember(manga, refreshStatus) {
         val items = mutableListOf<Any>()
         manga.forEach { manga ->
             items.add(manga)
