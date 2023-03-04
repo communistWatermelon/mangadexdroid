@@ -14,7 +14,7 @@ import io.ktor.http.*
 
 interface LoginService {
     suspend fun authenticate(email: String, password: String): AuthToken?
-    suspend fun refreshToken(token: AuthToken): AuthToken?
+    suspend fun refreshToken(token: AuthToken, logoutOnFail: Boolean): AuthToken?
 }
 
 class LoginServiceImpl(
@@ -32,7 +32,7 @@ class LoginServiceImpl(
         return if (response?.result == "ok") response.token else null
     }
 
-    override suspend fun refreshToken(token: AuthToken): AuthToken? {
+    override suspend fun refreshToken(token: AuthToken, logoutOnFail: Boolean): AuthToken? {
         return try {
             // note: not using catching call intentionally, prevents networking errors from forcing logout
             val result = client.post(HttpRoutes.REFRESH_TOKEN_URL) {
@@ -46,7 +46,7 @@ class LoginServiceImpl(
             if (response?.result == "ok") response.token else null
         } catch (e: Exception) {
             Clog.w(e.localizedMessage ?: "Unknown error")
-            token
+            if (logoutOnFail) null else token
         }
     }
 }

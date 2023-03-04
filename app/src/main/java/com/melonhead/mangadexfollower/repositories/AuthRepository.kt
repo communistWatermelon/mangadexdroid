@@ -29,7 +29,7 @@ class AuthRepository(
         }
     }
 
-    suspend fun refreshToken(): AuthToken? {
+    suspend fun refreshToken(logoutOnFail: Boolean = false): AuthToken? {
         fun signOut() {
             Clog.e("Signing out, refresh failed", Exception())
             mutableIsLoggedIn.value = LoginStatus.LoggedOut
@@ -44,7 +44,7 @@ class AuthRepository(
             signOut()
             return null
         }
-        val newToken = loginService.refreshToken(currentToken)
+        val newToken = loginService.refreshToken(currentToken, logoutOnFail)
         appDataService.updateToken(newToken)
         if (newToken == null) {
             signOut()

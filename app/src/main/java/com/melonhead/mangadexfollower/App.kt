@@ -9,6 +9,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.melonhead.mangadexfollower.di.appModule
 import com.melonhead.mangadexfollower.logs.Clog
+import com.melonhead.mangadexfollower.repositories.AuthRepository
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.AppDataService
 import com.melonhead.mangadexfollower.work_manager.RefreshWorker
@@ -23,14 +24,16 @@ import kotlin.time.toJavaDuration
 
 class App: Application() {
     private val mangaRepository: MangaRepository by inject()
+    private val authRepository: AuthRepository by inject()
     private val externalScope: CoroutineScope by inject()
     private val appDataService: AppDataService by inject()
 
     var inForeground = false
         private set
-
     override fun onCreate() {
         super.onCreate()
+
+        instance = this
 
         startKoin {
             // Log Koin into Android logger
@@ -58,5 +61,12 @@ class App: Application() {
                 WorkManager.getInstance(this@App).enqueueUniquePeriodicWork("refresh-task", ExistingPeriodicWorkPolicy.KEEP, refreshWorkRequest)
             }
         })
+    }
+
+    companion object {
+        private lateinit var instance: App
+        suspend fun authFailed() {
+            instance.authRepository.refreshToken(logoutOnFail = true)
+        }
     }
 }

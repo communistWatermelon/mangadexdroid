@@ -1,5 +1,6 @@
 package com.melonhead.mangadexfollower.extensions
 
+import com.melonhead.mangadexfollower.App
 import com.melonhead.mangadexfollower.logs.Clog
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -12,7 +13,11 @@ suspend inline fun <reified T> HttpClient.catching(logMessage: String, function:
         response = function()
         response.body()
     } catch (e: Exception) {
-        Clog.e("$logMessage: ${response?.bodyAsText() ?: ""}", e)
+        if (response?.status?.value == 401) {
+            App.authFailed()
+        } else {
+            Clog.e("$logMessage: ${response?.bodyAsText() ?: ""}", e)
+        }
         null
     }
 }
