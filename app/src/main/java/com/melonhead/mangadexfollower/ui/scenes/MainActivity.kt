@@ -3,6 +3,7 @@ package com.melonhead.mangadexfollower.ui.scenes
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -77,7 +78,7 @@ class MainActivity : ComponentActivity() {
         }
 
         // request permission to post notifications
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
 
@@ -107,7 +108,6 @@ class MainActivity : ComponentActivity() {
 
         onNewIntent(intent)
     }
-    @Suppress("DEPRECATION")
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         val mangaJson = intent?.getStringExtra(NewChapterNotification.MANGA_EXTRA) ?: return
@@ -367,14 +367,12 @@ fun Chapter(modifier: Modifier = Modifier,
 }
 
 @Composable
-fun MangaCover(uiManga: UIManga) {
-    Row {
-        Box(Modifier.padding(horizontal = 10.dp)) {
+fun MangaCover(modifier: Modifier = Modifier, uiManga: UIManga) {
+    Row(modifier) {
+        Box(Modifier.padding(horizontal = 10.dp).height(110.dp)) {
             SubcomposeAsyncImage(modifier = Modifier
-                .sizeIn(maxWidth = 95.dp)
-                .height(140.dp)
-                .clip(RoundedCornerShape(12.dp)),
-                contentScale = ContentScale.FillHeight,
+                .clip(RoundedCornerShape(12.dp, 12.dp, 0.dp, 0.dp)),
+                contentScale = ContentScale.Crop,
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(uiManga.coverAddress)
                     .crossfade(true)
@@ -412,32 +410,6 @@ fun MangaCover(uiManga: UIManga) {
 }
 
 @Composable
-fun Manga(
-    uiManga: UIManga,
-    refreshStatus: MangaRefreshStatus,
-    onChapterClicked: (UIManga, UIChapter) -> Unit,
-    onChapterLongPressed: (UIManga, UIChapter) -> Unit
-) {
-    Box {
-        MangaCover(uiManga = uiManga)
-        Column(modifier = Modifier.padding(top = 110.dp)) {
-            // todo: allow users to set a max chapters per series limit
-//            uiManga.chapters.take(5).forEach {
-            uiManga.chapters.forEach {
-                Chapter(modifier = Modifier.padding(bottom = 8.dp),
-                    uiChapter = it,
-                    uiManga = uiManga,
-                    refreshStatus = refreshStatus,
-                    onChapterClicked = onChapterClicked,
-                    onChapterLongPressed = onChapterLongPressed
-                )
-            }
-        }
-    }
-
-}
-
-@Composable
 fun ChaptersList(
     manga: List<UIManga>,
     refreshStatus: MangaRefreshStatus,
@@ -450,6 +422,16 @@ fun ChaptersList(
     var justPulledRefresh by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
+    val itemState = rememberSaveable(inputs = manga.toTypedArray()) {
+        val items = mutableListOf<Any>()
+        manga.forEach { manga ->
+            items.add(manga)
+            manga.chapters.forEach {
+                items.add(it to manga)
+            }
+        }
+        items.toList()
+    }
     LaunchedEffect(refreshStatus) { justPulledRefresh = false }
 
     Column {
@@ -490,7 +472,7 @@ fun ChaptersList(
             swipeEnabled = (refreshStatus is None) && !isRefreshing.isRefreshing && !justPulledRefresh) {
             LazyColumn(modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)) {
+                verticalArrangement = Arrangement.spacedBy(0.dp)) {
                 item {
                     AnimatedVisibility(visible = refreshStatus is None && !isRefreshing.isRefreshing) {
                         Text(text = "Last Refresh: $refreshText",
@@ -511,9 +493,15 @@ fun ChaptersList(
                             textAlign = TextAlign.Center)
                     }
                 }
-                items(manga) {
-                    Column(verticalArrangement = Arrangement.SpaceEvenly) {
-                        Manga(uiManga = it, refreshStatus = refreshStatus, onChapterClicked = onChapterClicked, onChapterLongPressed = onChapterLongPressed)
+
+                items(itemState) {
+                    if (it is UIManga) {
+                        MangaCover(modifier = Modifier.padding(top = if (itemState.first() == it) 0.dp else 12.dp), uiManga = it)
+                    }
+                    if (it is Pair<*, *> && it.first is UIChapter) {
+                        Chapter(
+                            modifier = Modifier.padding(bottom = 12.dp),
+                            uiChapter = it.first as UIChapter, uiManga = it.second as UIManga, refreshStatus = refreshStatus, onChapterClicked = onChapterClicked, onChapterLongPressed = onChapterLongPressed)
                     }
                 }
             }
@@ -538,8 +526,8 @@ fun MangaPreview() {
     val testChapters = listOf(UIChapter("", "101", "Test Title", Clock.System.now(), true), UIChapter("", "102", "Test Title 2", Clock.System.now(), false))
     MangadexFollowerTheme {
         Column(modifier = Modifier.fillMaxWidth()) {
-            Manga(uiManga = UIManga("", "Test Manga", testChapters, null), refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
-            Manga(uiManga = UIManga("", "Test Manga with a really long name that causes the name to clip a little", testChapters, null), refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
+            MangaCover(uiManga = UIManga("", "Test Manga", testChapters, null))
+            MangaCover(uiManga = UIManga("", "Test Manga with a really long name that causes the name to clip a little", testChapters, null))
         }
     }
 }
