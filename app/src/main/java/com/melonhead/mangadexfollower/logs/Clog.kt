@@ -3,6 +3,7 @@ package com.melonhead.mangadexfollower.logs
 import android.util.Log
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
+import io.ktor.client.call.*
 import io.ktor.client.network.sockets.*
 import java.io.EOFException
 import java.io.IOException
@@ -26,7 +27,7 @@ object Clog {
     fun e(message: String, exception: Exception) {
         i(message)
         when (exception) {
-            is ConnectTimeoutException, is IOException, is EOFException -> return
+            is ConnectTimeoutException, is IOException, is EOFException, is NoTransformationFoundException -> return
         }
         Firebase.crashlytics.recordException(exception)
     }
