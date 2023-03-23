@@ -12,6 +12,7 @@ import com.melonhead.mangadexfollower.repositories.AuthRepository
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.*
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
+import com.melonhead.mangadexfollower.ui.viewmodels.WebViewViewModel
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.network.sockets.*
@@ -123,5 +124,9 @@ val appModule = module {
 
     viewModel {
         MainViewModel(get(), get(), get())
+    }
+
+    viewModel {
+        WebViewViewModel()
     }
 }

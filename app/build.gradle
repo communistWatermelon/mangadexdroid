@@ -15,7 +15,7 @@ android {
         applicationId "com.melonhead.mangadexfollower"
         minSdk 24
         targetSdk 33
-        versionCode 30
+        versionCode 31
         versionName "1." + versionCode
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

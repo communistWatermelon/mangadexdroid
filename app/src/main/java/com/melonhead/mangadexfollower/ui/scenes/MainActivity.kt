@@ -119,7 +119,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Content(
+private fun Content(
     loginStatus: LoginStatus?,
     refreshStatus: MangaRefreshStatus,
     refreshText: String,
@@ -180,7 +180,7 @@ fun Content(
 }
 
 @Composable
-fun LoadingScreen(refreshStatus: MangaRefreshStatus?) {
+private fun LoadingScreen(refreshStatus: MangaRefreshStatus?) {
     Column(modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
@@ -193,7 +193,7 @@ fun LoadingScreen(refreshStatus: MangaRefreshStatus?) {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
+private fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
     var emailField by rememberSaveable { mutableStateOf("") }
     var passwordField by rememberSaveable { mutableStateOf("") }
     var loggingIn by rememberSaveable { mutableStateOf(false) }
@@ -314,7 +314,7 @@ fun LoginScreen(loginClicked: (email: String, password: String) -> Unit) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Chapter(modifier: Modifier = Modifier,
+private fun Chapter(modifier: Modifier = Modifier,
             uiChapter: UIChapter,
             uiManga: UIManga,
             refreshStatus: MangaRefreshStatus,
@@ -367,7 +367,7 @@ fun Chapter(modifier: Modifier = Modifier,
 }
 
 @Composable
-fun MangaCover(modifier: Modifier = Modifier, uiManga: UIManga) {
+private fun MangaCover(modifier: Modifier = Modifier, uiManga: UIManga) {
     Row(modifier) {
         Box(modifier.padding(horizontal = 10.dp).height(110.dp)) {
             SubcomposeAsyncImage(modifier = Modifier
@@ -410,7 +410,7 @@ fun MangaCover(modifier: Modifier = Modifier, uiManga: UIManga) {
 }
 
 @Composable
-fun ChaptersList(
+private fun ChaptersList(
     manga: List<UIManga>,
     refreshStatus: MangaRefreshStatus,
     refreshText: String,
@@ -515,9 +515,10 @@ fun ChaptersList(
         }
     }
 }
+
 @Preview(showBackground = true)
 @Composable
-fun ChapterPreview() {
+private fun ChapterPreview() {
     MangadexFollowerTheme {
         val manga = UIManga("", "Test Manga", listOf(), null)
         Column {
@@ -529,7 +530,7 @@ fun ChapterPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun MangaPreview() {
+private fun MangaPreview() {
     val testChapters = listOf(UIChapter("", "101", "Test Title", Clock.System.now(), true), UIChapter("", "102", "Test Title 2", Clock.System.now(), false))
     MangadexFollowerTheme {
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -541,7 +542,7 @@ fun MangaPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun LoginPreview() {
+private fun LoginPreview() {
     MangadexFollowerTheme {
         LoginScreen(loginClicked = { _, _ -> })
     }
@@ -549,16 +550,15 @@ fun LoginPreview() {
 
 @Preview(showBackground = true)
 @Composable
-fun LoadingPreviewNoStatus() {
+private fun LoadingPreviewNoStatus() {
     MangadexFollowerTheme {
         LoadingScreen(null)
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
-fun LoadingPreview() {
+private fun LoadingPreview() {
     MangadexFollowerTheme {
         LoadingScreen(ReadStatus)
     }
