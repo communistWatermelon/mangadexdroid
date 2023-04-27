@@ -64,7 +64,7 @@ val appModule = module {
     }
 
     single<AppDataService> {
-        AppDataServiceImpl(get())
+        AppDataServiceImpl(get(), get())
     }
 
     single<LoginService> {
