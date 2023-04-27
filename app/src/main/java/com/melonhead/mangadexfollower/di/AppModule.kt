@@ -86,7 +86,7 @@ val appModule = module {
     }
 
     single(createdAtStart = true) {
-        AuthRepository(get(), get(), get(), get())
+        AuthRepository(get(), get(), get(), get(), get())
     }
 
     single(createdAtStart = true) {

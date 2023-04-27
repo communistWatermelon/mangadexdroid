@@ -9,14 +9,17 @@ import com.melonhead.mangadexfollower.models.ui.LoginStatus
 import com.melonhead.mangadexfollower.notifications.AuthFailedNotification
 import com.melonhead.mangadexfollower.services.AppDataService
 import com.melonhead.mangadexfollower.services.LoginService
+import com.melonhead.mangadexfollower.services.UserService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.lang.RuntimeException
 
 class AuthRepository(
     private val appContext: Context,
     private val appDataService: AppDataService,
     private val loginService: LoginService,
+    private val userService: UserService,
     externalScope: CoroutineScope,
 ) {
     private val mutableIsLoggedIn = MutableStateFlow<LoginStatus>(LoginStatus.LoggedOut)
@@ -30,13 +33,14 @@ class AuthRepository(
     }
 
     suspend fun refreshToken(logoutOnFail: Boolean = false): AuthToken? {
-        fun signOut() {
+        suspend fun signOut() {
             Clog.e("Signing out, refresh failed", Exception())
             mutableIsLoggedIn.value = LoginStatus.LoggedOut
             if ((appContext as App).inForeground) return
             val notificationManager = NotificationManagerCompat.from(appContext)
             if (!notificationManager.areNotificationsEnabled()) return
             AuthFailedNotification.postAuthFailed(appContext)
+            appDataService.updateUserId("")
         }
 
         val currentToken = appDataService.token.firstOrNull()
@@ -48,6 +52,13 @@ class AuthRepository(
         appDataService.updateToken(newToken)
         if (newToken == null) {
             signOut()
+        } else {
+            val userResponse = userService.getInfo(newToken)
+            val userId = userResponse?.data?.id
+            if (userId == null) {
+                Clog.e("User info returned null", RuntimeException())
+            }
+            appDataService.updateUserId(userId ?: "")
         }
         return newToken
     }
