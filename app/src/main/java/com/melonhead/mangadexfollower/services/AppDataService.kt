@@ -15,10 +15,12 @@ interface AppDataService {
     val token: Flow<AuthToken?>
     val installDateSeconds: Flow<Long?>
     val lastRefreshDateSeconds: Flow<Long?>
+    val userIdFlow: Flow<String?>
 
     suspend fun updateToken(token: AuthToken?)
     suspend fun updateInstallTime()
     suspend fun updateLastRefreshDate()
+    suspend fun updateUserId(id: String)
 }
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth")
@@ -30,6 +32,7 @@ class AppDataServiceImpl(
     private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
     private val INSTALL_DATE_SECONDS = longPreferencesKey("install_epoch_seconds")
     private val REFRESH_DATE_SECONDS = longPreferencesKey("last_refresh_epoch_seconds")
+    private val USER_ID = stringPreferencesKey("user_id")
 
     private val authTokenFlow: Flow<String> = appContext.dataStore.data.map { preferences ->
         // No type safety.
@@ -39,6 +42,11 @@ class AppDataServiceImpl(
     private val refreshTokenFlow: Flow<String> = appContext.dataStore.data.map { preferences ->
         // No type safety.
         preferences[REFRESH_TOKEN] ?: ""
+    }.distinctUntilChanged()
+
+    override val userIdFlow: Flow<String> = appContext.dataStore.data.map { preferences ->
+        // No type safety.
+        preferences[USER_ID] ?: ""
     }.distinctUntilChanged()
 
     override val installDateSeconds: Flow<Long?> = appContext.dataStore.data.map { preferences ->
@@ -76,6 +84,12 @@ class AppDataServiceImpl(
     override suspend fun updateLastRefreshDate() {
         appContext.dataStore.edit { settings ->
             settings[REFRESH_DATE_SECONDS] = Clock.System.now().epochSeconds
+        }
+    }
+
+    override suspend fun updateUserId(id: String) {
+        appContext.dataStore.edit { settings ->
+            settings[USER_ID] = id
         }
     }
 }
