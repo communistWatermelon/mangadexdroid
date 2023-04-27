@@ -52,10 +52,10 @@ val appModule = module {
                 })
             }
             install(HttpRequestRetry) {
-                retryIf { request, response ->
+                retryIf { _, response ->
                     !response.status.isSuccess() && response.status.value != 301 && response.status.value != 429
                 }
-                retryOnExceptionIf { request, cause ->
+                retryOnExceptionIf { _, cause ->
                     cause is ConnectTimeoutException || cause is JsonConvertException
                 }
                 exponentialDelay()
