@@ -52,9 +52,10 @@ class AppDataServiceImpl(
 
     init {
         externalScope.launch(IO) {
-            userIdFlow.collectLatest {userId ->
-                if (userId.isNotBlank()) {
-                    firebaseDb.getReference("users").child(it).addValueEventListenerFlow(FirebaseDbUser::class.java).collectLatest { user ->
+            userIdFlow.collectLatest {
+                val userDb = userDb()
+                if (userDb != null) {
+                    userDb.addValueEventListenerFlow(FirebaseDbUser::class.java).collectLatest { user ->
                         mutableCurrentFirebaseDBUser.value = user
                     }
                 } else {
