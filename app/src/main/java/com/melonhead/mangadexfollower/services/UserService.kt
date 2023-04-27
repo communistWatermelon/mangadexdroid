@@ -5,6 +5,7 @@ import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.models.auth.AuthToken
 import com.melonhead.mangadexfollower.models.content.Chapter
 import com.melonhead.mangadexfollower.models.shared.handlePagination
+import com.melonhead.mangadexfollower.models.user.User
 import com.melonhead.mangadexfollower.routes.HttpRoutes
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -12,6 +13,8 @@ import io.ktor.http.*
 
 interface UserService {
     suspend fun getFollowedChapters(token: AuthToken): List<Chapter>
+
+    suspend fun getInfo(token: AuthToken): User?
 }
 
 class UserServiceImpl(
@@ -34,6 +37,21 @@ class UserServiceImpl(
                     }
                 }
             }!!
+        }
+    }
+
+    override suspend fun getInfo(token: AuthToken): User? {
+        Clog.i("Get user")
+        return client.catching("getInfo") {
+            client.get(HttpRoutes.USER_ME_URL) {
+                headers {
+                    contentType(ContentType.Application.Json)
+                    bearerAuth(token.session)
+                }
+                url {
+
+                }
+            }
         }
     }
 }

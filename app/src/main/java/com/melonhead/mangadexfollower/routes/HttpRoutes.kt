@@ -14,4 +14,5 @@ object HttpRoutes {
     const val MANGA_READ_MARKERS_URL = "${MANGA_ROUTE}/read"
 
     const val USER_FOLLOW_CHAPTERS_URL = "${USER_ROUTE}/follows/manga/feed"
+    const val USER_ME_URL = "${USER_ROUTE}/me"
 }
