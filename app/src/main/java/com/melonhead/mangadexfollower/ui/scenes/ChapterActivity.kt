@@ -64,7 +64,9 @@ class ChapterActivity: ComponentActivity() {
                     }
                 }
 
-                ChapterView(currentPageUrl = page,
+                ChapterView(
+                    title = if (page != null && pages != null) "${pages!!.indexOf(page!!) + 1} / ${pages!!.count()}" else "Loading...",
+                    currentPageUrl = page,
                     chapterTapAreaSize = viewModel.chapterTapAreaSize,
                     tappedRightSide = { viewModel.nextPage() },
                     tappedLeftSide = { viewModel.prevPage() },
@@ -103,6 +105,7 @@ private fun ChapterTapArea(chapterTapAreaSize: Dp, modifier: Modifier) {
 
 @Composable
 private fun ChapterView(
+    title: String,
     currentPageUrl: String?,
     chapterTapAreaSize: Dp,
     tappedRightSide: () -> Unit,
@@ -113,7 +116,7 @@ private fun ChapterView(
         color = MaterialTheme.colorScheme.background
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            CloseBanner(callClose)
+            CloseBanner(title, callClose = callClose)
             if (currentPageUrl == null) {
                 LoadingScreen(refreshStatus = null)
             } else {

@@ -15,7 +15,7 @@ import java.lang.Integer.min
 
 class ChapterViewModel(
     private val mangaRepository: MangaRepository,
-    private val appDataService: AppDataService
+    appDataService: AppDataService
 ): ViewModel() {
     private val mutableChapterData = MutableStateFlow<List<String>?>(null)
     val chapterData = mutableChapterData.asStateFlow()
@@ -39,7 +39,7 @@ class ChapterViewModel(
     }
 
     fun nextPage() {
-        mutablePageIndex.value = min(mutableChapterData.value?.count() ?: 0, mutablePageIndex.value + 1)
+        mutablePageIndex.value = min((mutableChapterData.value?.count()?.minus(1)) ?: 0, mutablePageIndex.value + 1)
         // TODO: close if at end and no following chapter?
     }
 

@@ -68,7 +68,7 @@ private fun WebView(url: String?, callClose: () -> Unit) {
         color = MaterialTheme.colorScheme.background
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            CloseBanner(callClose)
+            CloseBanner(callClose = callClose)
 
             AndroidView(
                 modifier = Modifier.fillMaxSize(),

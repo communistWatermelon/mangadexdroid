@@ -359,7 +359,10 @@ private fun Chapter(modifier: Modifier = Modifier,
 @Composable
 private fun MangaCover(modifier: Modifier = Modifier, uiManga: UIManga) {
     Row(modifier) {
-        Box(modifier.padding(horizontal = 10.dp).height(110.dp)) {
+        Box(
+            modifier
+                .padding(horizontal = 10.dp)
+                .height(110.dp)) {
             SubcomposeAsyncImage(modifier = Modifier
                 .clip(RoundedCornerShape(12.dp, 12.dp, 0.dp, 0.dp)),
                 contentScale = ContentScale.Crop,
@@ -416,6 +419,7 @@ private fun ChaptersList(
         val items = mutableListOf<Any>()
         manga.forEach { manga ->
             items.add(manga)
+            // TODO: limit based on showReadChapterCount here
             manga.chapters.forEach {
                 items.add(it to manga)
             }

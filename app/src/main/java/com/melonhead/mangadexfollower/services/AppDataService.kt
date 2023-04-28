@@ -39,6 +39,7 @@ interface AppDataService {
     val renderStyle: RenderStyle
     val useDataSaver: Boolean
     val chapterTapAreaSize: Dp
+    val showReadChapterCount: Int
 
     suspend fun updateToken(token: AuthToken?)
     suspend fun updateInstallTime()
@@ -46,6 +47,7 @@ interface AppDataService {
     suspend fun updateUserId(id: String)
     suspend fun updateRenderStyle(renderStyle: RenderStyle)
     suspend fun setUseDataSaver(useDataSaver: Boolean)
+    suspend fun setShowReadChapterCount(readChapterCount: Int)
 }
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth")
@@ -115,6 +117,9 @@ class AppDataServiceImpl(
     override val chapterTapAreaSize: Dp
         get() = 60.dp
 
+    override val showReadChapterCount: Int
+        get() = 3
+
     override suspend fun updateToken(token: AuthToken?) {
         appContext.dataStore.edit { settings ->
             if (settings[AUTH_TOKEN] != token?.session)
@@ -158,6 +163,10 @@ class AppDataServiceImpl(
     }
 
     override suspend fun setUseDataSaver(useDataSaver: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun setShowReadChapterCount(readChapterCount: Int) {
         TODO("Not yet implemented")
     }
 }
