@@ -1,6 +1,8 @@
 package com.melonhead.mangadexfollower.services
 
 import android.content.Context
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -24,6 +26,9 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+enum class RenderStyle {
+    Native, WebView, Browser
+}
 
 interface AppDataService {
     val token: Flow<AuthToken?>
@@ -31,10 +36,16 @@ interface AppDataService {
     val lastRefreshDateSeconds: Flow<Long?>
     val userIdFlow: Flow<String?>
 
+    val renderStyle: RenderStyle
+    val useDataSaver: Boolean
+    val chapterTapAreaSize: Dp
+
     suspend fun updateToken(token: AuthToken?)
     suspend fun updateInstallTime()
     suspend fun updateLastRefreshDate()
     suspend fun updateUserId(id: String)
+    suspend fun updateRenderStyle(renderStyle: RenderStyle)
+    suspend fun setUseDataSaver(useDataSaver: Boolean)
 }
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth")
@@ -95,6 +106,15 @@ class AppDataServiceImpl(
         AuthToken(auth, refresh)
     }.distinctUntilChanged()
 
+    override val renderStyle: RenderStyle
+        get() = RenderStyle.Native
+
+    override val useDataSaver: Boolean
+        get() = true
+
+    override val chapterTapAreaSize: Dp
+        get() = 60.dp
+
     override suspend fun updateToken(token: AuthToken?) {
         appContext.dataStore.edit { settings ->
             if (settings[AUTH_TOKEN] != token?.session)
@@ -130,5 +150,13 @@ class AppDataServiceImpl(
         appContext.dataStore.edit { settings ->
             settings[USER_ID] = id
         }
+    }
+
+    override suspend fun updateRenderStyle(renderStyle: RenderStyle) {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun setUseDataSaver(useDataSaver: Boolean) {
+        TODO("Not yet implemented")
     }
 }

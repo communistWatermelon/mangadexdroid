@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.melonhead.mangadexfollower.WebViewActivity
 import com.melonhead.mangadexfollower.extensions.asLiveData
 import com.melonhead.mangadexfollower.extensions.dateOrTimeString
 import com.melonhead.mangadexfollower.models.ui.UIChapter
@@ -15,6 +14,9 @@ import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.repositories.AuthRepository
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.AppDataService
+import com.melonhead.mangadexfollower.services.RenderStyle
+import com.melonhead.mangadexfollower.ui.scenes.ChapterActivity
+import com.melonhead.mangadexfollower.ui.scenes.WebViewActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
@@ -65,12 +67,10 @@ class MainViewModel(
     fun onChapterClicked(context: Context, uiManga: UIManga, uiChapter: UIChapter) = viewModelScope.launch(Dispatchers.IO) {
         mangaRepository.markChapterRead(uiManga, uiChapter)
 
-        val intent = if (useWebView) {
-            WebViewActivity.newIntent(context, uiChapter.webAddress)
-        } else {
-            Intent(Intent.ACTION_VIEW).apply {
-                data = Uri.parse(uiChapter.webAddress)
-            }
+        val intent = when (userAppDataService.renderStyle) {
+            RenderStyle.Native -> ChapterActivity.newIntent(context, uiChapter.id)
+            RenderStyle.WebView -> WebViewActivity.newIntent(context, uiChapter.webAddress)
+            RenderStyle.Browser -> Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(uiChapter.webAddress) }
         }
 
         context.startActivity(intent)
@@ -83,9 +83,5 @@ class MainViewModel(
     fun refreshContent() = viewModelScope.launch {
         mangaRepository.forceRefresh()
         delay(5000) // prevent another refresh for 5 second
-    }
-
-    companion object {
-        private var useWebView = true
     }
 }

@@ -59,6 +59,7 @@ import com.melonhead.mangadexfollower.R
 import com.melonhead.mangadexfollower.extensions.dateOrTimeString
 import com.melonhead.mangadexfollower.models.ui.*
 import com.melonhead.mangadexfollower.notifications.NewChapterNotification
+import com.melonhead.mangadexfollower.ui.scenes.shared.LoadingScreen
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
 import kotlinx.datetime.Clock
@@ -179,17 +180,6 @@ private fun Content(
     }
 }
 
-@Composable
-private fun LoadingScreen(refreshStatus: MangaRefreshStatus?) {
-    Column(modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        CircularProgressIndicator()
-        if (refreshStatus != null && refreshStatus !is None)
-            Text(text = refreshStatus.text, fontSize = 16.sp, modifier = Modifier.padding(vertical = 16.dp))
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -545,21 +535,5 @@ private fun MangaPreview() {
 private fun LoginPreview() {
     MangadexFollowerTheme {
         LoginScreen(loginClicked = { _, _ -> })
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoadingPreviewNoStatus() {
-    MangadexFollowerTheme {
-        LoadingScreen(null)
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoadingPreview() {
-    MangadexFollowerTheme {
-        LoadingScreen(ReadStatus)
     }
 }

@@ -11,6 +11,7 @@ import com.melonhead.mangadexfollower.ratelimit.impl.rate
 import com.melonhead.mangadexfollower.repositories.AuthRepository
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.*
+import com.melonhead.mangadexfollower.ui.viewmodels.ChapterViewModel
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
 import com.melonhead.mangadexfollower.ui.viewmodels.WebViewViewModel
 import io.ktor.client.*
@@ -86,7 +87,7 @@ val appModule = module {
     factory { CoroutineScope(Dispatchers.IO) }
 
     single {
-        MangaRepository(get(), get(), get(), get(), get(), get(), get(), get())
+        MangaRepository(get(), get(), get(), get(), get(), get(), get(), get(), get())
     }
 
     single(createdAtStart = true) {
@@ -132,5 +133,9 @@ val appModule = module {
 
     viewModel {
         WebViewViewModel()
+    }
+
+    viewModel {
+        ChapterViewModel(get(), get())
     }
 }

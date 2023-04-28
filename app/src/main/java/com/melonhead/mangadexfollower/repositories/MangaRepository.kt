@@ -14,6 +14,7 @@ import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.models.ui.*
 import com.melonhead.mangadexfollower.notifications.NewChapterNotification
 import com.melonhead.mangadexfollower.services.AppDataService
+import com.melonhead.mangadexfollower.services.AtHomeService
 import com.melonhead.mangadexfollower.services.MangaService
 import com.melonhead.mangadexfollower.services.UserService
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +28,7 @@ class MangaRepository(
     private val mangaService: MangaService,
     private val userService: UserService,
     private val appDataService: AppDataService,
+    private val atHomeService: AtHomeService,
     private val chapterDb: ChapterDao,
     private val mangaDb: MangaDao,
     private val readMarkerDb: ReadMarkerDao,
@@ -191,5 +193,15 @@ class MangaRepository(
         NewChapterNotification.dismissNotification(appContext, uiManga, uiChapter)
         readMarkerDb.update(entity.copy(readStatus = true))
         mangaService.changeReadStatus(token, uiManga, uiChapter, true)
+    }
+
+    suspend fun getChapterData(chapterId: String): List<String>? {
+        val token = appDataService.token.firstOrNull() ?: return null
+        val chapterData = atHomeService.getChapterData(token, chapterId)
+        return if (appDataService.useDataSaver) {
+            chapterData?.pagesDataSaver()
+        } else {
+            chapterData?.pages()
+        }
     }
 }
