@@ -127,6 +127,7 @@ class AppDataServiceImpl(
 
     private suspend fun userDb(): DatabaseReference? {
         val userId = userIdFlow.firstOrNull() ?: return null
+        if (userId.isBlank()) return null
         return firebaseDb.getReference("users").child(userId)
     }
 

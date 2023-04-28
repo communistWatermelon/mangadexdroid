@@ -154,6 +154,7 @@ private fun ChapterView(
                     SubcomposeAsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(currentPageUrl)
+                            .crossfade(true)
                             .build(),
                         loading = {
                             LoadingScreen(refreshStatus = null)
