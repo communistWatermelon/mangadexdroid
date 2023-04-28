@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.google.firebase.database.DatabaseReference
@@ -15,7 +14,14 @@ import com.melonhead.mangadexfollower.extensions.addValueEventListenerFlow
 import com.melonhead.mangadexfollower.models.auth.AuthToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
@@ -41,8 +47,6 @@ class AppDataServiceImpl(
 
     private val AUTH_TOKEN = stringPreferencesKey("auth_token")
     private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
-    private val INSTALL_DATE_SECONDS = longPreferencesKey("install_epoch_seconds") // only for migration, shouldn't need for long
-    private val REFRESH_DATE_SECONDS = longPreferencesKey("last_refresh_epoch_seconds") // only for migration, shouldn't need for long
     private val USER_ID = stringPreferencesKey("user_id")
 
     private val authTokenFlow: Flow<String> = appContext.dataStore.data.map { preferences ->
@@ -108,13 +112,7 @@ class AppDataServiceImpl(
 
     private suspend fun currentDbUser(): FirebaseDbUser {
         val now = Clock.System.now().epochSeconds
-        val installDate = appContext.dataStore.data.map { preferences ->
-            preferences[INSTALL_DATE_SECONDS]
-        }.firstOrNull()
-        val refreshDate = appContext.dataStore.data.map { preferences ->
-            preferences[REFRESH_DATE_SECONDS]
-        }.firstOrNull()
-        return currentFirebaseDBUser.value ?: FirebaseDbUser(installDateSeconds = installDate ?: now, lastRefreshDateSeconds = refreshDate ?: now)
+        return currentFirebaseDBUser.value ?: FirebaseDbUser(installDateSeconds = now, lastRefreshDateSeconds = now)
     }
 
     override suspend fun updateInstallTime() {
