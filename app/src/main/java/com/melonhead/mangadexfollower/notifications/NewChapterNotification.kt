@@ -64,14 +64,24 @@ object NewChapterNotification {
 
         val notificationManager = NotificationManagerCompat.from(context)
 
+        notificationManager.cancelAll()
+
         Clog.i("post: New chapters for ${series.count()} manga")
         series.forEach { manga ->
             manga.chapters.filter { it.createdDate.epochSeconds >= installDateSeconds }.forEach chapters@{ uiChapter ->
                 val pendingIntent = pendingIntent(context, manga, uiChapter) ?: return@chapters
                 val notification = buildNotification(context, pendingIntent, manga, uiChapter)
-                notificationManager.notify(manga.id.hashCode() + uiChapter.id.hashCode(), notification)
+                notificationManager.notify(notificationId(manga, uiChapter), notification)
                 delay(1000) // ensures android actually posts all notifications
             }
         }
+    }
+
+    fun dismissNotification(context: Context, manga: UIManga, chapter: UIChapter) {
+        val notificationManager = NotificationManagerCompat.from(context)
+        notificationManager.cancel(notificationId(manga, chapter))
+    }
+    private fun notificationId(manga: UIManga, chapter: UIChapter): Int {
+        return manga.id.hashCode() + chapter.id.hashCode()
     }
 }

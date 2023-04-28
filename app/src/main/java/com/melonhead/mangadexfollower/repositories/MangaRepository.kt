@@ -175,11 +175,16 @@ class MangaRepository(
 
     suspend fun toggleChapterRead(uiManga: UIManga, uiChapter: UIChapter) {
         val entity = readMarkerDb.getEntity(uiManga.id, uiChapter.chapter) ?: return
-        readMarkerDb.update(entity.copy(readStatus = !(entity.readStatus ?: false)))
+        val toggledStatus = !(entity.readStatus ?: false)
+        if (toggledStatus) {
+            NewChapterNotification.dismissNotification(appContext, uiManga, uiChapter)
+        }
+        readMarkerDb.update(entity.copy(readStatus = toggledStatus))
     }
 
     suspend fun markChapterRead(uiManga: UIManga, uiChapter: UIChapter) {
         val entity = readMarkerDb.getEntity(uiManga.id, uiChapter.chapter) ?: return
+        NewChapterNotification.dismissNotification(appContext, uiManga, uiChapter)
         readMarkerDb.update(entity.copy(readStatus = true))
     }
 }
