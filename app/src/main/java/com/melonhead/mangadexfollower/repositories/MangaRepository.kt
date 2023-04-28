@@ -145,7 +145,7 @@ class MangaRepository(
         val readMarkers = chapters.map { ReadMarkerEntity.from(it, null) }
         readMarkerDb.insertAll(*readMarkers.toTypedArray())
 
-        val readChapters = mangaService.getReadChapters(manga.map { it.id }, token)
+        val readChapters = mangaService.getReadChapters(token, manga.map { it.id })
         val chaptersToUpdate = chapters
             // filter out chapters already marked as read in the db
             .filter {
@@ -174,17 +174,22 @@ class MangaRepository(
     }
 
     suspend fun toggleChapterRead(uiManga: UIManga, uiChapter: UIChapter) {
+        val token = appDataService.token.firstOrNull() ?: return
         val entity = readMarkerDb.getEntity(uiManga.id, uiChapter.chapter) ?: return
+
         val toggledStatus = !(entity.readStatus ?: false)
         if (toggledStatus) {
             NewChapterNotification.dismissNotification(appContext, uiManga, uiChapter)
         }
         readMarkerDb.update(entity.copy(readStatus = toggledStatus))
+        mangaService.changeReadStatus(token, uiManga, uiChapter, toggledStatus)
     }
 
     suspend fun markChapterRead(uiManga: UIManga, uiChapter: UIChapter) {
+        val token = appDataService.token.firstOrNull() ?: return
         val entity = readMarkerDb.getEntity(uiManga.id, uiChapter.chapter) ?: return
         NewChapterNotification.dismissNotification(appContext, uiManga, uiChapter)
         readMarkerDb.update(entity.copy(readStatus = true))
+        mangaService.changeReadStatus(token, uiManga, uiChapter, true)
     }
 }
