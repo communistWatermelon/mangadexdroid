@@ -64,8 +64,6 @@ object NewChapterNotification {
 
         val notificationManager = NotificationManagerCompat.from(context)
 
-        notificationManager.cancelAll()
-
         Clog.i("post: New chapters for ${series.count()} manga")
         series.forEach { manga ->
             manga.chapters.filter { it.createdDate.epochSeconds >= installDateSeconds }.forEach chapters@{ uiChapter ->

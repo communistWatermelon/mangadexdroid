@@ -44,8 +44,6 @@ class App: Application() {
             modules(appModule)
         }
 
-        externalScope.launch { appDataService.updateInstallTime() }
-
         ProcessLifecycleOwner.get().lifecycle.addObserver(object: DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 super.onStart(owner)

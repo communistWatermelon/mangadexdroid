@@ -62,6 +62,8 @@ class AppDataServiceImpl(
     private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
     private val USER_ID = stringPreferencesKey("user_id")
 
+    private var hasFetchedDbUser = false
+
     private val authTokenFlow: Flow<String> = appContext.dataStore.data.map { preferences ->
         // No type safety.
         preferences[AUTH_TOKEN] ?: ""
@@ -73,7 +75,9 @@ class AppDataServiceImpl(
                 val userDb = userDb()
                 if (userDb != null) {
                     userDb.addValueEventListenerFlow(FirebaseDbUser::class.java).collectLatest { user ->
+                        hasFetchedDbUser = true
                         mutableCurrentFirebaseDBUser.value = user
+                        if (user == null) updateInstallTime()
                     }
                 } else {
                     mutableCurrentFirebaseDBUser.value = null
@@ -136,15 +140,15 @@ class AppDataServiceImpl(
         return firebaseDb.getReference("users").child(userId)
     }
 
-    private suspend fun currentDbUser(): FirebaseDbUser {
-        val now = Clock.System.now().epochSeconds
-        return currentFirebaseDBUser.value ?: FirebaseDbUser(installDateSeconds = now, lastRefreshDateSeconds = now)
+    private fun currentDbUser(): FirebaseDbUser {
+        return currentFirebaseDBUser.value ?: FirebaseDbUser()
     }
 
     override suspend fun updateInstallTime() {
         val userDb = userDb() ?: return
-        val new = currentDbUser().copy(installDateSeconds =  Clock.System.now().epochSeconds)
-        userDb.setValue(new)
+        val new = currentDbUser()
+        if (new.installDateSeconds != null || !hasFetchedDbUser) return
+        userDb.setValue(new.copy(installDateSeconds = Clock.System.now().epochSeconds))
     }
     override suspend fun updateLastRefreshDate() {
         val userDb = userDb() ?: return
