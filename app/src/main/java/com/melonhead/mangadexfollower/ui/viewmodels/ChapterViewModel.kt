@@ -49,6 +49,7 @@ class ChapterViewModel(
         // TODO: close if at end and no following chapter?
     }
 
+    @Suppress("DEPRECATION")
     fun parseIntent(intent: Intent) {
         manga = intent.getParcelableExtra(ChapterActivity.EXTRA_UIMANGA)!!
         chapter = intent.getParcelableExtra(ChapterActivity.EXTRA_UICHAPTER)!!

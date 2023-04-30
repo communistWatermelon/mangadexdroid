@@ -18,6 +18,7 @@ class WebViewViewModel(
     private lateinit var manga: UIManga
     private lateinit var chapter: UIChapter
 
+    @Suppress("DEPRECATION")
     fun parseIntent(intent: Intent) {
         manga = intent.getParcelableExtra(WebViewActivity.EXTRA_UIMANGA)!!
         chapter = intent.getParcelableExtra(WebViewActivity.EXTRA_UICHAPTER)!!
