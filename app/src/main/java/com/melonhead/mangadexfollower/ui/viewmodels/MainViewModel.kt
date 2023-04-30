@@ -65,6 +65,11 @@ class MainViewModel(
     }
 
     fun onChapterClicked(context: Context, uiManga: UIManga, uiChapter: UIChapter) = viewModelScope.launch(Dispatchers.IO) {
+        // mark chapter as read on tap only for browse style rendering
+        if (userAppDataService.renderStyle == RenderStyle.Browser) {
+            mangaRepository.markChapterRead(uiManga, uiChapter)
+        }
+
         val intent = when (userAppDataService.renderStyle) {
             RenderStyle.Native -> ChapterActivity.newIntent(context, uiChapter, uiManga)
             RenderStyle.WebView -> WebViewActivity.newIntent(context, uiChapter, uiManga)
