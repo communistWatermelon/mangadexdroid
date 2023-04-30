@@ -75,9 +75,9 @@ class AppDataServiceImpl(
                 val userDb = userDb()
                 if (userDb != null) {
                     userDb.addValueEventListenerFlow(FirebaseDbUser::class.java).collectLatest { user ->
-                        hasFetchedDbUser = true
                         mutableCurrentFirebaseDBUser.value = user
                         if (user == null) updateInstallTime()
+                        hasFetchedDbUser = true
                     }
                 } else {
                     mutableCurrentFirebaseDBUser.value = null
