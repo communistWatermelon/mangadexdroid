@@ -1,8 +1,12 @@
 package com.melonhead.mangadexfollower.ui.viewmodels
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.repositories.MangaRepository
@@ -31,11 +35,18 @@ class ChapterViewModel(
     private lateinit var manga: UIManga
     private lateinit var chapter: UIChapter
 
-    private fun loadChapter(chapterId: String) {
+    private fun loadChapter(activity: Activity, chapterId: String) {
         viewModelScope.launch {
-            val pages = mangaRepository.getChapterData(chapterId) // TODO: throw an error instead
+            val pages = mangaRepository.getChapterData(chapterId)
             if (pages != null) {
                 mutableChapterData.value = pages
+            } else {
+                // TODO: use secondary render style
+                Clog.i("Falling back to webview")
+                // fallback to secondary render style
+                val intent = WebViewActivity.newIntent(activity, chapter, manga)
+                activity.finish()
+                activity.startActivity(intent)
             }
         }
     }
@@ -50,10 +61,10 @@ class ChapterViewModel(
     }
 
     @Suppress("DEPRECATION")
-    fun parseIntent(intent: Intent) {
+    fun parseIntent(activity: Activity, intent: Intent) {
         manga = intent.getParcelableExtra(ChapterActivity.EXTRA_UIMANGA)!!
         chapter = intent.getParcelableExtra(ChapterActivity.EXTRA_UICHAPTER)!!
-        loadChapter(chapter.id)
+        loadChapter(activity, chapter.id)
     }
 
     suspend fun markAsRead() {

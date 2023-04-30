@@ -80,13 +80,13 @@ class ChapterActivity: ComponentActivity() {
                 )
             }
         }
-        viewModel.parseIntent(intent)
+        viewModel.parseIntent(this, intent)
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         if (intent != null) {
-            viewModel.parseIntent(intent)
+            viewModel.parseIntent(this, intent)
         }
     }
 
