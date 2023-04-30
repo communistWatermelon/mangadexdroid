@@ -58,13 +58,13 @@ class WebViewActivity : ComponentActivity() {
     }
 
     companion object {
-        const val EXTRA_UIMANGA = "EXTRA_UIMANGA"
         const val EXTRA_UICHAPTER = "EXTRA_UICHAPTER"
+        const val EXTRA_UIMANGA = "EXTRA_UIMANGA"
 
         fun newIntent(context: Context, uiChapter: UIChapter, uiManga: UIManga): Intent {
             val intent = Intent(context, WebViewActivity::class.java)
-            intent.putExtra(EXTRA_UIMANGA, uiChapter)
-            intent.putExtra(EXTRA_UICHAPTER, uiManga)
+            intent.putExtra(EXTRA_UICHAPTER, uiChapter)
+            intent.putExtra(EXTRA_UIMANGA, uiManga)
             return intent
         }
     }
