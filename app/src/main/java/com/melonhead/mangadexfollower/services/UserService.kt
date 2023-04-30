@@ -36,7 +36,7 @@ class UserServiceImpl(
                         parameters.append("offset", "$offset")
                     }
                 }
-            }!!
+            }
         }
     }
 
