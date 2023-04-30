@@ -116,7 +116,7 @@ class AppDataServiceImpl(
         get() = RenderStyle.Native
 
     override val useDataSaver: Boolean
-        get() = true
+        get() = false
 
     override val chapterTapAreaSize: Dp
         get() = 60.dp
