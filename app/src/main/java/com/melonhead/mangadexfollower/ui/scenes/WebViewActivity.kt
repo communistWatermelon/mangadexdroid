@@ -18,9 +18,13 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.lifecycleScope
+import com.melonhead.mangadexfollower.models.ui.UIChapter
+import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.ui.scenes.shared.CloseBanner
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
 import com.melonhead.mangadexfollower.ui.viewmodels.WebViewViewModel
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class WebViewActivity : ComponentActivity() {
@@ -35,7 +39,10 @@ class WebViewActivity : ComponentActivity() {
                 val url by viewModel.url.observeAsState()
 
                 WebView(url = url, callClose = {
-                    finish()
+                    lifecycleScope.launch {
+                        viewModel.markAsRead()
+                        finish()
+                    }
                 })
             }
         }
@@ -51,11 +58,13 @@ class WebViewActivity : ComponentActivity() {
     }
 
     companion object {
-        const val EXTRA_URL = "EXTRA_URL"
+        const val EXTRA_UIMANGA = "EXTRA_UIMANGA"
+        const val EXTRA_UICHAPTER = "EXTRA_UICHAPTER"
 
-        fun newIntent(context: Context, url: String): Intent {
+        fun newIntent(context: Context, uiChapter: UIChapter, uiManga: UIManga): Intent {
             val intent = Intent(context, WebViewActivity::class.java)
-            intent.putExtra(EXTRA_URL, url)
+            intent.putExtra(EXTRA_UIMANGA, uiChapter)
+            intent.putExtra(EXTRA_UICHAPTER, uiManga)
             return intent
         }
     }

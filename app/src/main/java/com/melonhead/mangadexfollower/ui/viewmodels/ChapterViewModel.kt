@@ -3,9 +3,12 @@ package com.melonhead.mangadexfollower.ui.viewmodels
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.melonhead.mangadexfollower.models.ui.UIChapter
+import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.AppDataService
 import com.melonhead.mangadexfollower.ui.scenes.ChapterActivity
+import com.melonhead.mangadexfollower.ui.scenes.WebViewActivity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -24,6 +27,9 @@ class ChapterViewModel(
 
     private val mutablePageIndex = MutableStateFlow(0)
     val currentPage = mutableChapterData.combine(mutablePageIndex) { data, index -> data?.getOrNull(index) }
+
+    private lateinit var manga: UIManga
+    private lateinit var chapter: UIChapter
 
     private fun loadChapter(chapterId: String) {
         viewModelScope.launch {
@@ -44,6 +50,12 @@ class ChapterViewModel(
     }
 
     fun parseIntent(intent: Intent) {
-        loadChapter(intent.getStringExtra(ChapterActivity.EXTRA_UICHAPTER_ID)!!)
+        manga = intent.getParcelableExtra(ChapterActivity.EXTRA_UIMANGA)!!
+        chapter = intent.getParcelableExtra(ChapterActivity.EXTRA_UICHAPTER)!!
+        loadChapter(chapter.id)
+    }
+
+    suspend fun markAsRead() {
+        mangaRepository.markChapterRead(manga, chapter)
     }
 }

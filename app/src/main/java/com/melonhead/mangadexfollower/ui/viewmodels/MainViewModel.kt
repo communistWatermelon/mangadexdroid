@@ -65,11 +65,9 @@ class MainViewModel(
     }
 
     fun onChapterClicked(context: Context, uiManga: UIManga, uiChapter: UIChapter) = viewModelScope.launch(Dispatchers.IO) {
-        mangaRepository.markChapterRead(uiManga, uiChapter)
-
         val intent = when (userAppDataService.renderStyle) {
-            RenderStyle.Native -> ChapterActivity.newIntent(context, uiChapter.id)
-            RenderStyle.WebView -> WebViewActivity.newIntent(context, uiChapter.webAddress)
+            RenderStyle.Native -> ChapterActivity.newIntent(context, uiChapter, uiManga)
+            RenderStyle.WebView -> WebViewActivity.newIntent(context, uiChapter, uiManga)
             RenderStyle.Browser -> Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(uiChapter.webAddress) }
         }
 

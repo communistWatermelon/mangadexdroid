@@ -132,7 +132,7 @@ val appModule = module {
     }
 
     viewModel {
-        WebViewViewModel()
+        WebViewViewModel(get())
     }
 
     viewModel {

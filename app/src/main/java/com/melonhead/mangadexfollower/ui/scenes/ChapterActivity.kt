@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculatePan
@@ -29,19 +28,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import coil.compose.SubcomposeAsyncImage
 import coil.imageLoader
 import coil.request.ImageRequest
+import com.melonhead.mangadexfollower.models.ui.UIChapter
+import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.ui.scenes.shared.CloseBanner
 import com.melonhead.mangadexfollower.ui.scenes.shared.LoadingScreen
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
 import com.melonhead.mangadexfollower.ui.viewmodels.ChapterViewModel
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ChapterActivity: ComponentActivity() {
@@ -70,7 +71,12 @@ class ChapterActivity: ComponentActivity() {
                     chapterTapAreaSize = viewModel.chapterTapAreaSize,
                     tappedRightSide = { viewModel.nextPage() },
                     tappedLeftSide = { viewModel.prevPage() },
-                    callClose = { finish() }
+                    callClose = {
+                        lifecycleScope.launch {
+                            viewModel.markAsRead()
+                            finish()
+                        }
+                    }
                 )
             }
         }
@@ -85,11 +91,13 @@ class ChapterActivity: ComponentActivity() {
     }
 
     companion object {
-        const val EXTRA_UICHAPTER_ID = "EXTRA_UICHAPTER_ID"
+        const val EXTRA_UICHAPTER = "EXTRA_UICHAPTER"
+        const val EXTRA_UIMANGA = "EXTRA_UIMANGA"
 
-        fun newIntent(context: Context, chapterId: String): Intent {
+        fun newIntent(context: Context, chapter: UIChapter, manga: UIManga): Intent {
             val intent = Intent(context, ChapterActivity::class.java)
-            intent.putExtra(EXTRA_UICHAPTER_ID, chapterId)
+            intent.putExtra(EXTRA_UIMANGA, manga)
+            intent.putExtra(EXTRA_UICHAPTER, chapter)
             return intent
         }
     }
