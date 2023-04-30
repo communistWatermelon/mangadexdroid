@@ -63,6 +63,7 @@ import com.melonhead.mangadexfollower.ui.scenes.shared.LoadingScreen
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -333,7 +334,7 @@ private fun Chapter(modifier: Modifier = Modifier,
                     fontWeight = FontWeight.Normal,
                     fontSize = 14.sp
                 )
-                Text(text = uiChapter.createdDate.dateOrTimeString(),
+                Text(text = Instant.fromEpochSeconds(uiChapter.createdDate).dateOrTimeString(),
                     color = MaterialTheme.colorScheme.tertiary,
                     fontWeight = FontWeight.Light,
                     fontSize = 12.sp
@@ -516,8 +517,8 @@ private fun ChapterPreview() {
     MangadexFollowerTheme {
         val manga = UIManga("", "Test Manga", listOf(), null)
         Column {
-            Chapter(uiChapter = UIChapter("", "101", "Test Title with an extremely long title that may or may not wrap", Clock.System.now(), false), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
-            Chapter(uiChapter = UIChapter("", "102", "Test Title 2", Clock.System.now(), true), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
+            Chapter(uiChapter = UIChapter("", "101", "Test Title with an extremely long title that may or may not wrap", Clock.System.now().epochSeconds, false), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
+            Chapter(uiChapter = UIChapter("", "102", "Test Title 2", Clock.System.now().epochSeconds, true), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
         }
     }
 }
@@ -525,7 +526,7 @@ private fun ChapterPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun MangaPreview() {
-    val testChapters = listOf(UIChapter("", "101", "Test Title", Clock.System.now(), true), UIChapter("", "102", "Test Title 2", Clock.System.now(), false))
+    val testChapters = listOf(UIChapter("", "101", "Test Title", Clock.System.now().epochSeconds, true), UIChapter("", "102", "Test Title 2", Clock.System.now().epochSeconds, false))
     MangadexFollowerTheme {
         Column(modifier = Modifier.fillMaxWidth()) {
             MangaCover(uiManga = UIManga("", "Test Manga", testChapters, null))

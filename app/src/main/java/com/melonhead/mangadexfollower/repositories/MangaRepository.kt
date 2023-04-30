@@ -61,7 +61,7 @@ class MangaRepository(
         val uiManga = dbSeries.mapNotNull { manga ->
             val chapters = dbChapters.filter { it.mangaId == manga.id }.map { chapter ->
                 val read = readMarkerDb.getEntity(chapter.mangaId, chapter.chapter)?.readStatus
-                UIChapter(id = chapter.id, chapter = chapter.chapter, title = chapter.chapterTitle, createdDate = chapter.createdAt, read = read)
+                UIChapter(id = chapter.id, chapter = chapter.chapter, title = chapter.chapterTitle, createdDate = chapter.createdAt.epochSeconds, read = read)
             }
             if (chapters.isEmpty()) return@mapNotNull null
             UIManga(id = manga.id, manga.mangaTitle ?: "", chapters = chapters, manga.mangaCoverId)

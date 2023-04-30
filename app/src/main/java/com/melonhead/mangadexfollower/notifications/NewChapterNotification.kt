@@ -66,7 +66,7 @@ object NewChapterNotification {
 
         Clog.i("post: New chapters for ${series.count()} manga")
         series.forEach { manga ->
-            manga.chapters.filter { it.createdDate.epochSeconds >= installDateSeconds }.forEach chapters@{ uiChapter ->
+            manga.chapters.filter { it.createdDate >= installDateSeconds }.forEach chapters@{ uiChapter ->
                 val pendingIntent = pendingIntent(context, manga, uiChapter) ?: return@chapters
                 val notification = buildNotification(context, pendingIntent, manga, uiChapter)
                 notificationManager.notify(notificationId(manga, uiChapter), notification)
