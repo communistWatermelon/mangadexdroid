@@ -42,6 +42,7 @@ import com.melonhead.mangadexfollower.ui.scenes.shared.CloseBanner
 import com.melonhead.mangadexfollower.ui.scenes.shared.LoadingScreen
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
 import com.melonhead.mangadexfollower.ui.viewmodels.ChapterViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -72,7 +73,7 @@ class ChapterActivity: ComponentActivity() {
                     tappedRightSide = { viewModel.nextPage() },
                     tappedLeftSide = { viewModel.prevPage() },
                     callClose = {
-                        lifecycleScope.launch {
+                        lifecycleScope.launch(Dispatchers.IO) {
                             viewModel.markAsRead()
                             finish()
                         }

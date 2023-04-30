@@ -24,6 +24,7 @@ import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.ui.scenes.shared.CloseBanner
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
 import com.melonhead.mangadexfollower.ui.viewmodels.WebViewViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -39,7 +40,7 @@ class WebViewActivity : ComponentActivity() {
                 val url by viewModel.url.observeAsState()
 
                 WebView(url = url, callClose = {
-                    lifecycleScope.launch {
+                    lifecycleScope.launch(Dispatchers.IO) {
                         viewModel.markAsRead()
                         finish()
                     }
