@@ -102,7 +102,8 @@ class MainActivity : ComponentActivity() {
                         loginClicked = { username, password -> viewModel.authenticate(username, password) },
                         onChapterClicked = { uiManga, chapter -> viewModel.onChapterClicked(this, uiManga, chapter) },
                         onChapterLongPressed = { uiManga, chapter -> viewModel.toggleChapterRead(uiManga, chapter) },
-                        onSwipeRefresh = { viewModel.refreshContent() }
+                        onSwipeRefresh = { viewModel.refreshContent() },
+                        onMangaLongPress = { uiManga -> viewModel.toggleMangaWebview(uiManga) }
                     )
                 }
             }
@@ -129,7 +130,8 @@ private fun Content(
     loginClicked: (username: String, password: String) -> Unit,
     onChapterClicked: (UIManga, UIChapter) -> Unit,
     onChapterLongPressed: (UIManga, UIChapter) -> Unit,
-    onSwipeRefresh: () -> Unit
+    onSwipeRefresh: () -> Unit,
+    onMangaLongPress: (UIManga) -> Unit
 ) {
     var chapterReadStatusDialog by remember { mutableStateOf<Pair<UIManga, UIChapter>?>(null) }
     val currentReadStatusDialog = chapterReadStatusDialog
@@ -161,6 +163,36 @@ private fun Content(
         )
     }
 
+    var mangaWebviewToggleDialog by remember { mutableStateOf<UIManga?>(null) }
+    val currentWebviewToggleDialog = mangaWebviewToggleDialog
+
+    if (currentWebviewToggleDialog != null) {
+        AlertDialog(
+            onDismissRequest = { mangaWebviewToggleDialog = null },
+            title = {
+                Text(text = currentWebviewToggleDialog.title)
+            },
+            text = {
+                Text(text = "Switch to ${if (currentWebviewToggleDialog.useWebview) "native" else "webView"} reader for manga?")
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    onMangaLongPress(currentWebviewToggleDialog)
+                    mangaWebviewToggleDialog = null
+                }) {
+                    Text("Okay")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    mangaWebviewToggleDialog = null
+                }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     when (loginStatus) {
         LoginStatus.LoggedIn -> {
             if (manga.isEmpty()) LoadingScreen(refreshStatus) else {
@@ -172,7 +204,10 @@ private fun Content(
                     onChapterLongPressed = { uiManga, uiChapter ->
                         chapterReadStatusDialog = uiManga to uiChapter
                     },
-                    onSwipeRefresh = onSwipeRefresh
+                    onSwipeRefresh = onSwipeRefresh,
+                    onMangaLongPress = { uiManga ->
+                        mangaWebviewToggleDialog = uiManga
+                    },
                 )
             }
         }
@@ -357,9 +392,10 @@ private fun Chapter(modifier: Modifier = Modifier,
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun MangaCover(modifier: Modifier = Modifier, uiManga: UIManga) {
-    Row(modifier) {
+private fun MangaCover(modifier: Modifier = Modifier, uiManga: UIManga, onLongPress: (uiManga: UIManga) -> Unit) {
+    Row(modifier.combinedClickable(onClick = { }, onLongClick = { onLongPress(uiManga) })) {
         Box(
             modifier
                 .padding(horizontal = 10.dp)
@@ -410,7 +446,8 @@ private fun ChaptersList(
     refreshText: String,
     onChapterClicked: (UIManga, UIChapter) -> Unit,
     onChapterLongPressed: (UIManga, UIChapter) -> Unit,
-    onSwipeRefresh: () -> Unit
+    onSwipeRefresh: () -> Unit,
+    onMangaLongPress: (UIManga) -> Unit,
 ) {
     val isRefreshing = rememberSwipeRefreshState(isRefreshing = false)
     var justPulledRefresh by remember { mutableStateOf(false) }
@@ -420,10 +457,13 @@ private fun ChaptersList(
         val items = mutableListOf<Any>()
         manga.forEach { manga ->
             items.add(manga)
-            // TODO: limit based on showReadChapterCount here
-            manga.chapters.forEach {
+            manga.chapters.filter { it.read != true }.forEach {
                 items.add(it to manga)
             }
+// TODO: limit based on showReadChapterCount here
+//            manga.chapters.filter { it.read == true }.take.forEach {
+//                it
+//            }
         }
         items.toList()
     }
