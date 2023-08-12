@@ -37,7 +37,7 @@ class ChapterViewModel(
 
     private fun loadChapter(activity: Activity, chapterId: String) {
         viewModelScope.launch {
-            val pages = mangaRepository.getChapterData(chapterId)
+            val pages = if (manga.useWebview) null else mangaRepository.getChapterData(chapterId)
             if (pages != null) {
                 mutableChapterData.value = pages
             } else {

@@ -204,4 +204,9 @@ class MangaRepository(
             chapterData?.pages()
         }
     }
+
+    suspend fun setUseWebview(manga: UIManga, useWebView: Boolean) {
+        val entity = mangaDb.mangaById(manga.id).first() ?: return
+        mangaDb.update(entity.copy(useWebview = useWebView))
+    }
 }
