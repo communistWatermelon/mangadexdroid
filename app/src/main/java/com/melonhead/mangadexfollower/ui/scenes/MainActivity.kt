@@ -426,16 +426,20 @@ private fun MangaCover(modifier: Modifier = Modifier, uiManga: UIManga, onLongPr
                 contentDescription = "${uiManga.title} cover"
             )
         }
-        Text(modifier = Modifier
-            .align(Alignment.Top)
-            .padding(top = 20.dp)
-            .fillMaxWidth(1f),
-            text = uiManga.title,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.End,
-            fontSize = 20.sp)
+        Column(
+            modifier = Modifier.align(Alignment.Top).padding(top = 20.dp).fillMaxWidth(1f),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(text = uiManga.title,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.End,
+                fontSize = 20.sp)
+            Text(text = if (uiManga.useWebview) "WebView" else "Native",
+                overflow = TextOverflow.Ellipsis, fontSize = 12.sp)
+        }
     }
 }
 
