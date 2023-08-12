@@ -10,6 +10,7 @@ data class MangaEntity(
     @PrimaryKey(autoGenerate = false) val id: String,
     @ColumnInfo(name = "manga_title") val mangaTitle: String?,
     @ColumnInfo(name = "manga_cover_id") val mangaCoverId: String? = null,
+    @ColumnInfo(name = "use_webview") val useWebview: Boolean = false,
 ) {
     companion object {
         fun from(manga: Manga): MangaEntity {

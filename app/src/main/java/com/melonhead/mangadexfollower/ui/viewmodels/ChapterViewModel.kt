@@ -37,11 +37,14 @@ class ChapterViewModel(
 
     private fun loadChapter(activity: Activity, chapterId: String) {
         viewModelScope.launch {
-            val pages = mangaRepository.getChapterData(chapterId)
+            val pages = if (manga.useWebview) null else mangaRepository.getChapterData(chapterId)
             if (pages != null) {
                 mutableChapterData.value = pages
             } else {
-                // TODO: use secondary render style
+                // use secondary render style
+                if (!manga.useWebview) {
+                    mangaRepository.setUseWebview(manga, true)
+                }
                 Clog.i("Falling back to webview")
                 // fallback to secondary render style
                 val intent = WebViewActivity.newIntent(activity, chapter, manga)

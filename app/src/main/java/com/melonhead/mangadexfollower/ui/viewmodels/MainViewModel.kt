@@ -87,4 +87,8 @@ class MainViewModel(
         mangaRepository.forceRefresh()
         delay(5000) // prevent another refresh for 5 second
     }
+
+    fun toggleMangaWebview(uiManga: UIManga) = viewModelScope.launch {
+        mangaRepository.setUseWebview(uiManga, !uiManga.useWebview)
+    }
 }
