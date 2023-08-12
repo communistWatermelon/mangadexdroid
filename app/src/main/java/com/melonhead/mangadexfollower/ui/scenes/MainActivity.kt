@@ -498,7 +498,7 @@ private fun ChaptersList(
                     }
                 }) {
                     if (it is UIManga) {
-                        MangaCover(modifier = Modifier.padding(top = if (itemState.first() == it) 0.dp else 12.dp), uiManga = it)
+                        MangaCover(modifier = Modifier.padding(top = if (itemState.first() == it) 0.dp else 12.dp), uiManga = it, onLongPress = onMangaLongPress)
                     }
                     if (it is Pair<*, *> && it.first is UIChapter) {
                         Chapter(
@@ -515,7 +515,7 @@ private fun ChaptersList(
 @Composable
 private fun ChapterPreview() {
     MangadexFollowerTheme {
-        val manga = UIManga("", "Test Manga", listOf(), null)
+        val manga = UIManga("", "Test Manga", listOf(), null, false)
         Column {
             Chapter(uiChapter = UIChapter("", "101", "Test Title with an extremely long title that may or may not wrap", Clock.System.now().epochSeconds, false), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
             Chapter(uiChapter = UIChapter("", "102", "Test Title 2", Clock.System.now().epochSeconds, true), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
@@ -529,8 +529,8 @@ private fun MangaPreview() {
     val testChapters = listOf(UIChapter("", "101", "Test Title", Clock.System.now().epochSeconds, true), UIChapter("", "102", "Test Title 2", Clock.System.now().epochSeconds, false))
     MangadexFollowerTheme {
         Column(modifier = Modifier.fillMaxWidth()) {
-            MangaCover(uiManga = UIManga("", "Test Manga", testChapters, null))
-            MangaCover(uiManga = UIManga("", "Test Manga with a really long name that causes the name to clip a little", testChapters, null))
+            MangaCover(uiManga = UIManga("", "Test Manga", testChapters, null, false), onLongPress = { })
+            MangaCover(uiManga = UIManga("", "Test Manga with a really long name that causes the name to clip a little", testChapters, null, false), onLongPress = { })
         }
     }
 }
