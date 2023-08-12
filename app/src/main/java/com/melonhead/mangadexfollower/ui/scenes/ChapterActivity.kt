@@ -30,8 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import coil.compose.SubcomposeAsyncImage
 import coil.imageLoader
@@ -45,6 +48,23 @@ import com.melonhead.mangadexfollower.ui.viewmodels.ChapterViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.lang.Integer.min
+
+@Composable
+private fun getWidthHeight(): Pair<Int, Int> {
+    val configuration = LocalConfiguration.current
+    val width = with(LocalDensity.current) { configuration.screenWidthDp.dp.toPx() }.toInt()
+    val height = with(LocalDensity.current) { configuration.screenHeightDp.dp.toPx() }.toInt()
+    return width to height
+}
+
+private fun String.preloadImageRequest(context: Context, width: Int, height: Int): ImageRequest {
+    return ImageRequest.Builder(context)
+        .data(this)
+        .size(width = width, height = height)
+        .crossfade(true)
+        .build()
+}
 
 class ChapterActivity: ComponentActivity() {
     private val viewModel by viewModel<ChapterViewModel>()
@@ -56,29 +76,49 @@ class ChapterActivity: ComponentActivity() {
                 val page by viewModel.currentPage.collectAsState(initial = null)
                 val pages by viewModel.chapterData.collectAsState()
                 val context = LocalContext.current
+                val (width, height) = getWidthHeight()
+
+                fun preloadImage(url: String) {
+                    val request = url.preloadImageRequest(context, width, height)
+                    context.imageLoader.enqueue(request)
+                }
 
                 LaunchedEffect(key1 = pages) {
-                    pages?.forEach {
-                        val request = ImageRequest.Builder(context)
-                            .data(it)
-                            .build()
-                        context.imageLoader.enqueue(request)
+                    pages?.take(3)?.forEach {
+                        preloadImage(it)
                     }
                 }
 
-                ChapterView(
-                    title = if (page != null && pages != null) "${pages!!.indexOf(page!!) + 1} / ${pages!!.count()}" else "Loading...",
-                    currentPageUrl = page,
-                    chapterTapAreaSize = viewModel.chapterTapAreaSize,
-                    tappedRightSide = { viewModel.nextPage() },
-                    tappedLeftSide = { viewModel.prevPage() },
-                    callClose = {
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            viewModel.markAsRead()
-                            finish()
-                        }
+                val allPages = pages
+                val currentPage = page
+                if (currentPage == null || allPages == null) {
+                    LoadingChapterView {
+                        finish()
                     }
-                )
+                } else {
+                    val currentPageIndex = allPages.indexOf(currentPage)
+                    val totalPages = allPages.count()
+                    ChapterView(
+                        title = "${currentPageIndex + 1} / $totalPages",
+                        currentPageUrl = currentPage,
+                        chapterTapAreaSize = viewModel.chapterTapAreaSize,
+                        tappedRightSide = {
+                            val nextPreloadIndex = currentPageIndex + 2
+                            val start = min(nextPreloadIndex, totalPages - 1)
+                            val end = min(totalPages - 1, nextPreloadIndex)
+                            allPages.slice(start..end).forEach { preloadImage(it) }
+                            viewModel.nextPage()
+                        },
+                        tappedLeftSide = { viewModel.prevPage() },
+                        callClose = {
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                viewModel.markAsRead()
+                                finish()
+                            }
+                        }
+                    )
+                }
+
             }
         }
         viewModel.parseIntent(this, intent)
@@ -113,9 +153,24 @@ private fun ChapterTapArea(chapterTapAreaSize: Dp, modifier: Modifier) {
 }
 
 @Composable
+private fun LoadingChapterView(
+    callClose: () -> Unit
+
+) {
+    Surface(modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            CloseBanner("Loading...", callClose = callClose)
+            LoadingScreen(refreshStatus = null)
+        }
+    }
+}
+
+@Composable
 private fun ChapterView(
     title: String,
-    currentPageUrl: String?,
+    currentPageUrl: String,
     chapterTapAreaSize: Dp,
     tappedRightSide: () -> Unit,
     tappedLeftSide: () -> Unit,
@@ -126,62 +181,56 @@ private fun ChapterView(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             CloseBanner(title, callClose = callClose)
-            if (currentPageUrl == null) {
-                LoadingScreen(refreshStatus = null)
-            } else {
-                var scale by remember { mutableStateOf(1f) }
-                var offset by remember { mutableStateOf(Offset.Zero) }
+            var scale by remember { mutableStateOf(1f) }
+            var offset by remember { mutableStateOf(Offset.Zero) }
 
-                Box(
-                    Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .pointerInput(Unit) {
-                            forEachGesture {
-                                awaitPointerEventScope {
-                                    awaitFirstDown()
-                                    do {
-                                        val event = awaitPointerEvent()
-                                        scale = maxOf(1f, scale * event.calculateZoom())
-                                        val offsetChange = event.calculatePan()
-                                        offset += offsetChange
-                                        if (scale == 1f) {
-                                            offset = Offset.Zero
-                                        }
-                                    } while (event.changes.any { it.pressed })
-                                }
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .pointerInput(Unit) {
+                        forEachGesture {
+                            awaitPointerEventScope {
+                                awaitFirstDown()
+                                do {
+                                    val event = awaitPointerEvent()
+                                    scale = maxOf(1f, scale * event.calculateZoom())
+                                    val offsetChange = event.calculatePan()
+                                    offset += offsetChange
+                                    if (scale == 1f) {
+                                        offset = Offset.Zero
+                                    }
+                                } while (event.changes.any { it.pressed })
                             }
                         }
-                ) {
-                    ChapterTapArea(chapterTapAreaSize, modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .clickable { tappedLeftSide() }
-                    )
+                    }
+            ) {
+                ChapterTapArea(chapterTapAreaSize, modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .clickable { tappedLeftSide() }
+                )
 
-                    ChapterTapArea(chapterTapAreaSize, modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .clickable { tappedRightSide() }
-                    )
+                ChapterTapArea(chapterTapAreaSize, modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .clickable { tappedRightSide() }
+                )
 
-                    SubcomposeAsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(currentPageUrl)
-                            .crossfade(true)
-                            .build(),
-                        loading = {
-                            LoadingScreen(refreshStatus = null)
-                        },
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .graphicsLayer(
-                                scaleX = scale,
-                                scaleY = scale,
-                                translationX = offset.x,
-                                translationY = offset.y
-                            ),
-                        contentDescription = "Manga page"
-                    )
-                }
+                val (width, height) = getWidthHeight()
+                SubcomposeAsyncImage(
+                    model = currentPageUrl.preloadImageRequest(LocalContext.current, width, height),
+                    loading = {
+                        LoadingScreen(refreshStatus = null)
+                    },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer(
+                            scaleX = scale,
+                            scaleY = scale,
+                            translationX = offset.x,
+                            translationY = offset.y
+                        ),
+                    contentDescription = "Manga page"
+                )
             }
         }
     }
