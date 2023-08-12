@@ -24,7 +24,7 @@ object Clog {
         Firebase.crashlytics.log(message)
     }
 
-    fun e(message: String, exception: Exception) {
+    fun e(message: String, exception: Throwable) {
         i(message)
         when (exception) {
             is ConnectTimeoutException, is IOException, is EOFException, is NoTransformationFoundException -> return

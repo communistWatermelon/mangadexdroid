@@ -39,6 +39,8 @@ import androidx.lifecycle.lifecycleScope
 import coil.compose.SubcomposeAsyncImage
 import coil.imageLoader
 import coil.request.ImageRequest
+import coil.request.SuccessResult
+import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.ui.scenes.shared.CloseBanner
@@ -63,6 +65,21 @@ private fun String.preloadImageRequest(context: Context, width: Int, height: Int
         .data(this)
         .size(width = width, height = height)
         .crossfade(true)
+        .listener(
+            onStart = { request ->
+                Clog.i("Image Load start: URL ${request.data}")
+            },
+            onCancel = { request ->
+                Clog.i("Image Load cancel: URL ${request.data}")
+            },
+            onSuccess = { request, result ->
+                Clog.i("Image Load success: Source ${result.dataSource.name}, URL ${request.data}")
+            },
+            onError = { request, result ->
+                Clog.i("Image Load failed: URL ${request.data}")
+                Clog.e("Image Load failed", result.throwable)
+            }
+        )
         .build()
 }
 
@@ -84,7 +101,9 @@ class ChapterActivity: ComponentActivity() {
                 }
 
                 LaunchedEffect(key1 = pages) {
-                    pages?.take(3)?.forEach {
+                    val preloadPages = 3
+                    pages?.take(preloadPages)?.forEach {
+                        Clog.d("Initial preload - $preloadPages pages")
                         preloadImage(it)
                     }
                 }
@@ -103,9 +122,10 @@ class ChapterActivity: ComponentActivity() {
                         currentPageUrl = currentPage,
                         chapterTapAreaSize = viewModel.chapterTapAreaSize,
                         tappedRightSide = {
-                            val nextPreloadIndex = currentPageIndex + 2
+                            val nextPreloadIndex = currentPageIndex + 3
                             val start = min(nextPreloadIndex, totalPages - 1)
-                            val end = min(totalPages - 1, nextPreloadIndex)
+                            val end = min(totalPages - 1, nextPreloadIndex + 2)
+                            Clog.i("Next page - Preloading pages $start - $end")
                             allPages.slice(start..end).forEach { preloadImage(it) }
                             viewModel.nextPage()
                         },
