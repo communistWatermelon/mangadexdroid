@@ -39,7 +39,6 @@ import androidx.lifecycle.lifecycleScope
 import coil.compose.SubcomposeAsyncImage
 import coil.imageLoader
 import coil.request.ImageRequest
-import coil.request.SuccessResult
 import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
@@ -60,26 +59,29 @@ private fun getWidthHeight(): Pair<Int, Int> {
     return width to height
 }
 
-private fun String.preloadImageRequest(context: Context, width: Int, height: Int): ImageRequest {
+private fun String.preloadImageRequest(pageIndex: Int, context: Context, width: Int, height: Int, retryHash: Boolean = false, onError: () -> Unit = { } ): ImageRequest {
+
     return ImageRequest.Builder(context)
         .data(this)
         .size(width = width, height = height)
         .crossfade(true)
         .listener(
-            onStart = { request ->
-                Clog.i("Image Load start: URL ${request.data}")
+            onStart = {
+                Clog.i("Image Load start: page $pageIndex")
             },
-            onCancel = { request ->
-                Clog.i("Image Load cancel: URL ${request.data}")
+            onCancel = {
+                Clog.i("Image Load cancel: page $pageIndex")
             },
-            onSuccess = { request, result ->
-                Clog.i("Image Load success: Source ${result.dataSource.name}, URL ${request.data}")
+            onSuccess = { _, result ->
+                Clog.i("Image Load success: Source ${result.dataSource.name}, page $pageIndex")
             },
-            onError = { request, result ->
-                Clog.i("Image Load failed: URL ${request.data}")
+            onError = { _, result ->
+                Clog.i("Image Load failed: page $pageIndex")
                 Clog.e("Image Load failed", result.throwable)
+                onError()
             }
         )
+        .setParameter("retry_hash", retryHash)
         .build()
 }
 
@@ -92,41 +94,46 @@ class ChapterActivity: ComponentActivity() {
             MangadexFollowerTheme {
                 val page by viewModel.currentPage.collectAsState(initial = null)
                 val pages by viewModel.chapterData.collectAsState()
-                val context = LocalContext.current
-                val (width, height) = getWidthHeight()
-
-                fun preloadImage(url: String) {
-                    val request = url.preloadImageRequest(context, width, height)
-                    context.imageLoader.enqueue(request)
-                }
-
-                LaunchedEffect(key1 = pages) {
-                    val preloadPages = 3
-                    pages?.take(preloadPages)?.forEach {
-                        Clog.d("Initial preload - $preloadPages pages")
-                        preloadImage(it)
-                    }
-                }
-
                 val allPages = pages
                 val currentPage = page
+
                 if (currentPage == null || allPages == null) {
                     LoadingChapterView {
                         finish()
                     }
                 } else {
+                    val context = LocalContext.current
+                    val (width, height) = getWidthHeight()
+
+                    fun preloadImage(url: String, currentPageIndex: Int) {
+                        val request = url.preloadImageRequest(currentPageIndex, context, width, height)
+                        context.imageLoader.enqueue(request)
+                    }
+
+                    LaunchedEffect(key1 = pages) {
+                        val preloadPages = 2
+                        Clog.i("First page - Preloading pages 1 - ${1 + preloadPages}")
+                        allPages.slice(1..(1 + preloadPages)).forEach { page ->
+                            preloadImage(page, allPages.indexOf(page))
+                        }
+                    }
+
                     val currentPageIndex = allPages.indexOf(currentPage)
                     val totalPages = allPages.count()
                     ChapterView(
                         title = "${currentPageIndex + 1} / $totalPages",
+//                        title = "$currentPageIndex / ${totalPages - 1}", // for debugging purposes
+                        currentPageIndex = currentPageIndex,
                         currentPageUrl = currentPage,
                         chapterTapAreaSize = viewModel.chapterTapAreaSize,
                         tappedRightSide = {
-                            val nextPreloadIndex = currentPageIndex + 3
+                            val nextPreloadIndex = currentPageIndex + 2
                             val start = min(nextPreloadIndex, totalPages - 1)
-                            val end = min(totalPages - 1, nextPreloadIndex + 2)
-                            Clog.i("Next page - Preloading pages $start - $end")
-                            allPages.slice(start..end).forEach { preloadImage(it) }
+                            val end = min(totalPages - 1, nextPreloadIndex + 1)
+                            Clog.i("Next page - Current Page $currentPageIndex, moving to ${currentPageIndex + 1} Preloading pages $start - $end")
+                            allPages.slice(start..end).forEach {
+                                preloadImage(it, allPages.indexOf(it))
+                            }
                             viewModel.nextPage()
                         },
                         tappedLeftSide = { viewModel.prevPage() },
@@ -191,6 +198,7 @@ private fun LoadingChapterView(
 private fun ChapterView(
     title: String,
     currentPageUrl: String,
+    currentPageIndex: Int,
     chapterTapAreaSize: Dp,
     tappedRightSide: () -> Unit,
     tappedLeftSide: () -> Unit,
@@ -235,9 +243,13 @@ private fun ChapterView(
                     .clickable { tappedRightSide() }
                 )
 
+                var retryHash by remember { mutableStateOf(false) }
                 val (width, height) = getWidthHeight()
                 SubcomposeAsyncImage(
-                    model = currentPageUrl.preloadImageRequest(LocalContext.current, width, height),
+                    model = currentPageUrl.preloadImageRequest(pageIndex = currentPageIndex, LocalContext.current, width, height, retryHash) {
+                        Clog.i("Retrying due to load failure")
+                        retryHash = !retryHash
+                    },
                     loading = {
                         LoadingScreen(refreshStatus = null)
                     },

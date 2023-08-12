@@ -25,7 +25,7 @@ object Clog {
     }
 
     fun e(message: String, exception: Throwable) {
-        i(message)
+        Log.e(null, message, exception)
         when (exception) {
             is ConnectTimeoutException, is IOException, is EOFException, is NoTransformationFoundException -> return
         }
