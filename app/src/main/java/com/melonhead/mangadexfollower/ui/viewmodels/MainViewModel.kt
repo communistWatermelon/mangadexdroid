@@ -33,6 +33,7 @@ class MainViewModel(
     val loginStatus = authRepository.loginStatus.asLiveData()
     val manga = mangaRepository.manga.asLiveData()
     val refreshStatus = mangaRepository.refreshStatus.asLiveData()
+    val readMangaCount = userAppDataService.showReadChapterCount
 
     private val mutableRefreshText = MutableLiveData<String>()
     val refreshText = mutableRefreshText.asLiveData()

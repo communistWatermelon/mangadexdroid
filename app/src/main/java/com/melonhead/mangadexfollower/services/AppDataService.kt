@@ -122,7 +122,7 @@ class AppDataServiceImpl(
         get() = 60.dp
 
     override val showReadChapterCount: Int
-        get() = 3
+        get() = 1
 
     override suspend fun updateToken(token: AuthToken?) {
         appContext.dataStore.edit { settings ->

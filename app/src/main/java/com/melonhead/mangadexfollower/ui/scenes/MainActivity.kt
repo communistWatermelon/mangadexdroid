@@ -95,9 +95,11 @@ class MainActivity : ComponentActivity() {
                     val refreshStatus by viewModel.refreshStatus.observeAsState(None)
                     val refreshText by viewModel.refreshText.observeAsState("")
 
-                    Content(loginStatus = loginStatus,
+                    Content(
+                        loginStatus = loginStatus,
                         refreshStatus = refreshStatus,
                         refreshText = refreshText,
+                        readMangaCount = viewModel.readMangaCount,
                         manga = manga,
                         loginClicked = { username, password -> viewModel.authenticate(username, password) },
                         onChapterClicked = { uiManga, chapter -> viewModel.onChapterClicked(this, uiManga, chapter) },
@@ -126,6 +128,7 @@ private fun Content(
     refreshStatus: MangaRefreshStatus,
     refreshText: String,
     manga: List<UIManga>,
+    readMangaCount: Int,
     loginClicked: (username: String, password: String) -> Unit,
     onChapterClicked: (UIManga, UIChapter) -> Unit,
     onChapterLongPressed: (UIManga, UIChapter) -> Unit,
@@ -166,6 +169,7 @@ private fun Content(
             if (manga.isEmpty()) LoadingScreen(refreshStatus) else {
                 ChaptersList(
                     manga,
+                    readMangaCount = readMangaCount,
                     refreshText = refreshText,
                     refreshStatus = refreshStatus,
                     onChapterClicked = onChapterClicked,
@@ -406,6 +410,7 @@ private fun MangaCover(modifier: Modifier = Modifier, uiManga: UIManga) {
 @Composable
 private fun ChaptersList(
     manga: List<UIManga>,
+    readMangaCount: Int,
     refreshStatus: MangaRefreshStatus,
     refreshText: String,
     onChapterClicked: (UIManga, UIChapter) -> Unit,
@@ -422,6 +427,9 @@ private fun ChaptersList(
             items.add(manga)
             // TODO: limit based on showReadChapterCount here
             manga.chapters.forEach {
+                items.add(it to manga)
+            }
+            manga.chapters.filter { it.read == true }.take(readMangaCount).forEach {
                 items.add(it to manga)
             }
         }
