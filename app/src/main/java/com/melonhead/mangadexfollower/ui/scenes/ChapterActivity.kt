@@ -151,11 +151,9 @@ class ChapterActivity: ComponentActivity() {
         viewModel.parseIntent(this, intent)
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (intent != null) {
-            viewModel.parseIntent(this, intent)
-        }
+        viewModel.parseIntent(this, intent)
     }
 
     companion object {

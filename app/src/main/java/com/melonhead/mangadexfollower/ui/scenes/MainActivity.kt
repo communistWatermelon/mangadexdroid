@@ -113,9 +113,9 @@ class MainActivity : ComponentActivity() {
 
         onNewIntent(intent)
     }
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        val mangaJson = intent?.getStringExtra(NewChapterNotification.MANGA_EXTRA) ?: return
+        val mangaJson = intent.getStringExtra(NewChapterNotification.MANGA_EXTRA) ?: return
         val chapterJson = intent.getStringExtra(NewChapterNotification.CHAPTER_EXTRA) ?: return
         val manga: UIManga = Json.decodeFromString(mangaJson)
         val chapter: UIChapter = Json.decodeFromString(chapterJson)

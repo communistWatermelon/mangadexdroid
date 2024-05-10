@@ -51,11 +51,9 @@ class WebViewActivity : ComponentActivity() {
         viewModel.parseIntent(intent)
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (intent != null) {
-            viewModel.parseIntent(intent)
-        }
+        viewModel.parseIntent(intent)
     }
 
     companion object {
