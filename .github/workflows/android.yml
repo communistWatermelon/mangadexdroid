@@ -23,7 +23,7 @@ jobs:
         gradlePath: app/build.gradle # or app/build.gradle.kts 
         versionCode: ${{github.run_number}}
     - name: Build Release APK
-      run: ./gradlew assembleRelease
+      run: ./gradlew assembleDebug
     - name: Releasing using Hub
       uses: sangatdesai/release-apk@main
       env:
