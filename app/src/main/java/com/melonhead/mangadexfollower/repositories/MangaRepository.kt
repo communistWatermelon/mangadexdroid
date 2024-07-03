@@ -66,7 +66,7 @@ class MangaRepository(
                 UIChapter(id = chapter.id, chapter = chapter.chapter, title = chapter.chapterTitle, createdDate = chapter.createdAt.epochSeconds, read = read, externalUrl = chapter.externalUrl)
             }
             if (chapters.isEmpty()) return@mapNotNull null
-            UIManga(id = manga.id, manga.mangaTitle ?: "", chapters = chapters, manga.mangaCoverId, hasExternalChapters || manga.useWebview)
+            UIManga(id = manga.id, manga.chosenTitle ?: "", chapters = chapters, manga.mangaCoverId, useWebview = hasExternalChapters || manga.useWebview, altTitles = manga.mangaTitles)
         }
         if (uiManga.isEmpty()) return emptyList()
 
@@ -210,5 +210,11 @@ class MangaRepository(
     suspend fun setUseWebview(manga: UIManga, useWebView: Boolean) {
         val entity = mangaDb.mangaById(manga.id).first() ?: return
         mangaDb.update(entity.copy(useWebview = useWebView))
+    }
+
+    suspend fun updateChosenTitle(manga: UIManga, chosenTitle: String) {
+        val entity = mangaDb.mangaById(manga.id).first() ?: return
+        if (!entity.mangaTitles.contains(chosenTitle)) return
+        mangaDb.update(entity.copy(chosenTitle = chosenTitle))
     }
 }

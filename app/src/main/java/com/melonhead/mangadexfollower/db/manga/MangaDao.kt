@@ -29,5 +29,5 @@ interface MangaDao {
     suspend fun delete(chapters: MangaEntity)
 
     @Update
-    suspend fun update(chapters: MangaEntity)
+    suspend fun update(manga: MangaEntity)
 }

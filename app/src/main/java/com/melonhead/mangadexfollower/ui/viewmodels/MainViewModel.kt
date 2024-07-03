@@ -96,4 +96,8 @@ class MainViewModel(
     fun toggleMangaWebview(uiManga: UIManga) = viewModelScope.launch {
         mangaRepository.setUseWebview(uiManga, !uiManga.useWebview)
     }
+
+    fun setMangaTitle(uiManga: UIManga, newTitle: String) = viewModelScope.launch {
+        mangaRepository.updateChosenTitle(uiManga, newTitle)
+    }
 }

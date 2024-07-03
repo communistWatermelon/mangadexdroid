@@ -15,6 +15,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -49,6 +50,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.ContextCompat
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
@@ -105,7 +107,8 @@ class MainActivity : ComponentActivity() {
                         onChapterClicked = { uiManga, chapter -> viewModel.onChapterClicked(this, uiManga, chapter) },
                         onChapterLongPressed = { uiManga, chapter -> viewModel.toggleChapterRead(uiManga, chapter) },
                         onSwipeRefresh = { viewModel.refreshContent() },
-                        onMangaLongPress = { uiManga -> viewModel.toggleMangaWebview(uiManga) }
+                        onMangaLongPress = { uiManga -> viewModel.toggleMangaWebview(uiManga) },
+                        onChangeMangaTitle = { uiManga, title -> viewModel.setMangaTitle(uiManga, title) }
                     )
                 }
             }
@@ -134,10 +137,13 @@ private fun Content(
     onChapterClicked: (UIManga, UIChapter) -> Unit,
     onChapterLongPressed: (UIManga, UIChapter) -> Unit,
     onSwipeRefresh: () -> Unit,
-    onMangaLongPress: (UIManga) -> Unit
+    onMangaLongPress: (UIManga) -> Unit,
+    onChangeMangaTitle: (UIManga, String) -> Unit,
 ) {
     var chapterReadStatusDialog by remember { mutableStateOf<Pair<UIManga, UIChapter>?>(null) }
     val currentReadStatusDialog = chapterReadStatusDialog
+
+    var showTitleChangeDialogForManga by remember { mutableStateOf<UIManga?>(null) }
 
     if (currentReadStatusDialog != null) {
         AlertDialog(
@@ -196,6 +202,53 @@ private fun Content(
         )
     }
 
+    if (showTitleChangeDialogForManga != null) {
+        val options = showTitleChangeDialogForManga!!.altTitles
+        var selectedOption by remember { mutableStateOf(showTitleChangeDialogForManga!!.title) }
+
+        AlertDialog(
+            onDismissRequest = { showTitleChangeDialogForManga = null },
+            confirmButton = {
+                Button(onClick = {
+                    onChangeMangaTitle(showTitleChangeDialogForManga!!, selectedOption)
+                    showTitleChangeDialogForManga = null
+                }) {
+                    Text("Change Title")
+                }
+            },
+            title = { Text("Select an Option") },
+            text = {
+                Column {
+                    options.forEach { option ->
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .selectable(
+                                    selected = (option == selectedOption),
+                                    onClick = { selectedOption = option }
+                                )
+                                .padding(vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = (option == selectedOption),
+                                onClick = { selectedOption = option }
+                            )
+                            Text(
+                                text = option,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                        }
+                    }
+                }
+            },
+            properties = DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true
+            )
+        )
+    }
     when (loginStatus) {
         LoginStatus.LoggedIn -> {
             if (manga.isEmpty()) LoadingScreen(refreshStatus) else {
@@ -212,6 +265,7 @@ private fun Content(
                     onMangaLongPress = { uiManga ->
                         mangaWebviewToggleDialog = uiManga
                     },
+                    onTitleLongPress = { uiManga -> showTitleChangeDialogForManga = uiManga },
                 )
             }
         }
@@ -398,7 +452,7 @@ private fun Chapter(modifier: Modifier = Modifier,
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun MangaCover(modifier: Modifier = Modifier, uiManga: UIManga, onLongPress: (uiManga: UIManga) -> Unit) {
+private fun MangaCover(modifier: Modifier = Modifier, uiManga: UIManga, onLongPress: (uiManga: UIManga) -> Unit, onTitleLongPress: (uiManga: UIManga) -> Unit) {
     Row(modifier.combinedClickable(onClick = { }, onLongClick = { onLongPress(uiManga) })) {
         Box(
             modifier
@@ -435,7 +489,9 @@ private fun MangaCover(modifier: Modifier = Modifier, uiManga: UIManga, onLongPr
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text(text = uiManga.title,
+            Text(
+                modifier = Modifier.combinedClickable(onClick = { }, onLongClick = { onTitleLongPress(uiManga) }),
+                text = uiManga.title,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 fontWeight = FontWeight.Bold,
@@ -457,6 +513,7 @@ private fun ChaptersList(
     onChapterLongPressed: (UIManga, UIChapter) -> Unit,
     onSwipeRefresh: () -> Unit,
     onMangaLongPress: (UIManga) -> Unit,
+    onTitleLongPress: (UIManga) -> Unit,
 ) {
     val isRefreshing = rememberSwipeRefreshState(isRefreshing = false)
     var justPulledRefresh by remember { mutableStateOf(false) }
@@ -546,7 +603,7 @@ private fun ChaptersList(
                     }
                 }) {
                     if (it is UIManga) {
-                        MangaCover(modifier = Modifier.padding(top = if (itemState.first() == it) 0.dp else 12.dp), uiManga = it, onLongPress = onMangaLongPress)
+                        MangaCover(modifier = Modifier.padding(top = if (itemState.first() == it) 0.dp else 12.dp), uiManga = it, onLongPress = onMangaLongPress, onTitleLongPress = onTitleLongPress)
                     }
                     if (it is Pair<*, *> && it.first is UIChapter) {
                         Chapter(
@@ -563,7 +620,7 @@ private fun ChaptersList(
 @Composable
 private fun ChapterPreview() {
     MangadexFollowerTheme {
-        val manga = UIManga("", "Test Manga", listOf(), null, false)
+        val manga = UIManga("", "Test Manga", listOf(), null, false, altTitles = listOf("Test Manga"))
         Column {
             Chapter(uiChapter = UIChapter("", "101", "Test Title with an extremely long title that may or may not wrap", Clock.System.now().epochSeconds, false), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
             Chapter(uiChapter = UIChapter("", "102", "Test Title 2", Clock.System.now().epochSeconds, true), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
@@ -577,8 +634,8 @@ private fun MangaPreview() {
     val testChapters = listOf(UIChapter("", "101", "Test Title", Clock.System.now().epochSeconds, true), UIChapter("", "102", "Test Title 2", Clock.System.now().epochSeconds, false))
     MangadexFollowerTheme {
         Column(modifier = Modifier.fillMaxWidth()) {
-            MangaCover(uiManga = UIManga("", "Test Manga", testChapters, null, false), onLongPress = { })
-            MangaCover(uiManga = UIManga("", "Test Manga with a really long name that causes the name to clip a little", testChapters, null, false), onLongPress = { })
+            MangaCover(uiManga = UIManga("", "Test Manga", testChapters, null, false, altTitles = listOf("Test Manga")), onLongPress = { }, onTitleLongPress = { })
+            MangaCover(uiManga = UIManga("", "Test Manga with a really long name that causes the name to clip a little", testChapters, null, false, altTitles = listOf("Test Manga")), onLongPress = { }, onTitleLongPress = { })
         }
     }
 }
