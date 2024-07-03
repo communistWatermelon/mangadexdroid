@@ -67,22 +67,22 @@ tasks.register('generateVersionTxt') {
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.13.1'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.0'
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.8.0"
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.3'
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.8.3"
 
     implementation 'androidx.activity:activity-compose:1.9.0'
-    implementation "androidx.compose.ui:ui:1.6.7"
-    implementation "androidx.compose.ui:ui-tooling-preview:1.6.7"
-    implementation "androidx.compose.runtime:runtime-livedata:1.6.7"
+    implementation "androidx.compose.ui:ui:1.6.8"
+    implementation "androidx.compose.ui:ui-tooling-preview:1.6.8"
+    implementation "androidx.compose.runtime:runtime-livedata:1.6.8"
 
     implementation 'androidx.compose.material3:material3:1.2.1'
-    implementation "androidx.compose.material:material-icons-extended:1.6.7"
-    implementation 'com.google.firebase:firebase-crashlytics-ktx:19.0.0'
-    implementation 'com.google.firebase:firebase-analytics-ktx:22.0.0'
+    implementation "androidx.compose.material:material-icons-extended:1.6.8"
+    implementation 'com.google.firebase:firebase-crashlytics-ktx:19.0.2'
+    implementation 'com.google.firebase:firebase-analytics-ktx:22.0.2'
     testImplementation 'junit:junit:4.13.2'
 
-    debugImplementation "androidx.compose.ui:ui-tooling:1.6.7"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:1.6.7"
+    debugImplementation "androidx.compose.ui:ui-tooling:1.6.8"
+    debugImplementation "androidx.compose.ui:ui-test-manifest:1.6.8"
 
     implementation "io.insert-koin:koin-android:3.3.0"
     implementation "io.insert-koin:koin-androidx-compose:3.3.0"
@@ -108,11 +108,11 @@ dependencies {
 
     implementation 'com.google.accompanist:accompanist-swiperefresh:0.27.0'
 
-    implementation "androidx.lifecycle:lifecycle-process:2.8.0"
-    implementation "androidx.lifecycle:lifecycle-common:2.8.0"
+    implementation "androidx.lifecycle:lifecycle-process:2.8.3"
+    implementation "androidx.lifecycle:lifecycle-common:2.8.3"
 
     // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:33.0.0')
+    implementation platform('com.google.firebase:firebase-bom:33.1.1')
 
     // Add the dependency for the Realtime Database library
     // When using the BoM, you don't specify versions in Firebase library dependencies
