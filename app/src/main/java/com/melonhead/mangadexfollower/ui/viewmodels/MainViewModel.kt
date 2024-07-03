@@ -47,8 +47,12 @@ class MainViewModel(
         }
 
         viewModelScope.launch {
-            userAppDataService.lastRefreshDateSeconds.collectLatest {
-                updateRefreshText()
+            try {
+                userAppDataService.lastRefreshDateSeconds.collectLatest {
+                    updateRefreshText()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
