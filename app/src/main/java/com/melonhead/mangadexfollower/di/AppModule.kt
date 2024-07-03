@@ -38,7 +38,7 @@ val appModule = module {
                 default().rate(5, 1, DurationUnit.SECONDS)
             }
             install(Logging) {
-                level = LogLevel.INFO
+                level = LogLevel.ALL
                 logger = object: Logger {
                     override fun log(message: String) {
                         Clog.i(message)
