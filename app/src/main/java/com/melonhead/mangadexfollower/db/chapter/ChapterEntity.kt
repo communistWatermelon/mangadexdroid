@@ -16,6 +16,7 @@ data class ChapterEntity(
     @ColumnInfo(name = "chapter_title") val chapterTitle: String?,
     @ColumnInfo(name = "chapter") val chapter: String?,
     @ColumnInfo(name = "createdAt") val createdAt: Instant,
+    @ColumnInfo(name = "externalUrl") val externalUrl: String?,
 ) {
     companion object {
         fun from(chapter: Chapter): ChapterEntity {
@@ -25,6 +26,7 @@ data class ChapterEntity(
                 chapterTitle = chapter.attributes.title,
                 chapter = chapter.attributes.chapter ?: "1",
                 createdAt = chapter.attributes.createdAt,
+                externalUrl = chapter.attributes.externalUrl,
             )
         }
     }

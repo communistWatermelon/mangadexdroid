@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 
 @Parcelize
 @Serializable
-data class UIChapter(val id: String, val chapter: String?, val title: String?, val createdDate: Long, val read: Boolean?) :
+data class UIChapter(val id: String, val chapter: String?, val title: String?, val createdDate: Long, val read: Boolean?, val externalUrl: String? = null) :
     Parcelable {
     @IgnoredOnParcel
     val webAddress: String = "https://mangadex.org/chapter/$id"

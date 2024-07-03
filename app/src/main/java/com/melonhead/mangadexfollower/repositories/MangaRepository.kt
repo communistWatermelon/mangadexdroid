@@ -59,12 +59,14 @@ class MangaRepository(
     private fun generateUIManga(dbSeries: List<MangaEntity>, dbChapters: List<ChapterEntity>): List<UIManga> {
         // map the series and chapters into UIManga, sorted from most recent to least
         val uiManga = dbSeries.mapNotNull { manga ->
+            var hasExternalChapters = false
             val chapters = dbChapters.filter { it.mangaId == manga.id }.map { chapter ->
                 val read = readMarkerDb.getEntity(chapter.mangaId, chapter.chapter)?.readStatus
-                UIChapter(id = chapter.id, chapter = chapter.chapter, title = chapter.chapterTitle, createdDate = chapter.createdAt.epochSeconds, read = read)
+                hasExternalChapters = hasExternalChapters || chapter.externalUrl != null
+                UIChapter(id = chapter.id, chapter = chapter.chapter, title = chapter.chapterTitle, createdDate = chapter.createdAt.epochSeconds, read = read, externalUrl = chapter.externalUrl)
             }
             if (chapters.isEmpty()) return@mapNotNull null
-            UIManga(id = manga.id, manga.mangaTitle ?: "", chapters = chapters, manga.mangaCoverId, manga.useWebview)
+            UIManga(id = manga.id, manga.mangaTitle ?: "", chapters = chapters, manga.mangaCoverId, hasExternalChapters || manga.useWebview)
         }
         if (uiManga.isEmpty()) return emptyList()
 

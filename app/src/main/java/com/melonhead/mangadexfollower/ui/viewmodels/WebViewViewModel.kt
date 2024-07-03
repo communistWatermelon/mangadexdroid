@@ -22,7 +22,7 @@ class WebViewViewModel(
     fun parseIntent(intent: Intent) {
         manga = intent.getParcelableExtra(WebViewActivity.EXTRA_UIMANGA)!!
         chapter = intent.getParcelableExtra(WebViewActivity.EXTRA_UICHAPTER)!!
-        mutableUrl.value = chapter.webAddress
+        mutableUrl.value = chapter.externalUrl ?: chapter.webAddress
     }
 
     suspend fun markAsRead() {
