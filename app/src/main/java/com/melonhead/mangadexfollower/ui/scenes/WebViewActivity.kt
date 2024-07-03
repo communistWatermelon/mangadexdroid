@@ -2,8 +2,10 @@ package com.melonhead.mangadexfollower.ui.scenes
 
 import android.content.Context
 import android.content.Intent
+import android.net.http.SslError
 import android.os.Bundle
 import android.view.ViewGroup
+import android.webkit.SslErrorHandler
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
@@ -86,7 +88,15 @@ private fun WebView(url: String?, callClose: () -> Unit) {
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT
                     )
-                    webViewClient = WebViewClient()
+                    webViewClient = object : WebViewClient() {
+                        override fun onReceivedSslError(
+                            view: WebView?,
+                            handler: SslErrorHandler?,
+                            error: SslError?
+                        ) {
+                            handler?.proceed()
+                        }
+                    }
                     settings.javaScriptEnabled = true
                     settings.domStorageEnabled = true
 
