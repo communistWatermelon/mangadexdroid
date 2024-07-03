@@ -16,6 +16,7 @@ import com.melonhead.mangadexfollower.extensions.addValueEventListenerFlow
 import com.melonhead.mangadexfollower.models.auth.AuthToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -71,17 +72,22 @@ class AppDataServiceImpl(
 
     init {
         externalScope.launch(IO) {
-            userIdFlow.collectLatest {
-                val userDb = userDb()
-                if (userDb != null) {
-                    userDb.addValueEventListenerFlow(FirebaseDbUser::class.java).collectLatest { user ->
-                        mutableCurrentFirebaseDBUser.value = user
-                        if (user == null) updateInstallTime()
-                        hasFetchedDbUser = true
+            delay(100L)
+            try {
+                userIdFlow.collectLatest {
+                    val userDb = userDb()
+                    if (userDb != null) {
+                        userDb.addValueEventListenerFlow(FirebaseDbUser::class.java).collectLatest { user ->
+                            mutableCurrentFirebaseDBUser.value = user
+                            if (user == null) updateInstallTime()
+                            hasFetchedDbUser = true
+                        }
+                    } else {
+                        mutableCurrentFirebaseDBUser.value = null
                     }
-                } else {
-                    mutableCurrentFirebaseDBUser.value = null
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }

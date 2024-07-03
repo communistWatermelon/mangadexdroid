@@ -48,7 +48,11 @@ class MangaRepository(
     init {
         externalScope.launch {
             // refresh manga on login
-            authRepository.loginStatus.collectLatest { if (it is LoginStatus.LoggedIn) { refreshMangaThrottled(Unit) } }
+            try {
+                authRepository.loginStatus.collectLatest { if (it is LoginStatus.LoggedIn) { refreshMangaThrottled(Unit) } }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
