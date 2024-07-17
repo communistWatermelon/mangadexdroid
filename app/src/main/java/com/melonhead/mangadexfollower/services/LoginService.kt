@@ -1,7 +1,7 @@
 package com.melonhead.mangadexfollower.services
 
 import com.melonhead.mangadexfollower.extensions.catching
-import com.melonhead.mangadexfollower.logs.Clog
+import com.melonhead.lib_logging.Clog
 import com.melonhead.mangadexfollower.models.auth.AuthRequest
 import com.melonhead.mangadexfollower.models.auth.AuthResponse
 import com.melonhead.mangadexfollower.models.auth.AuthToken
@@ -45,9 +45,8 @@ class LoginServiceImpl(
             val response: AuthResponse? = result.body()
             if (response?.result == "ok") response.token else null
         } catch (e: Exception) {
-            Clog.w(e.localizedMessage ?: "Unknown error")
+            com.melonhead.lib_logging.Clog.w(e.localizedMessage ?: "Unknown error")
             if (logoutOnFail) null else token
         }
     }
 }
-

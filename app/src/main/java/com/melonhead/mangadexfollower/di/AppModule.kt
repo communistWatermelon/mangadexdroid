@@ -1,6 +1,6 @@
 package com.melonhead.mangadexfollower.di
 
-import com.melonhead.mangadexfollower.logs.Clog
+import com.melonhead.lib_logging.Clog
 import com.melonhead.mangadexfollower.ratelimit.RateLimit
 import com.melonhead.mangadexfollower.ratelimit.impl.default
 import com.melonhead.mangadexfollower.ratelimit.impl.rate

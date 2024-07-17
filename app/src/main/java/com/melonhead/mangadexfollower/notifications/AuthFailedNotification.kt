@@ -10,7 +10,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.melonhead.mangadexfollower.R
-import com.melonhead.mangadexfollower.logs.Clog
+import com.melonhead.lib_logging.Clog
 import com.melonhead.mangadexfollower.ui.scenes.MainActivity
 import kotlin.random.Random
 
@@ -48,7 +48,7 @@ object AuthFailedNotification {
 
         val notificationManager = NotificationManagerCompat.from(context)
 
-        Clog.i("postAuthFailed: Auth failed")
+        com.melonhead.lib_logging.Clog.i("postAuthFailed: Auth failed")
         val notification = buildNotification(context)
         notificationManager.notify(Random.nextInt(), notification)
     }

@@ -11,7 +11,7 @@ import com.melonhead.lib_database.readmarkers.ReadMarkerDao
 import com.melonhead.lib_database.readmarkers.ReadMarkerEntity
 import com.melonhead.mangadexfollower.extensions.from
 import com.melonhead.mangadexfollower.extensions.throttleLatest
-import com.melonhead.mangadexfollower.logs.Clog
+import com.melonhead.lib_logging.Clog
 import com.melonhead.mangadexfollower.models.ui.*
 import com.melonhead.mangadexfollower.notifications.NewChapterNotification
 import com.melonhead.mangadexfollower.services.AppDataService
@@ -87,11 +87,11 @@ class MangaRepository(
         // refresh auth
         val token = authRepository.refreshToken()
         if (token == null) {
-            Clog.i("Failed to refresh token")
+            com.melonhead.lib_logging.Clog.i("Failed to refresh token")
             return@launch
         }
 
-        Clog.i("refreshManga")
+        com.melonhead.lib_logging.Clog.i("refreshManga")
 
         mutableRefreshStatus.value = Following
         // fetch chapters from server
@@ -99,7 +99,7 @@ class MangaRepository(
         val chapterEntities = chaptersResponse.map { ChapterEntity.from(it) }
         val newChapters = chapterEntities.filter { !chapterDb.containsChapter(it.id) }
 
-        Clog.i("New chapters: ${newChapters.count()}")
+        com.melonhead.lib_logging.Clog.i("New chapters: ${newChapters.count()}")
 
         if (newChapters.isNotEmpty()) {
             mutableRefreshStatus.value = MangaSeries
@@ -111,7 +111,7 @@ class MangaRepository(
 
             // fetch manga series
             val newMangaIds = mangaIds.filter { !mangaDb.containsManga(it) }
-            Clog.i("New manga: ${newMangaIds.count()}")
+            com.melonhead.lib_logging.Clog.i("New manga: ${newMangaIds.count()}")
 
             if (newMangaIds.isNotEmpty()) {
                 val newMangaSeries = mangaService.getManga(token, newMangaIds.toList())
@@ -135,7 +135,7 @@ class MangaRepository(
         val notificationManager = NotificationManagerCompat.from(appContext)
         if (!notificationManager.areNotificationsEnabled()) return
         val installDateSeconds = appDataService.installDateSeconds.firstOrNull() ?: 0L
-        Clog.i("notifyOfNewChapters")
+        com.melonhead.lib_logging.Clog.i("notifyOfNewChapters")
 
         val newChapters = chapterDb.getAllSync().filter { readMarkerDb.isRead(it.mangaId, it.chapter) != true }
         val manga = mangaDb.getAllSync()
@@ -146,7 +146,7 @@ class MangaRepository(
     private suspend fun refreshReadStatus() {
         // make sure we have a token
         val token = appDataService.token.firstOrNull() ?: return
-        Clog.i("refreshReadStatus")
+        com.melonhead.lib_logging.Clog.i("refreshReadStatus")
         val manga = mangaDb.getAllSync()
         val chapters = chapterDb.getAllSync()
 

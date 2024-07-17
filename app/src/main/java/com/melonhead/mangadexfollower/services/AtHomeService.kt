@@ -1,7 +1,7 @@
 package com.melonhead.mangadexfollower.services
 
 import com.melonhead.mangadexfollower.extensions.catching
-import com.melonhead.mangadexfollower.logs.Clog
+import com.melonhead.lib_logging.Clog
 import com.melonhead.mangadexfollower.models.auth.AuthToken
 import com.melonhead.mangadexfollower.models.content.AtHomeChapterResponse
 import com.melonhead.mangadexfollower.routes.HttpRoutes.CHAPTER_DATA_URL
@@ -23,7 +23,7 @@ class AtHomeServiceImpl(
         authToken: AuthToken,
         chapterId: String
     ): AtHomeChapterResponse? {
-        Clog.i("getChapterData: $chapterId")
+        com.melonhead.lib_logging.Clog.i("getChapterData: $chapterId")
         return client.catching("getChapterData") {
             client.get(CHAPTER_DATA_URL + chapterId) {
                 headers {

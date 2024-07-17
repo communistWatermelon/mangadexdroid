@@ -1,6 +1,6 @@
 package com.melonhead.mangadexfollower.models.shared
 
-import com.melonhead.mangadexfollower.logs.Clog
+import com.melonhead.lib_logging.Clog
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
 
@@ -21,7 +21,7 @@ suspend inline fun <reified T> handlePagination(
             if (fetchAll) total = response.total
             response.data
         } catch (e: Exception) {
-            Clog.e("handlePagination: ${result.bodyAsText()}", e)
+            com.melonhead.lib_logging.Clog.e("handlePagination: ${result.bodyAsText()}", e)
             break
         }
         allItems.addAll(items)

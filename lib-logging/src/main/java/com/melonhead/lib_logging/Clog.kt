@@ -1,4 +1,4 @@
-package com.melonhead.mangadexfollower.logs
+package com.melonhead.lib_logging
 
 import android.util.Log
 import com.google.firebase.crashlytics.ktx.crashlytics

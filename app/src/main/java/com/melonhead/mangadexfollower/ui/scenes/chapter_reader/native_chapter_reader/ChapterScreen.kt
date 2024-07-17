@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.imageLoader
 import coil.request.ImageRequest
-import com.melonhead.mangadexfollower.logs.Clog
+import com.melonhead.lib_logging.Clog
 import com.melonhead.mangadexfollower.ui.scenes.shared.CloseBanner
 import com.melonhead.mangadexfollower.ui.scenes.shared.LoadingScreen
 import java.lang.Integer.min
@@ -50,7 +50,7 @@ internal fun ChapterScreen(
 
         LaunchedEffect(key1 = allPages) {
             val preloadPages = 2
-            Clog.i("First page - Preloading pages 1 - ${1 + preloadPages}")
+            com.melonhead.lib_logging.Clog.i("First page - Preloading pages 1 - ${1 + preloadPages}")
             allPages.slice(min(1, allPages.count() - 1)..min((1 + preloadPages), allPages.count() - 1)).forEach { page ->
                 preloadImage(page, allPages.indexOf(page))
             }
@@ -67,7 +67,7 @@ internal fun ChapterScreen(
                 val nextPreloadIndex = currentPageIndex + 2
                 val start = min(nextPreloadIndex, totalPages - 1)
                 val end = min(totalPages - 1, nextPreloadIndex + 1)
-                Clog.i("Next page - Current Page $currentPageIndex, moving to ${currentPageIndex + 1} Preloading pages $start - $end")
+                com.melonhead.lib_logging.Clog.i("Next page - Current Page $currentPageIndex, moving to ${currentPageIndex + 1} Preloading pages $start - $end")
                 allPages.slice(start..end).forEach {
                     preloadImage(it, allPages.indexOf(it))
                 }
@@ -157,7 +157,7 @@ private fun ChapterView(
                 val (width, height) = getWidthHeight()
                 SubcomposeAsyncImage(
                     model = currentPageUrl.preloadImageRequest(pageIndex = currentPageIndex, LocalContext.current, width, height, retryHash) {
-                        Clog.i("Retrying due to load failure")
+                        com.melonhead.lib_logging.Clog.i("Retrying due to load failure")
                         retryHash = !retryHash
                     },
                     loading = {
@@ -193,17 +193,17 @@ private fun String.preloadImageRequest(pageIndex: Int, context: Context, width: 
         .crossfade(true)
         .listener(
             onStart = {
-                Clog.i("Image Load start: page $pageIndex")
+                com.melonhead.lib_logging.Clog.i("Image Load start: page $pageIndex")
             },
             onCancel = {
-                Clog.i("Image Load cancel: page $pageIndex")
+                com.melonhead.lib_logging.Clog.i("Image Load cancel: page $pageIndex")
             },
             onSuccess = { _, result ->
-                Clog.i("Image Load success: Source ${result.dataSource.name}, page $pageIndex")
+                com.melonhead.lib_logging.Clog.i("Image Load success: Source ${result.dataSource.name}, page $pageIndex")
             },
             onError = { _, result ->
-                Clog.i("Image Load failed: page $pageIndex")
-                Clog.e("Image Load failed", result.throwable)
+                com.melonhead.lib_logging.Clog.i("Image Load failed: page $pageIndex")
+                com.melonhead.lib_logging.Clog.e("Image Load failed", result.throwable)
                 onError()
             }
         )

@@ -12,7 +12,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
 import com.melonhead.mangadexfollower.R
-import com.melonhead.mangadexfollower.logs.Clog
+import com.melonhead.lib_logging.Clog
 import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.ui.scenes.MainActivity
@@ -64,7 +64,7 @@ object NewChapterNotification {
 
         val notificationManager = NotificationManagerCompat.from(context)
 
-        Clog.i("post: New chapters for ${series.count()} manga")
+        com.melonhead.lib_logging.Clog.i("post: New chapters for ${series.count()} manga")
         series.forEach { manga ->
             manga.chapters.filter { it.createdDate >= installDateSeconds }.forEach chapters@{ uiChapter ->
                 val pendingIntent = pendingIntent(context, manga, uiChapter) ?: return@chapters

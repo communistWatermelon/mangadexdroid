@@ -9,7 +9,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.melonhead.lib_database.di.DBModule
 import com.melonhead.mangadexfollower.di.appModule
-import com.melonhead.mangadexfollower.logs.Clog
+import com.melonhead.lib_logging.Clog
 import com.melonhead.mangadexfollower.repositories.AuthRepository
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.AppDataService
@@ -56,7 +56,7 @@ class App: Application() {
             override fun onStop(owner: LifecycleOwner) {
                 super.onStop(owner)
                 inForeground = false
-                Clog.i("onStop: Creating background task")
+                com.melonhead.lib_logging.Clog.i("onStop: Creating background task")
                 val refreshWorkRequest = PeriodicWorkRequestBuilder<RefreshWorker>(15.minutes.toJavaDuration()).build()
                 WorkManager.getInstance(this@App).enqueueUniquePeriodicWork("refresh-task", ExistingPeriodicWorkPolicy.KEEP, refreshWorkRequest)
             }

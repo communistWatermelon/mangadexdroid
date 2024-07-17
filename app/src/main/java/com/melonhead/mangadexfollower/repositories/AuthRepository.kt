@@ -3,7 +3,7 @@ package com.melonhead.mangadexfollower.repositories
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import com.melonhead.mangadexfollower.App
-import com.melonhead.mangadexfollower.logs.Clog
+import com.melonhead.lib_logging.Clog
 import com.melonhead.mangadexfollower.models.auth.AuthToken
 import com.melonhead.mangadexfollower.models.ui.LoginStatus
 import com.melonhead.mangadexfollower.notifications.AuthFailedNotification
@@ -34,7 +34,7 @@ class AuthRepository(
 
     suspend fun refreshToken(logoutOnFail: Boolean = false): AuthToken? {
         suspend fun signOut() {
-            Clog.e("Signing out, refresh failed", Exception())
+            com.melonhead.lib_logging.Clog.e("Signing out, refresh failed", Exception())
             mutableIsLoggedIn.value = LoginStatus.LoggedOut
             if ((appContext as App).inForeground) return
             val notificationManager = NotificationManagerCompat.from(appContext)
@@ -56,14 +56,14 @@ class AuthRepository(
             val userResponse = userService.getInfo(newToken)
             val userId = userResponse?.data?.id
             if (userId == null) {
-                Clog.e("User info returned null", RuntimeException())
+                com.melonhead.lib_logging.Clog.e("User info returned null", RuntimeException())
             }
             appDataService.updateUserId(userId ?: "")
         }
         return newToken
     }
     suspend fun authenticate(email: String, password: String) {
-        Clog.i("authenticate")
+        com.melonhead.lib_logging.Clog.i("authenticate")
         mutableIsLoggedIn.value = LoginStatus.LoggingIn
         val token = loginService.authenticate(email, password)
         appDataService.updateToken(token)

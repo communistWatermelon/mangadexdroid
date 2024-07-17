@@ -4,8 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.melonhead.mangadexfollower.logs.Clog
+import com.melonhead.lib_logging.Clog
 import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.repositories.MangaRepository
@@ -45,7 +44,7 @@ class ChapterViewModel(
                 if (!manga.useWebview) {
                     mangaRepository.setUseWebview(manga, true)
                 }
-                Clog.i("Falling back to webview")
+                com.melonhead.lib_logging.Clog.i("Falling back to webview")
                 // fallback to secondary render style
                 val intent = WebViewActivity.newIntent(activity, chapter, manga)
                 activity.finish()

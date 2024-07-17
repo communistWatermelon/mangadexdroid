@@ -1,7 +1,7 @@
 package com.melonhead.mangadexfollower.services
 
 import com.melonhead.mangadexfollower.extensions.catching
-import com.melonhead.mangadexfollower.logs.Clog
+import com.melonhead.lib_logging.Clog
 import com.melonhead.mangadexfollower.models.auth.AuthToken
 import com.melonhead.mangadexfollower.models.content.Chapter
 import com.melonhead.mangadexfollower.models.shared.handlePagination
@@ -21,7 +21,7 @@ class UserServiceImpl(
     private val client: HttpClient
 ): UserService {
     override suspend fun getFollowedChapters(token: AuthToken): List<Chapter> {
-        Clog.i("getFollowedChapters")
+        com.melonhead.lib_logging.Clog.i("getFollowedChapters")
         return handlePagination(50, fetchAll = false) { offset ->
             client.catching("getFollowedChapters") {
                 client.get(HttpRoutes.USER_FOLLOW_CHAPTERS_URL) {
@@ -41,7 +41,7 @@ class UserServiceImpl(
     }
 
     override suspend fun getInfo(token: AuthToken): UserResponse? {
-        Clog.i("Get user")
+        com.melonhead.lib_logging.Clog.i("Get user")
         return client.catching("getInfo") {
             client.get(HttpRoutes.USER_ME_URL) {
                 headers {
