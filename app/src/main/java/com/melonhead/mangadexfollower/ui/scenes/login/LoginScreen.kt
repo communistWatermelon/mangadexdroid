@@ -1,4 +1,4 @@
-package com.melonhead.mangadexfollower.ui.scenes.home
+package com.melonhead.mangadexfollower.ui.scenes.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column

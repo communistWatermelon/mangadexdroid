@@ -1,9 +1,7 @@
 package com.melonhead.mangadexfollower.ui.viewmodels
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.melonhead.mangadexfollower.logs.Clog
@@ -11,8 +9,8 @@ import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.AppDataService
-import com.melonhead.mangadexfollower.ui.scenes.ChapterActivity
-import com.melonhead.mangadexfollower.ui.scenes.WebViewActivity
+import com.melonhead.mangadexfollower.ui.scenes.chapter_reader.native_chapter_reader.ChapterActivity
+import com.melonhead.mangadexfollower.ui.scenes.chapter_reader.web_chapter_reader.WebViewActivity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine

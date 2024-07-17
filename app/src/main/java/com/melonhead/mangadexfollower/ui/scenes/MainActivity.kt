@@ -11,16 +11,15 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import com.melonhead.mangadexfollower.models.ui.*
 import com.melonhead.mangadexfollower.notifications.NewChapterNotification
-import com.melonhead.mangadexfollower.ui.scenes.home.HomeList
-import com.melonhead.mangadexfollower.ui.scenes.home.LoginScreen
-import com.melonhead.mangadexfollower.ui.scenes.home.MainContent
+import com.melonhead.mangadexfollower.ui.scenes.home.HomeScreen
+import com.melonhead.mangadexfollower.ui.scenes.login.LoginScreen
 import com.melonhead.mangadexfollower.ui.scenes.shared.LoadingScreen
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
@@ -50,7 +49,33 @@ class MainActivity : ComponentActivity() {
                 Surface(modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainContent(viewModel)
+                    val loginStatus by viewModel.loginStatus.observeAsState()
+                    val manga by viewModel.manga.observeAsState(listOf())
+                    val refreshStatus by viewModel.refreshStatus.observeAsState(None)
+                    val refreshText by viewModel.refreshText.observeAsState("")
+                    val context = LocalContext.current
+
+                    when (loginStatus) {
+                        LoginStatus.LoggedIn -> {
+                            if (manga.isEmpty()) {
+                                LoadingScreen(refreshStatus)
+                            } else {
+                                HomeScreen(
+                                    manga,
+                                    readMangaCount = viewModel.readMangaCount,
+                                    refreshText = refreshText,
+                                    refreshStatus = refreshStatus,
+                                    onChapterClicked = { uiManga, chapter -> viewModel.onChapterClicked(context, uiManga, chapter) },
+                                    onToggleChapterRead = { uiManga, uiChapter -> viewModel.toggleChapterRead(uiManga, uiChapter) },
+                                    onSwipeRefresh = { viewModel.refreshContent() },
+                                    onToggleMangaRenderType = { uiManga -> viewModel.toggleMangaWebview(uiManga) },
+                                    onChangeMangaTitle = { uiManga, title ->  viewModel.setMangaTitle(uiManga, title) },
+                                )
+                            }
+                        }
+                        LoginStatus.LoggedOut -> LoginScreen { username, password -> viewModel.authenticate(username, password) }
+                        LoginStatus.LoggingIn, null -> LoadingScreen(null)
+                    }
                 }
             }
         }

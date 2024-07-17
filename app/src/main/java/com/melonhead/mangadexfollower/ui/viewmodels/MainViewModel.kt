@@ -15,8 +15,8 @@ import com.melonhead.mangadexfollower.repositories.AuthRepository
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.AppDataService
 import com.melonhead.mangadexfollower.services.RenderStyle
-import com.melonhead.mangadexfollower.ui.scenes.ChapterActivity
-import com.melonhead.mangadexfollower.ui.scenes.WebViewActivity
+import com.melonhead.mangadexfollower.ui.scenes.chapter_reader.native_chapter_reader.ChapterActivity
+import com.melonhead.mangadexfollower.ui.scenes.chapter_reader.web_chapter_reader.WebViewActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest

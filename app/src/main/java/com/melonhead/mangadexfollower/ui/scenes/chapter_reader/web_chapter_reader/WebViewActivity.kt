@@ -1,4 +1,4 @@
-package com.melonhead.mangadexfollower.ui.scenes
+package com.melonhead.mangadexfollower.ui.scenes.chapter_reader.web_chapter_reader
 
 import android.content.Context
 import android.content.Intent
@@ -121,4 +121,3 @@ private fun ScreenPreview() {
         WebView("") { }
     }
 }
-

@@ -1,4 +1,4 @@
-package com.melonhead.mangadexfollower.ui.scenes
+package com.melonhead.mangadexfollower.ui.scenes.chapter_reader.native_chapter_reader
 
 import android.content.Context
 import android.content.Intent
@@ -50,40 +50,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.lang.Integer.min
-
-@Composable
-private fun getWidthHeight(): Pair<Int, Int> {
-    val configuration = LocalConfiguration.current
-    val width = with(LocalDensity.current) { configuration.screenWidthDp.dp.toPx() }.toInt()
-    val height = with(LocalDensity.current) { configuration.screenHeightDp.dp.toPx() }.toInt()
-    return width to height
-}
-
-private fun String.preloadImageRequest(pageIndex: Int, context: Context, width: Int, height: Int, retryHash: Boolean = false, onError: () -> Unit = { } ): ImageRequest {
-
-    return ImageRequest.Builder(context)
-        .data(this)
-        .size(width = width, height = height)
-        .crossfade(true)
-        .listener(
-            onStart = {
-                Clog.i("Image Load start: page $pageIndex")
-            },
-            onCancel = {
-                Clog.i("Image Load cancel: page $pageIndex")
-            },
-            onSuccess = { _, result ->
-                Clog.i("Image Load success: Source ${result.dataSource.name}, page $pageIndex")
-            },
-            onError = { _, result ->
-                Clog.i("Image Load failed: page $pageIndex")
-                Clog.e("Image Load failed", result.throwable)
-                onError()
-            }
-        )
-        .setParameter("retry_hash", retryHash)
-        .build()
-}
 
 class ChapterActivity: ComponentActivity() {
     private val viewModel by viewModel<ChapterViewModel>()
@@ -264,4 +230,37 @@ private fun ChapterView(
             }
         }
     }
+}
+
+@Composable
+private fun getWidthHeight(): Pair<Int, Int> {
+    val configuration = LocalConfiguration.current
+    val width = with(LocalDensity.current) { configuration.screenWidthDp.dp.toPx() }.toInt()
+    val height = with(LocalDensity.current) { configuration.screenHeightDp.dp.toPx() }.toInt()
+    return width to height
+}
+
+private fun String.preloadImageRequest(pageIndex: Int, context: Context, width: Int, height: Int, retryHash: Boolean = false, onError: () -> Unit = { } ): ImageRequest {
+    return ImageRequest.Builder(context)
+        .data(this)
+        .size(width = width, height = height)
+        .crossfade(true)
+        .listener(
+            onStart = {
+                Clog.i("Image Load start: page $pageIndex")
+            },
+            onCancel = {
+                Clog.i("Image Load cancel: page $pageIndex")
+            },
+            onSuccess = { _, result ->
+                Clog.i("Image Load success: Source ${result.dataSource.name}, page $pageIndex")
+            },
+            onError = { _, result ->
+                Clog.i("Image Load failed: page $pageIndex")
+                Clog.e("Image Load failed", result.throwable)
+                onError()
+            }
+        )
+        .setParameter("retry_hash", retryHash)
+        .build()
 }

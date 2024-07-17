@@ -32,7 +32,7 @@ import com.melonhead.mangadexfollower.ui.scenes.home.list.ChapterListItem
 import com.melonhead.mangadexfollower.ui.scenes.home.list.MangaCoverListItem
 
 @Composable
-internal fun HomeList(
+internal fun HomeScreen(
     manga: List<UIManga>,
     readMangaCount: Int,
     refreshStatus: MangaRefreshStatus,

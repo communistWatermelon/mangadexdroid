@@ -31,8 +31,8 @@
                 android:value="" />
         </activity>
 
-        <activity android:name=".ui.scenes.WebViewActivity" />
-        <activity android:name=".ui.scenes.ChapterActivity" />
+        <activity android:name=".ui.scenes.chapter_reader.web_chapter_reader.WebViewActivity" />
+        <activity android:name=".ui.scenes.chapter_reader.native_chapter_reader.ChapterActivity" />
     </application>
 
 </manifest>

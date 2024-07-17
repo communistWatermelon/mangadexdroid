@@ -7,7 +7,7 @@ import com.melonhead.mangadexfollower.extensions.asLiveData
 import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.repositories.MangaRepository
-import com.melonhead.mangadexfollower.ui.scenes.WebViewActivity
+import com.melonhead.mangadexfollower.ui.scenes.chapter_reader.web_chapter_reader.WebViewActivity
 
 class WebViewViewModel(
     private val mangaRepository: MangaRepository,

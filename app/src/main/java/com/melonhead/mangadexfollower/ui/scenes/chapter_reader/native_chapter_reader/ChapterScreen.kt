@@ -1,0 +1,1 @@
+package com.melonhead.mangadexfollower.ui.scenes.chapter_reader.native_chapter_reader
