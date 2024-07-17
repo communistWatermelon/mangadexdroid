@@ -1,4 +1,4 @@
-package com.melonhead.mangadexfollower.db.chapter
+package com.melonhead.lib_database.chapter
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

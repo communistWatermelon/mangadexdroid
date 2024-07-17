@@ -7,6 +7,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.melonhead.lib_database.di.DBModule
 import com.melonhead.mangadexfollower.di.appModule
 import com.melonhead.mangadexfollower.logs.Clog
 import com.melonhead.mangadexfollower.repositories.AuthRepository
@@ -42,6 +43,7 @@ class App: Application() {
             androidContext(this@App)
             // Load modules
             modules(appModule)
+            modules(DBModule)
         }
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(object: DefaultLifecycleObserver {

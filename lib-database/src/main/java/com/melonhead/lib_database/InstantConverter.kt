@@ -1,4 +1,4 @@
-package com.melonhead.mangadexfollower.db
+package com.melonhead.lib_database
 
 import androidx.room.TypeConverter
 import kotlinx.datetime.Instant

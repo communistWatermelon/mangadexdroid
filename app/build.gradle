@@ -3,7 +3,6 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.0-RC'
     id 'org.jetbrains.kotlin.plugin.compose' version '2.0.0'
-    id 'com.google.devtools.ksp'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
     id 'kotlin-parcelize'
@@ -98,12 +97,6 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
     implementation "androidx.datastore:datastore-preferences:1.1.1"
 
-    implementation "androidx.room:room-runtime:2.6.1"
-    implementation "androidx.room:room-ktx:2.6.1"
-    annotationProcessor "androidx.room:room-compiler:2.6.1"
-    ksp "androidx.room:room-compiler:2.6.1"
-
-
     implementation "androidx.work:work-runtime-ktx:2.9.0"
 
     implementation 'com.google.accompanist:accompanist-swiperefresh:0.27.0'
@@ -117,4 +110,7 @@ dependencies {
     // Add the dependency for the Realtime Database library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-database-ktx'
+
+//    implementation project(":feature-database")
+    implementation project(":lib-database")
 }

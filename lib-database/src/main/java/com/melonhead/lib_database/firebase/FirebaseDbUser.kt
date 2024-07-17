@@ -1,4 +1,4 @@
-package com.melonhead.mangadexfollower.db.firebase
+package com.melonhead.lib_database.firebase
 
 import com.google.firebase.database.IgnoreExtraProperties
 

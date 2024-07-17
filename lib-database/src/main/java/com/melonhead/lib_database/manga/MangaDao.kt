@@ -1,4 +1,4 @@
-package com.melonhead.mangadexfollower.db.manga
+package com.melonhead.lib_database.manga
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow

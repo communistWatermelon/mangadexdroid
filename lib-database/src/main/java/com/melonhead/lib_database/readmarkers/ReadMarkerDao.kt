@@ -1,4 +1,4 @@
-package com.melonhead.mangadexfollower.db.readmarkers
+package com.melonhead.lib_database.readmarkers
 
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow

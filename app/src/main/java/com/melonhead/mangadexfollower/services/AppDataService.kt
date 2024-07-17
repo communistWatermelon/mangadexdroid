@@ -11,7 +11,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.melonhead.mangadexfollower.db.firebase.FirebaseDbUser
+import com.melonhead.lib_database.firebase.FirebaseDbUser
 import com.melonhead.mangadexfollower.extensions.addValueEventListenerFlow
 import com.melonhead.mangadexfollower.models.auth.AuthToken
 import kotlinx.coroutines.CoroutineScope

@@ -1,11 +1,11 @@
-package com.melonhead.mangadexfollower.db.readmarkers
+package com.melonhead.lib_database.readmarkers
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.melonhead.mangadexfollower.db.InstantConverter
-import com.melonhead.mangadexfollower.db.chapter.ChapterEntity
+import com.melonhead.lib_database.InstantConverter
+import com.melonhead.lib_database.chapter.ChapterEntity
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 
