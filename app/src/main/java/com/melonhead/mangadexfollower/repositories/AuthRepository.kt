@@ -34,7 +34,7 @@ class AuthRepository(
 
     suspend fun refreshToken(logoutOnFail: Boolean = false): AuthToken? {
         suspend fun signOut() {
-            com.melonhead.lib_logging.Clog.e("Signing out, refresh failed", Exception())
+            Clog.e("Signing out, refresh failed", Exception())
             mutableIsLoggedIn.value = LoginStatus.LoggedOut
             if ((appContext as App).inForeground) return
             val notificationManager = NotificationManagerCompat.from(appContext)
@@ -56,14 +56,14 @@ class AuthRepository(
             val userResponse = userService.getInfo(newToken)
             val userId = userResponse?.data?.id
             if (userId == null) {
-                com.melonhead.lib_logging.Clog.e("User info returned null", RuntimeException())
+                Clog.e("User info returned null", RuntimeException())
             }
             appDataService.updateUserId(userId ?: "")
         }
         return newToken
     }
     suspend fun authenticate(email: String, password: String) {
-        com.melonhead.lib_logging.Clog.i("authenticate")
+        Clog.i("authenticate")
         mutableIsLoggedIn.value = LoginStatus.LoggingIn
         val token = loginService.authenticate(email, password)
         appDataService.updateToken(token)

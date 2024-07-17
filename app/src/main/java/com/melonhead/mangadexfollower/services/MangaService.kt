@@ -29,7 +29,7 @@ class MangaServiceImpl(
     private val client: HttpClient,
 ): MangaService {
     override suspend fun getManga(token: AuthToken, mangaIds: List<String>): List<Manga> {
-        com.melonhead.lib_logging.Clog.i("getManga: ${mangaIds.count()}")
+        Clog.i("getManga: ${mangaIds.count()}")
         val result: List<Manga?> = handlePagination(mangaIds.count()) { offset ->
             client.catching("getManga") {
                 client.get(MANGA_URL) {
@@ -50,10 +50,10 @@ class MangaServiceImpl(
     }
 
     override suspend fun getReadChapters(token: AuthToken, mangaIds: List<String>): List<String> {
-        com.melonhead.lib_logging.Clog.i("getReadChapters: total ${mangaIds.count()}")
+        Clog.i("getReadChapters: total ${mangaIds.count()}")
         val allChapters = mutableListOf<String>()
         mangaIds.chunked(100).map { list ->
-            com.melonhead.lib_logging.Clog.i("getReadChapters: chunked ${list.count()}")
+            Clog.i("getReadChapters: chunked ${list.count()}")
             val result: MangaReadMarkersResponse? = client.catching("getReadChapters") {
                 client.get(MANGA_READ_MARKERS_URL) {
                     headers {
@@ -74,7 +74,7 @@ class MangaServiceImpl(
     }
 
     override suspend fun changeReadStatus(token: AuthToken, uiManga: UIManga, uiChapter: UIChapter, readStatus: Boolean) {
-        com.melonhead.lib_logging.Clog.i("changeReadStatus: chapter ${uiChapter.title} readStatus $readStatus")
+        Clog.i("changeReadStatus: chapter ${uiChapter.title} readStatus $readStatus")
         client.catchingSuccess("changeReadStatus") {
             client.post(MANGA_READ_CHAPTER_MARKERS_URL.replace(ID_PLACEHOLDER, uiManga.id)) {
                 headers {

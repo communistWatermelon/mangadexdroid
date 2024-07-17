@@ -50,7 +50,7 @@ internal fun ChapterScreen(
 
         LaunchedEffect(key1 = allPages) {
             val preloadPages = 2
-            com.melonhead.lib_logging.Clog.i("First page - Preloading pages 1 - ${1 + preloadPages}")
+            Clog.i("First page - Preloading pages 1 - ${1 + preloadPages}")
             allPages.slice(min(1, allPages.count() - 1)..min((1 + preloadPages), allPages.count() - 1)).forEach { page ->
                 preloadImage(page, allPages.indexOf(page))
             }
@@ -67,7 +67,7 @@ internal fun ChapterScreen(
                 val nextPreloadIndex = currentPageIndex + 2
                 val start = min(nextPreloadIndex, totalPages - 1)
                 val end = min(totalPages - 1, nextPreloadIndex + 1)
-                com.melonhead.lib_logging.Clog.i("Next page - Current Page $currentPageIndex, moving to ${currentPageIndex + 1} Preloading pages $start - $end")
+                Clog.i("Next page - Current Page $currentPageIndex, moving to ${currentPageIndex + 1} Preloading pages $start - $end")
                 allPages.slice(start..end).forEach {
                     preloadImage(it, allPages.indexOf(it))
                 }
@@ -157,7 +157,7 @@ private fun ChapterView(
                 val (width, height) = getWidthHeight()
                 SubcomposeAsyncImage(
                     model = currentPageUrl.preloadImageRequest(pageIndex = currentPageIndex, LocalContext.current, width, height, retryHash) {
-                        com.melonhead.lib_logging.Clog.i("Retrying due to load failure")
+                        Clog.i("Retrying due to load failure")
                         retryHash = !retryHash
                     },
                     loading = {
@@ -193,17 +193,17 @@ private fun String.preloadImageRequest(pageIndex: Int, context: Context, width: 
         .crossfade(true)
         .listener(
             onStart = {
-                com.melonhead.lib_logging.Clog.i("Image Load start: page $pageIndex")
+                Clog.i("Image Load start: page $pageIndex")
             },
             onCancel = {
-                com.melonhead.lib_logging.Clog.i("Image Load cancel: page $pageIndex")
+                Clog.i("Image Load cancel: page $pageIndex")
             },
             onSuccess = { _, result ->
-                com.melonhead.lib_logging.Clog.i("Image Load success: Source ${result.dataSource.name}, page $pageIndex")
+                Clog.i("Image Load success: Source ${result.dataSource.name}, page $pageIndex")
             },
             onError = { _, result ->
-                com.melonhead.lib_logging.Clog.i("Image Load failed: page $pageIndex")
-                com.melonhead.lib_logging.Clog.e("Image Load failed", result.throwable)
+                Clog.i("Image Load failed: page $pageIndex")
+                Clog.e("Image Load failed", result.throwable)
                 onError()
             }
         )

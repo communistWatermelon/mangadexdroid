@@ -8,7 +8,7 @@ import io.ktor.client.statement.*
 import kotlin.random.Random
 
 suspend inline fun <reified T> HttpClient.catching(logMessage: String, function: HttpClient.() -> HttpResponse): T? {
-    com.melonhead.lib_logging.Clog.i(logMessage)
+    Clog.i(logMessage)
     var response: HttpResponse? = null
     return try {
         response = function()
@@ -21,14 +21,14 @@ suspend inline fun <reified T> HttpClient.catching(logMessage: String, function:
                 App.authFailed()
             }
         } else {
-            com.melonhead.lib_logging.Clog.e("$logMessage: ${response?.bodyAsText() ?: ""}", e)
+            Clog.e("$logMessage: ${response?.bodyAsText() ?: ""}", e)
         }
         null
     }
 }
 
 suspend inline fun HttpClient.catchingSuccess(logMessage: String, function: HttpClient.() -> HttpResponse): Boolean {
-    com.melonhead.lib_logging.Clog.i(logMessage)
+    Clog.i(logMessage)
     var response: HttpResponse? = null
     return try {
         response = function()
@@ -41,7 +41,7 @@ suspend inline fun HttpClient.catchingSuccess(logMessage: String, function: Http
                 App.authFailed()
             }
         } else {
-            com.melonhead.lib_logging.Clog.e("$logMessage: ${response?.bodyAsText() ?: ""}", e)
+            Clog.e("$logMessage: ${response?.bodyAsText() ?: ""}", e)
         }
         false
     }

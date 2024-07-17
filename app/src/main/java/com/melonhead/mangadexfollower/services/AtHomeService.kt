@@ -23,7 +23,7 @@ class AtHomeServiceImpl(
         authToken: AuthToken,
         chapterId: String
     ): AtHomeChapterResponse? {
-        com.melonhead.lib_logging.Clog.i("getChapterData: $chapterId")
+        Clog.i("getChapterData: $chapterId")
         return client.catching("getChapterData") {
             client.get(CHAPTER_DATA_URL + chapterId) {
                 headers {

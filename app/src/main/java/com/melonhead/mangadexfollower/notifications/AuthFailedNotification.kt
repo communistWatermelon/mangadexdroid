@@ -48,7 +48,7 @@ object AuthFailedNotification {
 
         val notificationManager = NotificationManagerCompat.from(context)
 
-        com.melonhead.lib_logging.Clog.i("postAuthFailed: Auth failed")
+        Clog.i("postAuthFailed: Auth failed")
         val notification = buildNotification(context)
         notificationManager.notify(Random.nextInt(), notification)
     }

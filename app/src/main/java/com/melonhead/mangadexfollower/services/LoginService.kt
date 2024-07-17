@@ -45,7 +45,7 @@ class LoginServiceImpl(
             val response: AuthResponse? = result.body()
             if (response?.result == "ok") response.token else null
         } catch (e: Exception) {
-            com.melonhead.lib_logging.Clog.w(e.localizedMessage ?: "Unknown error")
+            Clog.w(e.localizedMessage ?: "Unknown error")
             if (logoutOnFail) null else token
         }
     }

@@ -21,7 +21,7 @@ suspend inline fun <reified T> handlePagination(
             if (fetchAll) total = response.total
             response.data
         } catch (e: Exception) {
-            com.melonhead.lib_logging.Clog.e("handlePagination: ${result.bodyAsText()}", e)
+            Clog.e("handlePagination: ${result.bodyAsText()}", e)
             break
         }
         allItems.addAll(items)

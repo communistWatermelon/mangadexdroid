@@ -64,7 +64,7 @@ object NewChapterNotification {
 
         val notificationManager = NotificationManagerCompat.from(context)
 
-        com.melonhead.lib_logging.Clog.i("post: New chapters for ${series.count()} manga")
+        Clog.i("post: New chapters for ${series.count()} manga")
         series.forEach { manga ->
             manga.chapters.filter { it.createdDate >= installDateSeconds }.forEach chapters@{ uiChapter ->
                 val pendingIntent = pendingIntent(context, manga, uiChapter) ?: return@chapters

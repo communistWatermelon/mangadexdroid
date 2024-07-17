@@ -21,7 +21,7 @@ class UserServiceImpl(
     private val client: HttpClient
 ): UserService {
     override suspend fun getFollowedChapters(token: AuthToken): List<Chapter> {
-        com.melonhead.lib_logging.Clog.i("getFollowedChapters")
+        Clog.i("getFollowedChapters")
         return handlePagination(50, fetchAll = false) { offset ->
             client.catching("getFollowedChapters") {
                 client.get(HttpRoutes.USER_FOLLOW_CHAPTERS_URL) {
@@ -41,7 +41,7 @@ class UserServiceImpl(
     }
 
     override suspend fun getInfo(token: AuthToken): UserResponse? {
-        com.melonhead.lib_logging.Clog.i("Get user")
+        Clog.i("Get user")
         return client.catching("getInfo") {
             client.get(HttpRoutes.USER_ME_URL) {
                 headers {

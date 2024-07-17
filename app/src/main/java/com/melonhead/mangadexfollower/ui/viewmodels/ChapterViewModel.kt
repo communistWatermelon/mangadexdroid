@@ -44,7 +44,7 @@ class ChapterViewModel(
                 if (!manga.useWebview) {
                     mangaRepository.setUseWebview(manga, true)
                 }
-                com.melonhead.lib_logging.Clog.i("Falling back to webview")
+                Clog.i("Falling back to webview")
                 // fallback to secondary render style
                 val intent = WebViewActivity.newIntent(activity, chapter, manga)
                 activity.finish()
