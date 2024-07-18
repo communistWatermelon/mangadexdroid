@@ -21,7 +21,9 @@ fun MangaEntity.Companion.from(manga: Manga): MangaEntity {
     return MangaEntity(
         id = manga.id,
         mangaTitles = titles,
-        chosenTitle = titles.first(),
-        mangaCoverId = manga.fileName
+        chosenTitle = titles.last(),
+        mangaCoverId = manga.fileName,
+        status = manga.attributes.status,
+        tags = manga.attributes.tags.mapNotNull { it.attributes.name["en"] },
     )
 }

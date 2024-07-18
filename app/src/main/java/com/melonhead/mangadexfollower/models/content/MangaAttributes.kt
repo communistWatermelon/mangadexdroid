@@ -6,7 +6,22 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
 
 @kotlinx.serialization.Serializable
-data class MangaAttributes(val title: Map<String, String>, val altTitles: JsonElement?) {
+data class MangaTagAttributes(
+    val name: Map<String, String>,
+)
+
+@kotlinx.serialization.Serializable
+data class MangaTags(
+    val attributes: MangaTagAttributes,
+)
+
+@kotlinx.serialization.Serializable
+data class MangaAttributes(
+    val title: Map<String, String>,
+    val altTitles: JsonElement?,
+    val status: String,
+    val tags: List<MangaTags>,
+) {
     fun getEnglishTitles(): List<String> {
         val englishTitles = mutableListOf<String>()
         for ((key, value) in title) {

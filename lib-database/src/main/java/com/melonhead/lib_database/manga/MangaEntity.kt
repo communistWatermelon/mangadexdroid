@@ -14,6 +14,8 @@ data class MangaEntity(
     @ColumnInfo(name = "manga_cover_id") val mangaCoverId: String? = null,
     @ColumnInfo(name = "use_webview") val useWebview: Boolean = false,
     @ColumnInfo(name = "chosen_title") val chosenTitle: String? = null,
+    @ColumnInfo(name = "status") val status: String,
+    @ColumnInfo(name = "tags") val tags: List<String>,
 ) {
     // required for mapping functions
     companion object
