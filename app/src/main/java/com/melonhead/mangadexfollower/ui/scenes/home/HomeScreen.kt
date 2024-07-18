@@ -26,6 +26,7 @@ import com.melonhead.mangadexfollower.models.ui.None
 import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.ui.scenes.home.dialogs.MarkChapterReadDialog
+import com.melonhead.mangadexfollower.ui.scenes.home.dialogs.ShowMangaDescriptionDialog
 import com.melonhead.mangadexfollower.ui.scenes.home.dialogs.TitleChangeDialog
 import com.melonhead.mangadexfollower.ui.scenes.home.dialogs.ToggleRenderTypeDialog
 import com.melonhead.mangadexfollower.ui.scenes.home.list.ChapterListItem
@@ -62,6 +63,12 @@ internal fun HomeScreen(
         showTitleChangeDialogForManga,
         onChangeMangaTitle = { uiManga, title -> onChangeMangaTitle(uiManga, title) },
         onDismissed = { showTitleChangeDialogForManga = null }
+    )
+
+    var showDescriptionDialogForManga by remember { mutableStateOf<UIManga?>(null) }
+    ShowMangaDescriptionDialog(
+        showDescriptionDialogForManga,
+        onDismissed = { showDescriptionDialogForManga = null }
     )
 
     val isRefreshing = rememberSwipeRefreshState(isRefreshing = false)
@@ -152,9 +159,15 @@ internal fun HomeScreen(
                     }
                 }) {
                     if (it is UIManga) {
-                        MangaCoverListItem(modifier = Modifier.padding(top = if (itemState.first() == it) 0.dp else 12.dp), uiManga = it, onLongPress = { mangaWebviewToggleDialog = it }, onTitleLongPress = {
-                            showTitleChangeDialogForManga = it
-                        })
+                        MangaCoverListItem(
+                            modifier = Modifier.padding(top = if (itemState.first() == it) 0.dp else 12.dp),
+                            uiManga = it,
+                            onLongPress = { mangaWebviewToggleDialog = it },
+                            onTapped = { showDescriptionDialogForManga = it },
+                            onTitleLongPress = {
+                                showTitleChangeDialogForManga = it
+                            }
+                        )
                     }
                     if (it is Pair<*, *> && it.first is UIChapter) {
                         ChapterListItem(

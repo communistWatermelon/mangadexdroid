@@ -82,6 +82,7 @@ class MangaRepository(
                 status = manga.status,
                 contentRating = manga.contentRating,
                 lastChapter = manga.lastChapter,
+                description = manga.description,
             )
         }
         if (uiManga.isEmpty()) return emptyList()

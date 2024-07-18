@@ -30,8 +30,14 @@ import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
-internal fun MangaCoverListItem(modifier: Modifier = Modifier, uiManga: UIManga, onLongPress: (uiManga: UIManga) -> Unit, onTitleLongPress: (uiManga: UIManga) -> Unit) {
-    Row(modifier.combinedClickable(onClick = { }, onLongClick = { onLongPress(uiManga) })) {
+internal fun MangaCoverListItem(
+    modifier: Modifier = Modifier,
+    uiManga: UIManga,
+    onTapped: (uiManga: UIManga) -> Unit,
+    onLongPress: (uiManga: UIManga) -> Unit,
+    onTitleLongPress: (uiManga: UIManga) -> Unit,
+) {
+    Row(modifier.combinedClickable(onClick = { onTapped(uiManga) }, onLongClick = { onLongPress(uiManga) })) {
         Box(
             modifier
                 .padding(horizontal = 10.dp)
@@ -153,11 +159,13 @@ private fun MangaPreview() {
             MangaCoverListItem(
                 uiManga = Previews.previewUIManga(),
                 onLongPress = { },
+                onTapped = { },
                 onTitleLongPress = { }
             )
             MangaCoverListItem(
                 uiManga = Previews.previewUIManga().copy(title = "Test Manga with a really long name that causes the name to clip a little"),
                 onLongPress = { },
+                onTapped = { },
                 onTitleLongPress = { }
             )
         }
