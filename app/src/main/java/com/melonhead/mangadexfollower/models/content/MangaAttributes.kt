@@ -24,6 +24,7 @@ data class MangaAttributes(
     val tags: List<MangaTags>,
     val contentRating: String,
     val lastChapter: String?,
+    val description: Map<String, String>
 ) {
     fun getEnglishTitles(): List<String> {
         val englishTitles = mutableListOf<String>()
@@ -37,5 +38,9 @@ data class MangaAttributes(
             englishTitles.addAll(altArray.filterIsInstance<JsonObject>().mapNotNull { it.getOrDefault("en", null) }.filterIsInstance<JsonPrimitive>().map { it.content })
         }
         return englishTitles
+    }
+
+    fun getEnglishDescription(): String? {
+        return description.getOrDefault("en", null)
     }
 }

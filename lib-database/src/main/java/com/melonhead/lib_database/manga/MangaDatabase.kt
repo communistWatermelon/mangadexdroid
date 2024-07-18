@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [MangaEntity::class],
-    version = 6
+    version = 7
 )
 internal abstract class MangaDatabase: RoomDatabase() {
     abstract fun mangaDao(): MangaDao

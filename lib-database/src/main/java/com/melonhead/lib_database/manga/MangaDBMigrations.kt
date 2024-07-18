@@ -33,4 +33,10 @@ internal object MangaDBMigrations {
             db.execSQL("ALTER TABLE manga ADD COLUMN last_chapter TEXT")
         }
     }
+
+    val MIGRATION_6_7 = object : Migration(6, 7) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE manga ADD COLUMN description TEXT")
+        }
+    }
 }

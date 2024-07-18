@@ -30,6 +30,7 @@ fun MangaEntity.Companion.from(manga: Manga): MangaEntity {
             MangaTag(it.id, name)
         },
         contentRating = manga.attributes.contentRating,
-        lastChapter = manga.attributes.lastChapter
+        lastChapter = manga.attributes.lastChapter,
+        description = manga.attributes.getEnglishDescription(),
     )
 }
