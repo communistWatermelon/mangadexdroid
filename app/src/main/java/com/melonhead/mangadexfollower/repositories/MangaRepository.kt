@@ -71,7 +71,16 @@ class MangaRepository(
                 UIChapter(id = chapter.id, chapter = chapter.chapter, title = chapter.chapterTitle, createdDate = chapter.createdAt.epochSeconds, read = read, externalUrl = chapter.externalUrl)
             }
             if (chapters.isEmpty()) return@mapNotNull null
-            UIManga(id = manga.id, manga.chosenTitle ?: "", chapters = chapters, manga.mangaCoverId, useWebview = hasExternalChapters || manga.useWebview, altTitles = manga.mangaTitles)
+            UIManga(
+                id = manga.id,
+                manga.chosenTitle ?: "",
+                chapters = chapters,
+                manga.mangaCoverId,
+                useWebview = hasExternalChapters || manga.useWebview,
+                altTitles = manga.mangaTitles,
+                tags = manga.tags,
+                status = manga.status,
+            )
         }
         if (uiManga.isEmpty()) return emptyList()
 

@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.melonhead.mangadexfollower.extensions.Previews
 import com.melonhead.mangadexfollower.extensions.dateOrTimeString
 import com.melonhead.mangadexfollower.models.ui.*
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
@@ -79,10 +80,10 @@ internal fun ChapterListItem(
 @Composable
 private fun ChapterPreview() {
     MangadexFollowerTheme {
-        val manga = UIManga("", "Test Manga", listOf(), null, false, altTitles = listOf("Test Manga"))
+        val manga = Previews.previewUIManga()
         Column {
-            ChapterListItem(uiChapter = UIChapter("", "101", "Test Title with an extremely long title that may or may not wrap", Clock.System.now().epochSeconds, false), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
-            ChapterListItem(uiChapter = UIChapter("", "102", "Test Title 2", Clock.System.now().epochSeconds, true), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
+            ChapterListItem(uiChapter = Previews.previewUIChapters().first(), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
+            ChapterListItem(uiChapter = Previews.previewUIChapters().first().copy(title = "Test Title with an extremely long title that may or may not wrap"), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
         }
     }
 }

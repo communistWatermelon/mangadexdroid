@@ -5,6 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import com.melonhead.mangadexfollower.extensions.Previews
 import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
@@ -50,7 +51,7 @@ internal fun MarkChapterReadDialog(
 private fun MarkChapterReadPreview() {
     MangadexFollowerTheme {
         MarkChapterReadDialog(
-            UIManga("", "Test Manga", listOf(), null, false, altTitles = listOf("Test Manga")) to UIChapter("", "101", "Test Title", 0, false),
+            Previews.previewUIManga() to Previews.previewUIChapters().first(),
             onToggleChapterRead = { _, _ -> },
             onDismissed = { })
     }
