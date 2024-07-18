@@ -23,6 +23,7 @@ data class MangaAttributes(
     val status: String,
     val tags: List<MangaTags>,
     val contentRating: String,
+    val lastChapter: String?,
 ) {
     fun getEnglishTitles(): List<String> {
         val englishTitles = mutableListOf<String>()

@@ -2,6 +2,7 @@ package com.melonhead.lib_database.di
 
 import androidx.room.Room
 import com.melonhead.lib_database.chapter.ChapterDatabase
+import com.melonhead.lib_database.manga.MangaDBMigrations
 import com.melonhead.lib_database.manga.MangaDatabase
 import com.melonhead.lib_database.readmarkers.ReadMarkerDatabase
 import org.koin.dsl.module
@@ -11,21 +12,27 @@ val DBModule = module {
         Room.databaseBuilder(
             get(),
             ChapterDatabase::class.java, "chapter"
-        ).fallbackToDestructiveMigration().build()
+        ).build()
     }
 
     single(createdAtStart = true) {
         Room.databaseBuilder(
             get(),
             MangaDatabase::class.java, "manga"
-        ).fallbackToDestructiveMigration().build()
+        ).addMigrations(
+            MangaDBMigrations.MIGRATION_1_2,
+            MangaDBMigrations.MIGRATION_2_3,
+            MangaDBMigrations.MIGRATION_3_4,
+            MangaDBMigrations.MIGRATION_4_5,
+            MangaDBMigrations.MIGRATION_5_6,
+        ).build()
     }
 
     single(createdAtStart = true) {
         Room.databaseBuilder(
             get(),
             ReadMarkerDatabase::class.java, "readmarker"
-        ).fallbackToDestructiveMigration().build()
+        ).build()
     }
 
     single {
