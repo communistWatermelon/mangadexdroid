@@ -4,6 +4,6 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 
 @Database(entities = [ReadMarkerEntity::class], version = 1)
-abstract class ReadMarkerDatabase: RoomDatabase() {
+internal abstract class ReadMarkerDatabase: RoomDatabase() {
     abstract fun readMarkersDao(): ReadMarkerDao
 }

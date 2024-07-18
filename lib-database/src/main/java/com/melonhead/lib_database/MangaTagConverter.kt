@@ -3,7 +3,7 @@ package com.melonhead.lib_database
 import androidx.room.TypeConverter
 import com.melonhead.lib_database.manga.MangaTag
 
-object MangaTagConverter {
+internal object MangaTagConverter {
     @TypeConverter
     fun toMangaTag(string: String): MangaTag {
         val parts = string.split(".")

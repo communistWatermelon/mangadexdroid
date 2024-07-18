@@ -3,7 +3,7 @@ package com.melonhead.lib_database
 import androidx.room.TypeConverter
 import kotlinx.datetime.Instant
 
-object InstantConverter {
+internal object InstantConverter {
     @TypeConverter
     fun toInstant(dateMillis: Long): Instant {
         return Instant.fromEpochMilliseconds(dateMillis)

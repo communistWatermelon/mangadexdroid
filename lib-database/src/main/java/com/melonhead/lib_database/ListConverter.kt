@@ -2,7 +2,7 @@ package com.melonhead.lib_database
 
 import androidx.room.TypeConverter
 
-class ListConverter {
+internal class ListConverter {
     @TypeConverter
     fun listToJson(value: List<String>): String {
         return value.joinToString(separator = "*,*") { it }
