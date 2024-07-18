@@ -81,6 +81,7 @@ class MangaRepository(
                 tags = manga.tags.sortedBy { it.id }.map { it.name },
                 status = manga.status,
                 contentRating = manga.contentRating,
+                lastChapter = manga.lastChapter,
             )
         }
         if (uiManga.isEmpty()) return emptyList()

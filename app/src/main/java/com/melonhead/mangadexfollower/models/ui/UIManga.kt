@@ -17,6 +17,7 @@ data class UIManga(
     val tags: List<String>,
     val status: String,
     val contentRating: String,
+    val lastChapter: String?
 ) :
     Parcelable {
     @IgnoredOnParcel

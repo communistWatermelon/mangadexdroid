@@ -46,10 +46,24 @@ internal fun ChapterListItem(
             Column(modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text(text = "Chapter ${uiChapter.chapter}",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 18.sp)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "Chapter ${uiChapter.chapter}",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 18.sp)
+
+                    if (uiManga.lastChapter == uiChapter.chapter) {
+                        Text(
+                            text = "End",
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
                 Text(text = uiChapter.title ?: "",
                     fontWeight = FontWeight.Normal,
                     fontSize = 14.sp
@@ -83,6 +97,9 @@ private fun ChapterPreview() {
         val manga = Previews.previewUIManga()
         Column {
             ChapterListItem(uiChapter = Previews.previewUIChapters().first(), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
+            ChapterListItem(uiChapter = Previews.previewUIChapters().first().copy(read = false), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
+            ChapterListItem(uiChapter = Previews.previewUIChapters().first().copy(read = false), uiManga = manga, refreshStatus = None, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
+            ChapterListItem(uiChapter = Previews.previewUIChapters().first().copy(chapter = "101"), uiManga = manga.copy(lastChapter = "101"), refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
             ChapterListItem(uiChapter = Previews.previewUIChapters().first().copy(title = "Test Title with an extremely long title that may or may not wrap"), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
         }
     }

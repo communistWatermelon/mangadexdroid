@@ -16,7 +16,8 @@ object Previews {
         altTitles = listOf("Test Manga"),
         tags = listOf("Comedy", "Slice of Life", "Romance"),
         status = "ongoing",
-        contentRating = "Safe"
+        contentRating = "Safe",
+        lastChapter = null,
     )
 
     fun previewUIChapters() = listOf(
