@@ -118,16 +118,18 @@ class MangaRepository(
             // map app chapters into the manga ids
             val mangaIds = chaptersResponse.mapNotNull { chapters -> chapters.relationships?.firstOrNull { it.type == "manga" }?.id }.toSet()
 
-            // fetch manga series
-            val newMangaIds = mangaIds.filter { !mangaDb.containsManga(it) }
-            Clog.i("New manga: ${newMangaIds.count()}")
+            // fetch manga series info
+            Clog.i("New manga: ${mangaIds.count()}")
 
-            if (newMangaIds.isNotEmpty()) {
-                val newMangaSeries = mangaService.getManga(token, newMangaIds.toList())
-                val newManga = newMangaSeries.map { MangaEntity.from(it) }
+            if (mangaIds.isNotEmpty()) {
+                val mangaSeries = mangaService.getManga(token, mangaIds.toList())
+                val manga = mangaSeries.map { MangaEntity.from(it) }
+
+                // grab the chosen title from the DB
+                manga.map { it.copy(chosenTitle = mangaDb.getMangaById(it.id).first()?.chosenTitle) }
 
                 // insert new series into local db
-                mangaDb.insertAll(*newManga.toTypedArray())
+                mangaDb.insertAll(*manga.toTypedArray())
             }
         }
 
