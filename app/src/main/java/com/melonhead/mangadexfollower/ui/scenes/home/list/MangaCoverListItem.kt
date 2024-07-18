@@ -2,10 +2,12 @@ package com.melonhead.mangadexfollower.ui.scenes.home.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,12 +24,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.melonhead.mangadexfollower.models.ui.UIChapter
+import com.melonhead.mangadexfollower.extensions.Previews
 import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
-import kotlinx.datetime.Clock
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 internal fun MangaCoverListItem(modifier: Modifier = Modifier, uiManga: UIManga, onLongPress: (uiManga: UIManga) -> Unit, onTitleLongPress: (uiManga: UIManga) -> Unit) {
     Row(modifier.combinedClickable(onClick = { }, onLongClick = { onLongPress(uiManga) })) {
@@ -66,31 +67,99 @@ internal fun MangaCoverListItem(modifier: Modifier = Modifier, uiManga: UIManga,
                 .align(Alignment.Top)
                 .padding(top = 20.dp)
                 .fillMaxWidth(1f),
-            horizontalAlignment = Alignment.End,
+            horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text(
-                modifier = Modifier.combinedClickable(onClick = { }, onLongClick = { onTitleLongPress(uiManga) }),
-                text = uiManga.title,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.End,
-                fontSize = 20.sp)
-            Text(text = if (uiManga.useWebview) "WebView" else "Native",
-                overflow = TextOverflow.Ellipsis, fontSize = 12.sp)
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier
+                        .combinedClickable(onClick = { },
+                            onLongClick = { onTitleLongPress(uiManga) })
+                        .weight(1f),
+                    text = uiManga.title,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Start,
+                    fontSize = 20.sp)
+
+                Text(
+                    modifier = Modifier
+                        .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(4.dp))
+                        .padding(horizontal = 4.dp)
+                        .combinedClickable(
+                            onClick = { },
+                            onLongClick = { onTitleLongPress(uiManga) }),
+                    text = uiManga.status.uppercase(),
+                    maxLines = 1,
+                    fontWeight = FontWeight.Normal,
+                    textAlign = TextAlign.End,
+                    fontSize = 10.sp)
+            }
+
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                if (uiManga.contentRating != "safe") {
+                    TagText(
+                        text = uiManga.contentRating.replaceFirstChar { it.uppercase() },
+                        overrideColor = colorForContentRating(uiManga.contentRating)
+                    )
+                }
+                for (tag in uiManga.tags) {
+                    TagText(
+                        text = tag,
+                        overrideColor = colorForContentRating(tag)
+                    )
+                }
+            }
+
         }
     }
+}
+
+@Composable
+private fun colorForContentRating(contentRating: String): Color? {
+    return when (contentRating.lowercase()) {
+        "suggestive" -> return MaterialTheme.colorScheme.tertiary
+        "erotica" -> return MaterialTheme.colorScheme.error
+        "pornographic" -> return MaterialTheme.colorScheme.error
+        else -> null
+    }
+}
+
+@Composable
+private fun TagText(text: String, overrideColor: Color? = null) {
+    Text(
+        modifier = Modifier
+            .background(overrideColor ?: MaterialTheme.colorScheme.surfaceTint, RoundedCornerShape(4.dp))
+            .padding(horizontal = 4.dp),
+        text = text,
+        color = MaterialTheme.colorScheme.surface,
+        fontSize = 12.sp
+    )
 }
 
 @Preview(showBackground = true)
 @Composable
 private fun MangaPreview() {
-    val testChapters = listOf(UIChapter("", "101", "Test Title", Clock.System.now().epochSeconds, true), UIChapter("", "102", "Test Title 2", Clock.System.now().epochSeconds, false))
     MangadexFollowerTheme {
         Column(modifier = Modifier.fillMaxWidth()) {
-            MangaCoverListItem(uiManga = UIManga("", "Test Manga", testChapters, null, false, altTitles = listOf("Test Manga")), onLongPress = { }, onTitleLongPress = { })
-            MangaCoverListItem(uiManga = UIManga("", "Test Manga with a really long name that causes the name to clip a little", testChapters, null, false, altTitles = listOf("Test Manga")), onLongPress = { }, onTitleLongPress = { })
+            MangaCoverListItem(
+                uiManga = Previews.previewUIManga(),
+                onLongPress = { },
+                onTitleLongPress = { }
+            )
+            MangaCoverListItem(
+                uiManga = Previews.previewUIManga().copy(title = "Test Manga with a really long name that causes the name to clip a little"),
+                onLongPress = { },
+                onTitleLongPress = { }
+            )
         }
     }
 }
