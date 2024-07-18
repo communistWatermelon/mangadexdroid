@@ -12,6 +12,7 @@ data class MangaTagAttributes(
 
 @kotlinx.serialization.Serializable
 data class MangaTags(
+    val id: String,
     val attributes: MangaTagAttributes,
 )
 
@@ -21,6 +22,7 @@ data class MangaAttributes(
     val altTitles: JsonElement?,
     val status: String,
     val tags: List<MangaTags>,
+    val contentRating: String,
 ) {
     fun getEnglishTitles(): List<String> {
         val englishTitles = mutableListOf<String>()

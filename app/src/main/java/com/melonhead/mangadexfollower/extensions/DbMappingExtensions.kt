@@ -2,6 +2,7 @@ package com.melonhead.mangadexfollower.extensions
 
 import com.melonhead.lib_database.chapter.ChapterEntity
 import com.melonhead.lib_database.manga.MangaEntity
+import com.melonhead.lib_database.manga.MangaTag
 import com.melonhead.mangadexfollower.models.content.Chapter
 import com.melonhead.mangadexfollower.models.content.Manga
 
@@ -24,6 +25,10 @@ fun MangaEntity.Companion.from(manga: Manga): MangaEntity {
         chosenTitle = titles.last(),
         mangaCoverId = manga.fileName,
         status = manga.attributes.status,
-        tags = manga.attributes.tags.mapNotNull { it.attributes.name["en"] },
+        tags = manga.attributes.tags.mapNotNull {
+            val name = it.attributes.name["en"] ?: return@mapNotNull null
+            MangaTag(it.id, name)
+        },
+        contentRating = manga.attributes.contentRating,
     )
 }

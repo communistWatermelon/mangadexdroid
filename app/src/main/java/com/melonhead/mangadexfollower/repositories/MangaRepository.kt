@@ -78,8 +78,9 @@ class MangaRepository(
                 manga.mangaCoverId,
                 useWebview = hasExternalChapters || manga.useWebview,
                 altTitles = manga.mangaTitles,
-                tags = manga.tags,
+                tags = manga.tags.sortedBy { it.id }.map { it.name },
                 status = manga.status,
+                contentRating = manga.contentRating,
             )
         }
         if (uiManga.isEmpty()) return emptyList()
