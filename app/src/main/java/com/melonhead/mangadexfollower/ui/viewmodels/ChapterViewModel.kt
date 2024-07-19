@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.lang.Integer.max
 import java.lang.Integer.min
 
@@ -34,21 +36,26 @@ class ChapterViewModel(
     private lateinit var manga: UIManga
     private lateinit var chapter: UIChapter
 
+    private val chapterLoadMutex = Mutex()
+
     private fun loadChapter(activity: Activity, chapterId: String) {
         viewModelScope.launch {
-            val pages = if (manga.useWebview) null else mangaRepository.getChapterData(chapterId)
-            if (pages != null) {
-                mutableChapterData.value = pages
-            } else {
-                // use secondary render style
-                if (!manga.useWebview) {
-                    mangaRepository.setUseWebview(manga, true)
+            chapterLoadMutex.withLock {
+                if (mutableChapterData.value != null) return@withLock
+                val pages = if (manga.useWebview) null else mangaRepository.getChapterData(chapterId)
+                if (pages != null) {
+                    mutableChapterData.value = pages
+                } else {
+                    // use secondary render style
+                    if (!manga.useWebview) {
+                        mangaRepository.setUseWebview(manga, true)
+                    }
+                    Clog.i("Falling back to webview")
+                    // fallback to secondary render style
+                    val intent = WebViewActivity.newIntent(activity, chapter, manga)
+                    activity.finish()
+                    activity.startActivity(intent)
                 }
-                Clog.i("Falling back to webview")
-                // fallback to secondary render style
-                val intent = WebViewActivity.newIntent(activity, chapter, manga)
-                activity.finish()
-                activity.startActivity(intent)
             }
         }
     }
