@@ -16,3 +16,6 @@ rootProject.name = "Mangadex Follower"
 include ':app'
 include ':lib-database'
 include ':lib-logging'
+include ':lib-chapter-cache'
+include ':network-at-home'
+include ':lib-networking'

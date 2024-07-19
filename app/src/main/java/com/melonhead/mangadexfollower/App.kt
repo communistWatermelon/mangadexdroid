@@ -7,9 +7,11 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.melonhead.lib_chapter_cache.di.ChapterCacheModule
 import com.melonhead.lib_database.di.DBModule
 import com.melonhead.mangadexfollower.di.appModule
 import com.melonhead.lib_logging.Clog
+import com.melonhead.lib_networking.di.NetworkingModule
 import com.melonhead.mangadexfollower.repositories.AuthRepository
 import com.melonhead.mangadexfollower.repositories.MangaRepository
 import com.melonhead.mangadexfollower.services.AppDataService
@@ -42,8 +44,10 @@ class App: Application() {
             // Reference Android context
             androidContext(this@App)
             // Load modules
-            modules(appModule)
             modules(DBModule)
+            modules(NetworkingModule)
+            modules(ChapterCacheModule)
+            modules(appModule)
         }
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(object: DefaultLifecycleObserver {

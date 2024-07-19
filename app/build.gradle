@@ -113,4 +113,6 @@ dependencies {
 
     implementation project(":lib-logging")
     implementation project(":lib-database")
+    implementation project(":lib-chapter-cache")
+    implementation project(":lib-networking")
 }
