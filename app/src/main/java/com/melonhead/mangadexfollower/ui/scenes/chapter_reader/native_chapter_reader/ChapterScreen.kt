@@ -49,7 +49,7 @@ internal fun ChapterScreen(
         }
 
         LaunchedEffect(key1 = allPages) {
-            val preloadPages = 2
+            val preloadPages = 1
             Clog.i("First page - Preloading pages 1 - ${1 + preloadPages}")
             allPages.slice(min(1, allPages.count() - 1)..min((1 + preloadPages), allPages.count() - 1)).forEach { page ->
                 preloadImage(page, allPages.indexOf(page))
