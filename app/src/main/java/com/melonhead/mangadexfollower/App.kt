@@ -7,15 +7,19 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.melonhead.lib_chapter_cache.di.ChapterCacheModule
+import com.melonhead.data_app_data.AppDataService
+import com.melonhead.feature_chapter_cache.di.ChapterCacheModule
 import com.melonhead.lib_database.di.DBModule
 import com.melonhead.mangadexfollower.di.appModule
 import com.melonhead.lib_logging.Clog
-import com.melonhead.lib_networking.di.NetworkingModule
-import com.melonhead.mangadexfollower.repositories.AuthRepository
+import com.melonhead.lib_networking.extensions.error401Callback
 import com.melonhead.mangadexfollower.repositories.MangaRepository
-import com.melonhead.mangadexfollower.services.AppDataService
+import com.melonhead.data_app_data.di.AppDataServiceModule
 import com.melonhead.mangadexfollower.work_manager.RefreshWorker
+import com.melonhead.data_at_home.di.DataAtHomeServiceModule
+import com.melonhead.feature_authentication.AuthRepository
+import com.melonhead.feature_authentication.di.FeatureAuthenticationModule
+import com.melonhead.lib_app_context.AppContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -31,8 +35,6 @@ class App: Application() {
     private val externalScope: CoroutineScope by inject()
     private val appDataService: AppDataService by inject()
 
-    var inForeground = false
-        private set
     override fun onCreate() {
         super.onCreate()
 
@@ -44,22 +46,29 @@ class App: Application() {
             // Reference Android context
             androidContext(this@App)
             // Load modules
-            modules(DBModule)
-            modules(NetworkingModule)
             modules(ChapterCacheModule)
+
+            modules(FeatureAuthenticationModule)
+            modules(DataAtHomeServiceModule)
+
             modules(appModule)
+        }
+
+        // TODO: replace this with a proper event
+        error401Callback = {
+            authFailed()
         }
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(object: DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 super.onStart(owner)
-                inForeground = true
+                AppContext.isInForeground = true
                 externalScope.launch { mangaRepository.forceRefresh() }
             }
 
             override fun onStop(owner: LifecycleOwner) {
                 super.onStop(owner)
-                inForeground = false
+                AppContext.isInForeground = false
                 Clog.i("onStop: Creating background task")
                 val refreshWorkRequest = PeriodicWorkRequestBuilder<RefreshWorker>(15.minutes.toJavaDuration()).build()
                 WorkManager.getInstance(this@App).enqueueUniquePeriodicWork("refresh-task", ExistingPeriodicWorkPolicy.KEEP, refreshWorkRequest)

@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
                     val context = LocalContext.current
 
                     when (loginStatus) {
-                        LoginStatus.LoggedIn -> {
+                        com.melonhead.feature_authentication.models.LoginStatus.LoggedIn -> {
                             if (manga.isEmpty()) {
                                 LoadingScreen(refreshStatus)
                             } else {
@@ -73,8 +73,8 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         }
-                        LoginStatus.LoggedOut -> LoginScreen { username, password -> viewModel.authenticate(username, password) }
-                        LoginStatus.LoggingIn, null -> LoadingScreen(null)
+                        com.melonhead.feature_authentication.models.LoginStatus.LoggedOut -> LoginScreen { username, password -> viewModel.authenticate(username, password) }
+                        com.melonhead.feature_authentication.models.LoginStatus.LoggingIn, null -> LoadingScreen(null)
                     }
                 }
             }

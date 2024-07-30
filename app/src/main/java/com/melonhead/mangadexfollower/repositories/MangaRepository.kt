@@ -2,22 +2,23 @@ package com.melonhead.mangadexfollower.repositories
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import com.melonhead.mangadexfollower.App
+import com.melonhead.data_app_data.AppDataService
+import com.melonhead.data_at_home.AtHomeService
+import com.melonhead.data_user.services.UserService
+import com.melonhead.feature_chapter_cache.ChapterCacheMechanism
+import com.melonhead.lib_app_context.AppContext
 import com.melonhead.lib_database.chapter.ChapterDao
 import com.melonhead.lib_database.chapter.ChapterEntity
+import com.melonhead.lib_database.extensions.from
 import com.melonhead.lib_database.manga.MangaDao
 import com.melonhead.lib_database.manga.MangaEntity
 import com.melonhead.lib_database.readmarkers.ReadMarkerDao
 import com.melonhead.lib_database.readmarkers.ReadMarkerEntity
-import com.melonhead.mangadexfollower.extensions.from
-import com.melonhead.mangadexfollower.extensions.throttleLatest
 import com.melonhead.lib_logging.Clog
+import com.melonhead.mangadexfollower.extensions.throttleLatest
 import com.melonhead.mangadexfollower.models.ui.*
 import com.melonhead.mangadexfollower.notifications.NewChapterNotification
-import com.melonhead.mangadexfollower.services.AppDataService
-import com.melonhead.mangadexfollower.services.AtHomeService
 import com.melonhead.mangadexfollower.services.MangaService
-import com.melonhead.mangadexfollower.services.UserService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -33,9 +34,10 @@ class MangaRepository(
     private val chapterDb: ChapterDao,
     private val mangaDb: MangaDao,
     private val readMarkerDb: ReadMarkerDao,
-    private val appContext: Context
+    private val appContext: Context,
+    private val chapterCache: ChapterCacheMechanism,
 ): KoinComponent {
-    private val authRepository: AuthRepository by inject()
+    private val authRepository: com.melonhead.feature_authentication.AuthRepository by inject()
     private val refreshMangaThrottled: (Unit) -> Unit = throttleLatest(300L, externalScope, ::refreshManga)
 
     // combine all manga series and chapters
@@ -50,7 +52,7 @@ class MangaRepository(
         externalScope.launch {
             // refresh manga on login
             try {
-                authRepository.loginStatus.collectLatest { if (it is LoginStatus.LoggedIn) { refreshMangaThrottled(Unit) } }
+                authRepository.loginStatus.collectLatest { if (it is com.melonhead.feature_authentication.models.LoginStatus.LoggedIn) { refreshMangaThrottled(Unit) } }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -58,7 +60,7 @@ class MangaRepository(
     }
 
     suspend fun forceRefresh() {
-        if (authRepository.loginStatus.first() is LoginStatus.LoggedIn) refreshMangaThrottled(Unit)
+        if (authRepository.loginStatus.first() is com.melonhead.feature_authentication.models.LoginStatus.LoggedIn) refreshMangaThrottled(Unit)
     }
 
     private fun generateUIManga(dbSeries: List<MangaEntity>, dbChapters: List<ChapterEntity>): List<UIManga> {
@@ -145,7 +147,7 @@ class MangaRepository(
     }
 
     private suspend fun notifyOfNewChapters() {
-        if ((appContext as App).inForeground) return
+        if (AppContext.isInForeground) return
         val notificationManager = NotificationManagerCompat.from(appContext)
         if (!notificationManager.areNotificationsEnabled()) return
         val installDateSeconds = appDataService.installDateSeconds.firstOrNull() ?: 0L
@@ -154,6 +156,7 @@ class MangaRepository(
         val newChapters = chapterDb.getAllSync().filter { readMarkerDb.isRead(it.mangaId, it.chapter) != true }
         val manga = mangaDb.getAllSync()
         val notifyChapters = generateUIManga(manga, newChapters)
+        chapterCache.cacheImagesForChapters(newChapters)
         NewChapterNotification.post(appContext, notifyChapters, installDateSeconds)
     }
 

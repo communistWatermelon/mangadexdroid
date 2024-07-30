@@ -1,13 +1,13 @@
 package com.melonhead.mangadexfollower.services
 
-import com.melonhead.mangadexfollower.extensions.catching
-import com.melonhead.mangadexfollower.extensions.catchingSuccess
+import com.melonhead.data_authentication.models.AuthToken
+import com.melonhead.lib_networking.extensions.catching
+import com.melonhead.lib_networking.extensions.catchingSuccess
 import com.melonhead.lib_logging.Clog
-import com.melonhead.mangadexfollower.models.auth.AuthToken
-import com.melonhead.mangadexfollower.models.content.Manga
+import com.melonhead.data_core_manga.models.Manga
 import com.melonhead.mangadexfollower.models.content.MangaReadMarkersResponse
 import com.melonhead.mangadexfollower.models.content.ReadChapterRequest
-import com.melonhead.mangadexfollower.models.shared.handlePagination
+import com.melonhead.lib_networking.models.handlePagination
 import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.routes.HttpRoutes.ID_PLACEHOLDER

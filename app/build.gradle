@@ -78,6 +78,7 @@ dependencies {
     implementation "androidx.compose.material:material-icons-extended:1.6.8"
     implementation 'com.google.firebase:firebase-crashlytics-ktx:19.0.2'
     implementation 'com.google.firebase:firebase-analytics-ktx:22.0.2'
+    implementation project(':data-user')
     testImplementation 'junit:junit:4.13.2'
 
     debugImplementation "androidx.compose.ui:ui-tooling:1.6.8"
@@ -85,12 +86,6 @@ dependencies {
 
     implementation "io.insert-koin:koin-android:3.3.0"
     implementation "io.insert-koin:koin-androidx-compose:3.3.0"
-
-    implementation "io.ktor:ktor-client-cio:2.1.3"
-    implementation "io.insert-koin:koin-ktor:3.2.2"
-    implementation "io.ktor:ktor-client-content-negotiation:2.1.3"
-    implementation "io.ktor:ktor-client-logging:2.1.3"
-    implementation "io.ktor:ktor-serialization-kotlinx-json:2.1.3"
 
     implementation 'io.coil-kt:coil-compose:2.2.2'
 
@@ -111,8 +106,14 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-database-ktx'
 
+    implementation project(":data-core-manga")
     implementation project(":lib-logging")
     implementation project(":lib-database")
-    implementation project(":lib-chapter-cache")
+    implementation project(":lib-app-context")
+    implementation project(':feature-authentication')
+    implementation project(':feature-chapter-cache')
     implementation project(":lib-networking")
+    implementation project(':data-at-home')
+    implementation project(':data-app-data')
+
 }

@@ -8,7 +8,7 @@ import com.melonhead.lib_logging.Clog
 import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
 import com.melonhead.mangadexfollower.repositories.MangaRepository
-import com.melonhead.mangadexfollower.services.AppDataService
+import com.melonhead.data_app_data.AppDataService
 import com.melonhead.mangadexfollower.ui.scenes.chapter_reader.native_chapter_reader.ChapterActivity
 import com.melonhead.mangadexfollower.ui.scenes.chapter_reader.web_chapter_reader.WebViewActivity
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +23,7 @@ import java.lang.Integer.min
 
 class ChapterViewModel(
     private val mangaRepository: MangaRepository,
-    appDataService: AppDataService
+    appDataService: com.melonhead.data_app_data.AppDataService
 ): ViewModel() {
     private val mutableChapterData = MutableStateFlow<List<String>?>(null)
     val chapterData = mutableChapterData.asStateFlow()

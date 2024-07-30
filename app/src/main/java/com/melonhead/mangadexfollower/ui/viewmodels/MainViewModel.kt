@@ -11,10 +11,9 @@ import com.melonhead.mangadexfollower.extensions.asLiveData
 import com.melonhead.mangadexfollower.extensions.dateOrTimeString
 import com.melonhead.mangadexfollower.models.ui.UIChapter
 import com.melonhead.mangadexfollower.models.ui.UIManga
-import com.melonhead.mangadexfollower.repositories.AuthRepository
 import com.melonhead.mangadexfollower.repositories.MangaRepository
-import com.melonhead.mangadexfollower.services.AppDataService
-import com.melonhead.mangadexfollower.services.RenderStyle
+import com.melonhead.data_app_data.AppDataService
+import com.melonhead.data_app_data.RenderStyle
 import com.melonhead.mangadexfollower.ui.scenes.chapter_reader.native_chapter_reader.ChapterActivity
 import com.melonhead.mangadexfollower.ui.scenes.chapter_reader.web_chapter_reader.WebViewActivity
 import kotlinx.coroutines.Dispatchers
@@ -26,9 +25,9 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 
 class MainViewModel(
-    private val authRepository: AuthRepository,
+    private val authRepository: com.melonhead.feature_authentication.AuthRepository,
     private val mangaRepository: MangaRepository,
-    private val userAppDataService: AppDataService
+    private val userAppDataService: com.melonhead.data_app_data.AppDataService
 ): ViewModel() {
     val loginStatus = authRepository.loginStatus.asLiveData()
     val manga = mangaRepository.manga.asLiveData()
@@ -71,14 +70,14 @@ class MainViewModel(
 
     fun onChapterClicked(context: Context, uiManga: UIManga, uiChapter: UIChapter) = viewModelScope.launch(Dispatchers.IO) {
         // mark chapter as read on tap only for browse style rendering
-        if (userAppDataService.renderStyle == RenderStyle.Browser) {
+        if (userAppDataService.renderStyle == com.melonhead.data_app_data.RenderStyle.Browser) {
             mangaRepository.markChapterRead(uiManga, uiChapter)
         }
 
         val intent = when (userAppDataService.renderStyle) {
-            RenderStyle.Native -> ChapterActivity.newIntent(context, uiChapter, uiManga)
-            RenderStyle.WebView -> WebViewActivity.newIntent(context, uiChapter, uiManga)
-            RenderStyle.Browser -> Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(uiChapter.webAddress) }
+            com.melonhead.data_app_data.RenderStyle.Native -> ChapterActivity.newIntent(context, uiChapter, uiManga)
+            com.melonhead.data_app_data.RenderStyle.WebView -> WebViewActivity.newIntent(context, uiChapter, uiManga)
+            com.melonhead.data_app_data.RenderStyle.Browser -> Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(uiChapter.webAddress) }
         }
 
         context.startActivity(intent)
