@@ -9,11 +9,12 @@ interface ChapterCacheMechanism {
 
 internal class ChapterCacheMechanismImpl : ChapterCacheMechanism {
     override fun cacheImagesForChapters(chapters: List<ChapterEntity>) {
-        TODO("Not yet implemented")
+        //TODO("Not yet implemented")
     }
 
     override fun getChapterFromCache(chapterId: String): List<String> {
-        TODO("Not yet implemented")
+        //TODO("Not yet implemented")
+        return emptyList()
     }
 
 }
