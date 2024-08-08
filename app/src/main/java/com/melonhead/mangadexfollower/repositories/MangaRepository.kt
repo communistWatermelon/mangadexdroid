@@ -128,10 +128,10 @@ class MangaRepository(
 
             if (mangaIds.isNotEmpty()) {
                 val mangaSeries = mangaService.getManga(token, mangaIds.toList())
-                val manga = mangaSeries.map { MangaEntity.from(it) }
-
-                // grab the chosen title from the DB
-                manga.map { it.copy(chosenTitle = mangaDb.getMangaById(it.id).first()?.chosenTitle) }
+                val manga = mangaSeries.map {
+                    // grab the chosen title from the DB
+                    MangaEntity.from(it, mangaDb.getMangaById(it.id).first()?.chosenTitle)
+                }
 
                 // insert new series into local db
                 mangaDb.insertAll(*manga.toTypedArray())
