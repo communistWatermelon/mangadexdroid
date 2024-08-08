@@ -17,12 +17,12 @@ fun ChapterEntity.Companion.from(chapter: Chapter): ChapterEntity {
     )
 }
 
-fun MangaEntity.Companion.from(manga: Manga): MangaEntity {
+fun MangaEntity.Companion.from(manga: Manga, chosenTitle: String?): MangaEntity {
     val titles = manga.attributes.getEnglishTitles()
     return MangaEntity(
         id = manga.id,
         mangaTitles = titles,
-        chosenTitle = titles.last(),
+        chosenTitle = chosenTitle ?: titles.last(),
         mangaCoverId = manga.fileName,
         status = manga.attributes.status,
         tags = manga.attributes.tags.mapNotNull {
