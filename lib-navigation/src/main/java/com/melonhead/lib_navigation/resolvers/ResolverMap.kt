@@ -9,7 +9,7 @@ interface ResolverMap {
 
 internal class ResolverMapImpl: ResolverMap {
     private val mutableActivityResolvers = hashMapOf<Class<out ActivityKey>, ActivityResolver<*>>()
-    override val activityResolvers = mutableActivityResolvers.toMap()
+    override val activityResolvers: HashMap<Class<out ActivityKey>, ActivityResolver<*>> = mutableActivityResolvers
 
     override fun registerResolver(key: Class<out ActivityKey>, resolver: ActivityResolver<*>) {
         if (mutableActivityResolvers.containsKey(key)) {
