@@ -64,18 +64,7 @@ tasks.register('generateVersionTxt') {
 }
 
 dependencies {
-    implementation 'com.google.firebase:firebase-crashlytics-ktx:19.0.2'
-    implementation 'com.google.firebase:firebase-analytics-ktx:22.0.2'
-    // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:33.1.1')
-    // Add the dependency for the Realtime Database library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation 'com.google.firebase:firebase-database-ktx'
-
-    implementation "androidx.datastore:datastore-preferences:1.1.1"
-
     implementation "androidx.work:work-runtime-ktx:2.9.0"
-
     implementation 'com.google.accompanist:accompanist-swiperefresh:0.27.0'
 
     implementation project(":core")
