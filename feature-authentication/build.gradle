@@ -1,0 +1,64 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.serialization'
+    id 'org.jetbrains.kotlin.plugin.compose' version '2.0.0'
+}
+
+android {
+    namespace 'com.melonhead.feature_authentication'
+    compileSdk 34
+
+    def properties = new Properties()
+    if (rootProject.file("local.properties").exists()) {
+        properties.load(rootProject.file("local.properties").newDataInputStream())
+    }
+
+    def debugEmail = properties.getProperty("debug_email", "")
+    def debugPassword = properties.getProperty("debug_password", "")
+
+    defaultConfig {
+        minSdk 24
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+
+        buildConfigField("String", "DEBUG_EMAIL", "\"${debugEmail}\"")
+        buildConfigField("String", "DEBUG_PASSWORD", "\"${debugPassword}\"")
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    buildFeatures {
+        compose true
+        buildConfig true
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+dependencies {
+
+    implementation project(":core")
+    implementation project(":core-ui")
+    implementation project(":lib-networking")
+    implementation project(":lib-logging")
+    implementation project(":lib-notifications")
+    implementation project(":lib-navigation")
+    implementation project(":lib-app-context")
+    implementation project(":lib-app-events")
+    implementation project(":data-authentication")
+    implementation project(":data-user")
+    implementation project(":data-app-data")
+
+    api project(":data-authentication")
+}

@@ -16,20 +16,23 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
-import com.melonhead.mangadexfollower.models.ui.*
-import com.melonhead.mangadexfollower.notifications.NewChapterNotification
 import com.melonhead.mangadexfollower.ui.scenes.home.HomeScreen
-import com.melonhead.mangadexfollower.ui.scenes.login.LoginScreen
-import com.melonhead.mangadexfollower.ui.scenes.shared.LoadingScreen
-import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
+import com.melonhead.core_ui.scenes.LoadingScreen
+import com.melonhead.data_core_manga_ui.UIChapter
+import com.melonhead.data_core_manga_ui.UIManga
+import com.melonhead.feature_authentication.models.LoginStatus
+import com.melonhead.lib_navigation.Navigator
+import com.melonhead.lib_navigation.keys.ScreenKey
+import com.melonhead.lib_notifications.NewChapterNotificationChannel
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModel<MainViewModel>()
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private val navigator: Navigator by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,14 +47,15 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            MangadexFollowerTheme {
+            com.melonhead.core_ui.theme.MangadexFollowerTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(),
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val loginStatus by viewModel.loginStatus.observeAsState()
                     val manga by viewModel.manga.observeAsState(listOf())
-                    val refreshStatus by viewModel.refreshStatus.observeAsState(None)
+                    val refreshStatus by viewModel.refreshStatus.observeAsState(com.melonhead.data_core_manga_ui.None)
                     val refreshText by viewModel.refreshText.observeAsState("")
                     val context = LocalContext.current
 
@@ -65,16 +69,45 @@ class MainActivity : ComponentActivity() {
                                     readMangaCount = viewModel.readMangaCount,
                                     refreshText = refreshText,
                                     refreshStatus = refreshStatus,
-                                    onChapterClicked = { uiManga, chapter -> viewModel.onChapterClicked(context, uiManga, chapter) },
-                                    onToggleChapterRead = { uiManga, uiChapter -> viewModel.toggleChapterRead(uiManga, uiChapter) },
+                                    onChapterClicked = { uiManga, chapter ->
+                                        viewModel.onChapterClicked(
+                                            context,
+                                            uiManga,
+                                            chapter
+                                        )
+                                    },
+                                    onToggleChapterRead = { uiManga, uiChapter ->
+                                        viewModel.toggleChapterRead(
+                                            uiManga,
+                                            uiChapter
+                                        )
+                                    },
                                     onSwipeRefresh = { viewModel.refreshContent() },
-                                    onToggleMangaRenderType = { uiManga -> viewModel.toggleMangaWebview(uiManga) },
-                                    onChangeMangaTitle = { uiManga, title ->  viewModel.setMangaTitle(uiManga, title) },
+                                    onToggleMangaRenderType = { uiManga ->
+                                        viewModel.toggleMangaWebview(
+                                            uiManga
+                                        )
+                                    },
+                                    onChangeMangaTitle = { uiManga, title ->
+                                        viewModel.setMangaTitle(
+                                            uiManga,
+                                            title
+                                        )
+                                    },
                                 )
                             }
                         }
-                        LoginStatus.LoggedOut -> LoginScreen { username, password -> viewModel.authenticate(username, password) }
-                        LoginStatus.LoggingIn, null -> LoadingScreen(null)
+
+                        LoginStatus.LoggedOut, null -> {
+                            navigator.ComposeWithKey(screenKey = ScreenKey.LoginScreen(onLoginTapped = { username, password ->
+                                viewModel.authenticate(
+                                    username,
+                                    password
+                                )
+                            }))
+                        }
+
+                        LoginStatus.LoggingIn -> LoadingScreen(null)
                     }
                 }
             }
@@ -84,8 +117,8 @@ class MainActivity : ComponentActivity() {
     }
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        val mangaJson = intent.getStringExtra(NewChapterNotification.MANGA_EXTRA) ?: return
-        val chapterJson = intent.getStringExtra(NewChapterNotification.CHAPTER_EXTRA) ?: return
+        val mangaJson = intent.getStringExtra(NewChapterNotificationChannel.MANGA_EXTRA) ?: return
+        val chapterJson = intent.getStringExtra(NewChapterNotificationChannel.CHAPTER_EXTRA) ?: return
         val manga: UIManga = Json.decodeFromString(mangaJson)
         val chapter: UIChapter = Json.decodeFromString(chapterJson)
         viewModel.onChapterClicked(this, manga, chapter)

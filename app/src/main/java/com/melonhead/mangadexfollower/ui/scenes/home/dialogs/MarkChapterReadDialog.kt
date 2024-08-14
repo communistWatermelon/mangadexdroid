@@ -5,15 +5,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.melonhead.mangadexfollower.extensions.Previews
-import com.melonhead.mangadexfollower.models.ui.UIChapter
-import com.melonhead.mangadexfollower.models.ui.UIManga
-import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
+import com.melonhead.core_ui.extensions.Previews
 
 @Composable
 internal fun MarkChapterReadDialog(
-    mangaChapterPair: Pair<UIManga, UIChapter>?,
-    onToggleChapterRead: (UIManga, UIChapter) -> Unit,
+    mangaChapterPair: Pair<com.melonhead.data_core_manga_ui.UIManga, com.melonhead.data_core_manga_ui.UIChapter>?,
+    onToggleChapterRead: (com.melonhead.data_core_manga_ui.UIManga, com.melonhead.data_core_manga_ui.UIChapter) -> Unit,
     onDismissed: () -> Unit,
 ) {
     if (mangaChapterPair != null) {
@@ -49,7 +46,7 @@ internal fun MarkChapterReadDialog(
 @Preview
 @Composable
 private fun MarkChapterReadPreview() {
-    MangadexFollowerTheme {
+    com.melonhead.core_ui.theme.MangadexFollowerTheme {
         MarkChapterReadDialog(
             Previews.previewUIManga() to Previews.previewUIChapters().first(),
             onToggleChapterRead = { _, _ -> },
