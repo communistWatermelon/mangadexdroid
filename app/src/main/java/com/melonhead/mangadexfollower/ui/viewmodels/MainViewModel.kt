@@ -88,7 +88,7 @@ class MainViewModel(
         authRepository.authenticate(email, password)
     }
 
-    fun onChapterClicked(context: Context, uiManga: UIManga, uiChapter: UIChapter) = viewModelScope.launch(Dispatchers.IO) {
+    fun onChapterClicked(context: Context, uiManga: UIManga, uiChapter: UIChapter) {
         // mark chapter as read on tap only for browse style rendering
         if (userAppDataService.renderStyle == RenderStyle.Browser) {
             mangaRepository.markChapterRead(uiManga, uiChapter)

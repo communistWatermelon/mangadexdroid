@@ -33,7 +33,7 @@ interface MangaRepository {
     val manga: Flow<List<UIManga>>
     val refreshStatus: Flow<MangaRefreshStatus>
     suspend fun toggleChapterRead(uiManga: UIManga, uiChapter: UIChapter)
-    suspend fun markChapterRead(uiManga: UIManga, uiChapter: UIChapter)
+    fun markChapterRead(uiManga: UIManga, uiChapter: UIChapter)
     suspend fun getChapterData(chapterId: String): List<String>?
     suspend fun setUseWebview(manga: UIManga, useWebView: Boolean)
     suspend fun updateChosenTitle(manga: UIManga, chosenTitle: String)
@@ -62,7 +62,7 @@ class MangaRepositoryImpl(
     }.shareIn(externalScope, replay = 1, started = SharingStarted.WhileSubscribed())
 
     private val mutableRefreshStatus = MutableStateFlow<MangaRefreshStatus>(None)
-    override val refreshStatus = mutableRefreshStatus.shareIn(externalScope, replay = 1, started = SharingStarted.WhileSubscribed())
+    override val refreshStatus = mutableRefreshStatus.shareIn(externalScope, replay = 0, started = SharingStarted.WhileSubscribed())
 
     private var isLoggedIn: Boolean = false
 
@@ -73,8 +73,10 @@ class MangaRepositoryImpl(
                 appEventsRepository.events.collectLatest {
                     when (it) {
                         is AuthenticationEvent.LoggedIn -> {
-                            isLoggedIn = true
-                            refreshMangaThrottled(Unit)
+                            if (!isLoggedIn) {
+                                isLoggedIn = true
+                                forceRefresh()
+                            }
                         }
                         is AuthenticationEvent.LoggedOut -> {
                             isLoggedIn = false
@@ -253,12 +255,14 @@ class MangaRepositoryImpl(
         mangaService.changeReadStatus(token, uiManga, uiChapter, toggledStatus)
     }
 
-    override suspend fun markChapterRead(uiManga: UIManga, uiChapter: UIChapter) {
-        val token = appDataService.token.firstOrNull() ?: return
-        val entity = readMarkerDb.getEntity(uiManga.id, uiChapter.chapter) ?: return
-        newChapterNotificationChannel.dismissNotification(appContext, uiManga, uiChapter)
-        readMarkerDb.update(entity.copy(readStatus = true))
-        mangaService.changeReadStatus(token, uiManga, uiChapter, true)
+    override fun markChapterRead(uiManga: UIManga, uiChapter: UIChapter) {
+        externalScope.launch {
+            val token = appDataService.token.firstOrNull() ?: return@launch
+            val entity = readMarkerDb.getEntity(uiManga.id, uiChapter.chapter) ?: return@launch
+            newChapterNotificationChannel.dismissNotification(appContext, uiManga, uiChapter)
+            readMarkerDb.update(entity.copy(readStatus = true))
+            mangaService.changeReadStatus(token, uiManga, uiChapter, true)
+        }
     }
 
     override suspend fun getChapterData(chapterId: String): List<String>? {

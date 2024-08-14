@@ -81,7 +81,7 @@ internal class ChapterViewModel(
         loadChapter(activity, chapter.id)
     }
 
-    fun markAsRead() = viewModelScope.launch(Dispatchers.IO) {
+    fun markAsRead() {
         mangaRepository.markChapterRead(manga, chapter)
     }
 }

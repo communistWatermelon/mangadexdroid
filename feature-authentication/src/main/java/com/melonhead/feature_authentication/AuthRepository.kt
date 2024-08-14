@@ -9,6 +9,7 @@ import com.melonhead.data_user.services.UserService
 import com.melonhead.lib_app_context.AppContext
 import com.melonhead.lib_app_events.AppEventsRepository
 import com.melonhead.lib_app_events.events.AuthenticationEvent
+import com.melonhead.lib_app_events.events.UserEvent
 import com.melonhead.lib_logging.Clog
 import com.melonhead.lib_notifications.AuthFailedNotificationChannel
 import kotlinx.coroutines.CoroutineScope
@@ -57,6 +58,7 @@ internal class AuthRepositoryImpl(
             signOut()
             return null
         }
+
         val newToken = loginService.refreshToken(currentToken, logoutOnFail)
         appDataService.updateToken(newToken)
         if (newToken == null) {
@@ -79,5 +81,6 @@ internal class AuthRepositoryImpl(
         val token = loginService.authenticate(email, password)
         appDataService.updateToken(token)
         appEventsRepository.postEvent(AuthenticationEvent.LoggedIn)
+        appEventsRepository.postEvent(UserEvent.RefreshManga)
     }
 }

@@ -24,7 +24,7 @@ class WebViewViewModel(
         mutableUrl.value = chapter.externalUrl ?: chapter.webAddress
     }
 
-    suspend fun markAsRead() {
+    fun markAsRead() {
         mangaRepository.markChapterRead(manga, chapter)
     }
 }

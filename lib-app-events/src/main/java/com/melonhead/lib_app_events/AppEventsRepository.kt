@@ -12,7 +12,7 @@ interface AppEventsRepository {
 }
 
 internal class AppEventsRepositoryImpl: AppEventsRepository {
-    private val mutableEvents = MutableSharedFlow<AppEvent>(1)
+    private val mutableEvents = MutableSharedFlow<AppEvent>(3)
     override val events: Flow<AppEvent> = mutableEvents.asSharedFlow()
 
     override fun postEvent(appEvent: AppEvent) {

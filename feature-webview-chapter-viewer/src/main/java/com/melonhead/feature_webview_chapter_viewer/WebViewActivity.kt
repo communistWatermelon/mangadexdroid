@@ -38,10 +38,8 @@ internal class WebViewActivity : ComponentActivity() {
                 val url by viewModel.url.observeAsState()
 
                 WebView(url = url, callClose = {
-                    lifecycleScope.launch(Dispatchers.IO) {
-                        viewModel.markAsRead()
-                        finish()
-                    }
+                    viewModel.markAsRead()
+                    finish()
                 })
             }
         }

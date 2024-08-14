@@ -15,12 +15,8 @@ internal class NavigatorImpl(
 ): Navigator {
     override fun <T: ActivityKey> intentForKey(context: Context, activityKey: T): Intent {
         val resolver = resolverMap.activityResolvers[activityKey::class.java]
-        if (resolver == null) {
-            throw IllegalArgumentException("ActivityResolver not registered for $activityKey")
-        }
-        if ((resolver as? ActivityResolver<T>) == null) {
-            throw IllegalArgumentException("Incorrect type registered for $activityKey, expecting ActivityResolver<${activityKey::class.java}>, got ${resolver::class.java}")
-        }
-        return (resolver as? ActivityResolver<T>)!!.intentForKey(context, activityKey)
+            ?: throw IllegalArgumentException("ActivityResolver not registered for $activityKey")
+        val activityResolver = (resolver as? ActivityResolver<T>) ?: throw IllegalArgumentException("Incorrect type registered for $activityKey, expecting ActivityResolver<${activityKey::class.java}>, got ${resolver::class.java}")
+        return activityResolver.intentForKey(context, activityKey)
     }
 }
