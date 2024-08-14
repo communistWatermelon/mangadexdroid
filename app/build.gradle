@@ -12,14 +12,6 @@ android {
     namespace 'com.melonhead.mangadexfollower'
     compileSdk 34
 
-    def properties = new Properties()
-    if (rootProject.file("local.properties").exists()) {
-        properties.load(rootProject.file("local.properties").newDataInputStream())
-    }
-
-    def debugEmail = properties.getProperty("debug_email", "")
-    def debugPassword = properties.getProperty("debug_password", "")
-
     defaultConfig {
         applicationId "com.melonhead.mangadexfollower"
         minSdk 24
@@ -31,9 +23,6 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
-
-        buildConfigField("String", "DEBUG_EMAIL", "\"${debugEmail}\"")
-        buildConfigField("String", "DEBUG_PASSWORD", "\"${debugPassword}\"")
     }
 
     buildTypes {
@@ -75,29 +64,19 @@ tasks.register('generateVersionTxt') {
 }
 
 dependencies {
-
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.3'
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.8.3"
-
     implementation 'com.google.firebase:firebase-crashlytics-ktx:19.0.2'
     implementation 'com.google.firebase:firebase-analytics-ktx:22.0.2'
-    testImplementation 'junit:junit:4.13.2'
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:33.1.1')
+    // Add the dependency for the Realtime Database library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-database-ktx'
 
     implementation "androidx.datastore:datastore-preferences:1.1.1"
 
     implementation "androidx.work:work-runtime-ktx:2.9.0"
 
     implementation 'com.google.accompanist:accompanist-swiperefresh:0.27.0'
-
-    implementation "androidx.lifecycle:lifecycle-process:2.8.3"
-    implementation "androidx.lifecycle:lifecycle-common:2.8.3"
-
-    // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:33.1.1')
-
-    // Add the dependency for the Realtime Database library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation 'com.google.firebase:firebase-database-ktx'
 
     implementation project(":core")
     implementation project(":core-ui")

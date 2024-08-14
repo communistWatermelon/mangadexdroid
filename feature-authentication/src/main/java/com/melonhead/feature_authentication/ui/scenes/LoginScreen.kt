@@ -1,4 +1,4 @@
-package com.melonhead.mangadexfollower.ui.scenes.login
+package com.melonhead.feature_authentication.ui.scenes
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -33,9 +33,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.melonhead.mangadexfollower.R
-import com.melonhead.core_ui.theme.MangadexFollowerTheme
-import com.melonhead.mangadexfollower.BuildConfig
+import com.melonhead.feature_authentication.BuildConfig
+import com.melonhead.feature_authentication.R
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

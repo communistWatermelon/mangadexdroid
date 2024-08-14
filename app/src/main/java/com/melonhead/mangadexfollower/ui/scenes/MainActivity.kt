@@ -17,20 +17,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import com.melonhead.mangadexfollower.ui.scenes.home.HomeScreen
-import com.melonhead.mangadexfollower.ui.scenes.login.LoginScreen
 import com.melonhead.core_ui.scenes.LoadingScreen
 import com.melonhead.data_core_manga_ui.UIChapter
 import com.melonhead.data_core_manga_ui.UIManga
 import com.melonhead.feature_authentication.models.LoginStatus
+import com.melonhead.lib_navigation.Navigator
+import com.melonhead.lib_navigation.keys.ScreenKey
 import com.melonhead.lib_notifications.NewChapterNotificationChannel
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModel<MainViewModel>()
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    private val navigator: Navigator by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,11 +98,13 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                        LoginStatus.LoggedOut, null -> LoginScreen { username, password ->
-                            viewModel.authenticate(
-                                username,
-                                password
-                            )
+                        LoginStatus.LoggedOut, null -> {
+                            navigator.ComposeWithKey(screenKey = ScreenKey.LoginScreen(onLoginTapped = { username, password ->
+                                viewModel.authenticate(
+                                    username,
+                                    password
+                                )
+                            }))
                         }
 
                         LoginStatus.LoggingIn -> LoadingScreen(null)

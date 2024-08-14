@@ -27,5 +27,5 @@ val AppModule = module {
     }
 
     single(createdAtStart = true) { MainActivityResolver() }
-    single(createdAtStart = true) { AppNavigationMap(get(), get(), get(), get()) }
+    single(createdAtStart = true) { AppNavigationMap(get(), get(), get(), get(), get()) }
 }
