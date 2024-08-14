@@ -5,23 +5,22 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.melonhead.mangadexfollower.extensions.Previews
-import com.melonhead.mangadexfollower.models.ui.UIManga
-import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
+import com.melonhead.core_ui.extensions.Previews
 
 @Composable
 internal fun ShowMangaDescriptionDialog(
-    uiManga: UIManga?,
+    uiManga: com.melonhead.data_core_manga_ui.UIManga?,
     onDismissed: () -> Unit,
 ) {
-    if (uiManga?.description != null) {
+    val description = uiManga?.description
+    if (description != null) {
         AlertDialog(
             onDismissRequest = { onDismissed() },
             title = {
                 Text(text = uiManga.title)
             },
             text = {
-                Text(text = uiManga.description)
+                Text(text = description)
             },
             confirmButton = {
                 TextButton(onClick = {
@@ -37,7 +36,7 @@ internal fun ShowMangaDescriptionDialog(
 @Preview
 @Composable
 private fun MarkChapterReadPreview() {
-    MangadexFollowerTheme {
+    com.melonhead.core_ui.theme.MangadexFollowerTheme {
         ShowMangaDescriptionDialog(
             Previews.previewUIManga(),
             onDismissed = { })

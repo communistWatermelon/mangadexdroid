@@ -24,18 +24,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.melonhead.mangadexfollower.extensions.Previews
-import com.melonhead.mangadexfollower.models.ui.UIManga
-import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
+import com.melonhead.core_ui.extensions.Previews
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 internal fun MangaCoverListItem(
     modifier: Modifier = Modifier,
-    uiManga: UIManga,
-    onTapped: (uiManga: UIManga) -> Unit,
-    onLongPress: (uiManga: UIManga) -> Unit,
-    onTitleLongPress: (uiManga: UIManga) -> Unit,
+    uiManga: com.melonhead.data_core_manga_ui.UIManga,
+    onTapped: (uiManga: com.melonhead.data_core_manga_ui.UIManga) -> Unit,
+    onLongPress: (uiManga: com.melonhead.data_core_manga_ui.UIManga) -> Unit,
+    onTitleLongPress: (uiManga: com.melonhead.data_core_manga_ui.UIManga) -> Unit,
 ) {
     Row(modifier.combinedClickable(onClick = { onTapped(uiManga) }, onLongClick = { onLongPress(uiManga) })) {
         Box(
@@ -154,7 +152,7 @@ private fun TagText(text: String, overrideColor: Color? = null) {
 @Preview(showBackground = true)
 @Composable
 private fun MangaPreview() {
-    MangadexFollowerTheme {
+    com.melonhead.core_ui.theme.MangadexFollowerTheme {
         Column(modifier = Modifier.fillMaxWidth()) {
             MangaCoverListItem(
                 uiManga = Previews.previewUIManga(),
@@ -163,7 +161,8 @@ private fun MangaPreview() {
                 onTitleLongPress = { }
             )
             MangaCoverListItem(
-                uiManga = Previews.previewUIManga().copy(title = "Test Manga with a really long name that causes the name to clip a little"),
+                uiManga = Previews.previewUIManga()
+                    .copy(title = "Test Manga with a really long name that causes the name to clip a little"),
                 onLongPress = { },
                 onTapped = { },
                 onTitleLongPress = { }

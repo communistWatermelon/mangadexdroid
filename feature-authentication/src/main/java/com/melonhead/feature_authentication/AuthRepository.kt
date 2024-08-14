@@ -6,18 +6,17 @@ import com.melonhead.data_app_data.AppDataService
 import com.melonhead.data_authentication.models.AuthToken
 import com.melonhead.data_authentication.services.LoginService
 import com.melonhead.data_user.services.UserService
-import com.melonhead.feature_authentication.models.LoginStatus
 import com.melonhead.lib_app_context.AppContext
+import com.melonhead.lib_app_events.AppEventsRepository
+import com.melonhead.lib_app_events.events.AuthenticationEvent
 import com.melonhead.lib_logging.Clog
-//import com.melonhead.lib_notifications.AuthFailedNotification
+import com.melonhead.lib_notifications.AuthFailedNotificationChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 interface AuthRepository {
-    suspend fun refreshToken(logoutOnFail: Boolean = false): AuthToken?
     suspend fun authenticate(email: String, password: String)
-    val loginStatus: Flow<LoginStatus>
 }
 
 internal class AuthRepositoryImpl(
@@ -25,27 +24,31 @@ internal class AuthRepositoryImpl(
     private val appDataService: AppDataService,
     private val loginService: LoginService,
     private val userService: UserService,
+    private val appEventsRepository: AppEventsRepository,
+    private val authFailedNotificationChannel: AuthFailedNotificationChannel,
     externalScope: CoroutineScope,
 ) : AuthRepository {
-    private val mutableIsLoggedIn = MutableStateFlow<LoginStatus>(LoginStatus.LoggedOut)
-    override val loginStatus = mutableIsLoggedIn.shareIn(externalScope, replay = 1, started = SharingStarted.WhileSubscribed()).distinctUntilChanged()
-
     init {
         externalScope.launch {
-            mutableIsLoggedIn.value = if (appDataService.token.firstOrNull() != null) LoginStatus.LoggedIn else LoginStatus.LoggedOut
-            refreshToken()
+            appEventsRepository.postEvent(if (appDataService.token.firstOrNull() != null) AuthenticationEvent.LoggedIn else AuthenticationEvent.LoggedOut)
+            refreshToken(logoutOnFail = false)
+        }
+
+        externalScope.launch {
+            appEventsRepository.events.collectLatest {
+                if (it is AuthenticationEvent.RefreshToken) refreshToken(logoutOnFail = it.logoutOnFail)
+            }
         }
     }
 
-    override suspend fun refreshToken(logoutOnFail: Boolean): AuthToken? {
+    private suspend fun refreshToken(logoutOnFail: Boolean): AuthToken? {
         suspend fun signOut() {
             Clog.e("Signing out, refresh failed", Exception())
-            mutableIsLoggedIn.value = LoginStatus.LoggedOut
+            appEventsRepository.postEvent(AuthenticationEvent.LoggedOut)
             if (AppContext.isInForeground) return
             val notificationManager = NotificationManagerCompat.from(appContext)
             if (!notificationManager.areNotificationsEnabled()) return
-            // TODO: RESTORE THIS
-//            AuthFailedNotification.postAuthFailed(appContext)
+            authFailedNotificationChannel.postAuthFailed(appContext)
             appDataService.updateUserId("")
         }
 
@@ -65,15 +68,16 @@ internal class AuthRepositoryImpl(
                 Clog.e("User info returned null", RuntimeException())
             }
             appDataService.updateUserId(userId ?: "")
+            appEventsRepository.postEvent(AuthenticationEvent.LoggedIn)
         }
         return newToken
     }
 
     override suspend fun authenticate(email: String, password: String) {
         Clog.i("authenticate")
-        mutableIsLoggedIn.value = LoginStatus.LoggingIn
+        appEventsRepository.postEvent(AuthenticationEvent.LoggingIn)
         val token = loginService.authenticate(email, password)
         appDataService.updateToken(token)
-        mutableIsLoggedIn.value = LoginStatus.LoggedIn
+        appEventsRepository.postEvent(AuthenticationEvent.LoggedIn)
     }
 }

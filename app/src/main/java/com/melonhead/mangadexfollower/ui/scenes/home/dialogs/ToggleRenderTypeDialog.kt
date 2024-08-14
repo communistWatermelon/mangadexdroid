@@ -5,14 +5,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.melonhead.mangadexfollower.extensions.Previews
-import com.melonhead.mangadexfollower.models.ui.UIManga
-import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
+import com.melonhead.core_ui.extensions.Previews
 
 @Composable
 internal fun ToggleRenderTypeDialog(
-    uiManga: UIManga?,
-    onRenderTypeToggled: (UIManga) -> Unit,
+    uiManga: com.melonhead.data_core_manga_ui.UIManga?,
+    onRenderTypeToggled: (com.melonhead.data_core_manga_ui.UIManga) -> Unit,
     onDismissed: () -> Unit,
 ) {
     if (uiManga != null) {
@@ -46,7 +44,10 @@ internal fun ToggleRenderTypeDialog(
 @Preview
 @Composable
 private fun ToggleRenderTypePreview() {
-    MangadexFollowerTheme {
-        ToggleRenderTypeDialog(Previews.previewUIManga(), onRenderTypeToggled = { }, onDismissed = { })
+    com.melonhead.core_ui.theme.MangadexFollowerTheme {
+        ToggleRenderTypeDialog(
+            Previews.previewUIManga(),
+            onRenderTypeToggled = { },
+            onDismissed = { })
     }
 }

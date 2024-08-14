@@ -11,11 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -37,7 +34,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.melonhead.mangadexfollower.R
-import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
+import com.melonhead.core_ui.theme.MangadexFollowerTheme
+import com.melonhead.mangadexfollower.BuildConfig
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -49,6 +47,13 @@ internal fun LoginScreen(
     var loggingIn by rememberSaveable { mutableStateOf(false) }
     var isPasswordVisible by rememberSaveable { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    if (BuildConfig.DEBUG) {
+        LaunchedEffect(key1 = true) {
+            emailField = BuildConfig.DEBUG_EMAIL
+            passwordField = BuildConfig.DEBUG_PASSWORD
+        }
+    }
 
     fun signIn() {
         onLoginTapped(emailField, passwordField)
@@ -166,7 +171,7 @@ internal fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 private fun LoginPreview() {
-    MangadexFollowerTheme {
+    com.melonhead.core_ui.theme.MangadexFollowerTheme {
         LoginScreen(onLoginTapped = { _, _ -> })
     }
 }

@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.0-RC'
+    id 'org.jetbrains.kotlin.plugin.serialization'
     id 'org.jetbrains.kotlin.plugin.compose' version '2.0.0'
     id 'com.google.gms.google-services'
     id 'com.google.firebase.crashlytics'
@@ -11,6 +11,14 @@ plugins {
 android {
     namespace 'com.melonhead.mangadexfollower'
     compileSdk 34
+
+    def properties = new Properties()
+    if (rootProject.file("local.properties").exists()) {
+        properties.load(rootProject.file("local.properties").newDataInputStream())
+    }
+
+    def debugEmail = properties.getProperty("debug_email", "")
+    def debugPassword = properties.getProperty("debug_password", "")
 
     defaultConfig {
         applicationId "com.melonhead.mangadexfollower"
@@ -23,6 +31,9 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+
+        buildConfigField("String", "DEBUG_EMAIL", "\"${debugEmail}\"")
+        buildConfigField("String", "DEBUG_PASSWORD", "\"${debugPassword}\"")
     }
 
     buildTypes {
@@ -65,31 +76,13 @@ tasks.register('generateVersionTxt') {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.13.1'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.3'
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.8.3"
 
-    implementation 'androidx.activity:activity-compose:1.9.0'
-    implementation "androidx.compose.ui:ui:1.6.8"
-    implementation "androidx.compose.ui:ui-tooling-preview:1.6.8"
-    implementation "androidx.compose.runtime:runtime-livedata:1.6.8"
-
-    implementation 'androidx.compose.material3:material3:1.2.1'
-    implementation "androidx.compose.material:material-icons-extended:1.6.8"
     implementation 'com.google.firebase:firebase-crashlytics-ktx:19.0.2'
     implementation 'com.google.firebase:firebase-analytics-ktx:22.0.2'
-    implementation project(':data-user')
     testImplementation 'junit:junit:4.13.2'
 
-    debugImplementation "androidx.compose.ui:ui-tooling:1.6.8"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:1.6.8"
-
-    implementation "io.insert-koin:koin-android:3.3.0"
-    implementation "io.insert-koin:koin-androidx-compose:3.3.0"
-
-    implementation 'io.coil-kt:coil-compose:2.2.2'
-
-    implementation "org.jetbrains.kotlinx:kotlinx-datetime:0.4.0"
     implementation "androidx.datastore:datastore-preferences:1.1.1"
 
     implementation "androidx.work:work-runtime-ktx:2.9.0"
@@ -106,14 +99,24 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-database-ktx'
 
-    implementation project(":data-core-manga")
+    implementation project(":core")
+    implementation project(":core-ui")
+    implementation project(":lib-app-events")
     implementation project(":lib-logging")
+    implementation project(":lib-notifications")
+    implementation project(":lib-navigation")
     implementation project(":lib-database")
     implementation project(":lib-app-context")
-    implementation project(':feature-authentication')
-    implementation project(':feature-chapter-cache')
+    implementation project(":lib-di")
     implementation project(":lib-networking")
+    implementation project(":data-core-manga")
+    implementation project(":data-core-manga-ui")
+    implementation project(':data-manga')
     implementation project(':data-at-home')
     implementation project(':data-app-data')
-
+    implementation project(':data-user')
+    implementation project(':feature-authentication')
+    implementation project(':lib-chapter-cache')
+    implementation project(':feature-native-chapter-viewer')
+    implementation project(':feature-webview-chapter-viewer')
 }

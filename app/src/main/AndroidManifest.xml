@@ -31,8 +31,8 @@
                 android:value="" />
         </activity>
 
-        <activity android:name=".ui.scenes.chapter_reader.web_chapter_reader.WebViewActivity" />
-        <activity android:name=".ui.scenes.chapter_reader.native_chapter_reader.ChapterActivity" />
+        <activity android:name="com.melonhead.feature_webview_chapter_viewer.WebViewActivity" />
+        <activity android:name="com.melonhead.feature_native_chapter_viewer.ChapterActivity" />
     </application>
 
 </manifest>

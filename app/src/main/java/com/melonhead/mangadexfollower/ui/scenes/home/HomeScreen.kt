@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.sp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.melonhead.mangadexfollower.BuildConfig
-import com.melonhead.mangadexfollower.models.ui.MangaRefreshStatus
-import com.melonhead.mangadexfollower.models.ui.None
-import com.melonhead.mangadexfollower.models.ui.UIChapter
-import com.melonhead.mangadexfollower.models.ui.UIManga
+import com.melonhead.data_core_manga_ui.MangaRefreshStatus
+import com.melonhead.data_core_manga_ui.None
+import com.melonhead.data_core_manga_ui.UIChapter
+import com.melonhead.data_core_manga_ui.UIManga
 import com.melonhead.mangadexfollower.ui.scenes.home.dialogs.MarkChapterReadDialog
 import com.melonhead.mangadexfollower.ui.scenes.home.dialogs.ShowMangaDescriptionDialog
 import com.melonhead.mangadexfollower.ui.scenes.home.dialogs.TitleChangeDialog
@@ -154,7 +154,7 @@ internal fun HomeScreen(
                 items(itemState, {
                     when {
                         it is UIManga -> it.id
-                        it is Pair<*, *> && it.first == UIChapter -> (it.first as UIChapter).id
+                        it is Pair<*, *> && it.first is UIChapter -> (it.first as UIChapter).id
                         else -> it.hashCode()
                     }
                 }) {

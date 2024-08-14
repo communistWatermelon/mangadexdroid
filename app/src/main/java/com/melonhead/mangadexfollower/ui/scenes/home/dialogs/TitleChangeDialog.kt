@@ -12,14 +12,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import com.melonhead.mangadexfollower.extensions.Previews
-import com.melonhead.mangadexfollower.models.ui.UIManga
-import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
+import com.melonhead.core_ui.extensions.Previews
 
 @Composable
 internal fun TitleChangeDialog(
-    uiManga: UIManga?,
-    onChangeMangaTitle: (UIManga, String) -> Unit,
+    uiManga: com.melonhead.data_core_manga_ui.UIManga?,
+    onChangeMangaTitle: (com.melonhead.data_core_manga_ui.UIManga, String) -> Unit,
     onDismissed: () -> Unit,
 ) {
     if (uiManga != null) {
@@ -74,7 +72,10 @@ internal fun TitleChangeDialog(
 @Preview
 @Composable
 private fun TitleChangePreview() {
-    MangadexFollowerTheme {
-        TitleChangeDialog(Previews.previewUIManga(), onChangeMangaTitle = { _, _ -> }, onDismissed = { })
+    com.melonhead.core_ui.theme.MangadexFollowerTheme {
+        TitleChangeDialog(
+            Previews.previewUIManga(),
+            onChangeMangaTitle = { _, _ -> },
+            onDismissed = { })
     }
 }

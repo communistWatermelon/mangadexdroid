@@ -1,36 +1,31 @@
 package com.melonhead.mangadexfollower.di
 
-import com.melonhead.mangadexfollower.repositories.MangaRepository
-import com.melonhead.mangadexfollower.services.*
-import com.melonhead.mangadexfollower.ui.viewmodels.ChapterViewModel
+import com.melonhead.data_app_data.di.AppDataServiceModule
+import com.melonhead.feature_authentication.di.FeatureAuthenticationModule
+import com.melonhead.feature_native_chapter_viewer.di.FeatureNativeChapterViewerModule
+import com.melonhead.feature_webview_chapter_viewer.di.FeatureWebViewChapterViewerModule
+import com.melonhead.lib_app_events.di.LibAppEventsModule
+import com.melonhead.lib_navigation.di.LibNavigationModule
+import com.melonhead.mangadexfollower.AppNavigationMap
+import com.melonhead.mangadexfollower.navigation.MainActivityResolver
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
-import com.melonhead.mangadexfollower.ui.viewmodels.WebViewViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
-val appModule = module {
+val AppModule = module {
+    includes(LibAppEventsModule)
+    includes(LibNavigationModule)
 
-    single<MangaService> {
-        MangaServiceImpl(get())
-    }
+    includes(AppDataServiceModule)
 
-    factory { CoroutineScope(Dispatchers.IO) }
-
-    single {
-        MangaRepository(get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
-    }
+    includes(FeatureAuthenticationModule)
+    includes(FeatureNativeChapterViewerModule)
+    includes(FeatureWebViewChapterViewerModule)
 
     viewModel {
-        MainViewModel(get(), get(), get())
+        MainViewModel(get(), get(), get(), get(), get())
     }
 
-    viewModel {
-        WebViewViewModel(get())
-    }
-
-    viewModel {
-        ChapterViewModel(get(), get())
-    }
+    single(createdAtStart = true) { MainActivityResolver() }
+    single(createdAtStart = true) { AppNavigationMap(get(), get(), get(), get()) }
 }

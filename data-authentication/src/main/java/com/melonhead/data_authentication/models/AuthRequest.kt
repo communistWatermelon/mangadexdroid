@@ -1,4 +1,6 @@
- package com.melonhead.data_authentication.models
+package com.melonhead.data_authentication.models
 
-@kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class AuthRequest(val email: String, val password: String)

@@ -14,22 +14,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.melonhead.mangadexfollower.extensions.Previews
-import com.melonhead.mangadexfollower.extensions.dateOrTimeString
-import com.melonhead.mangadexfollower.models.ui.*
-import com.melonhead.mangadexfollower.ui.theme.MangadexFollowerTheme
-import kotlinx.datetime.Clock
+import com.melonhead.core_ui.extensions.Previews
+import com.melonhead.core.extensions.dateOrTimeString
 import kotlinx.datetime.Instant
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun ChapterListItem(
     modifier: Modifier = Modifier,
-    uiChapter: UIChapter,
-    uiManga: UIManga,
-    refreshStatus: MangaRefreshStatus,
-    onChapterClicked: (UIManga, UIChapter) -> Unit,
-    onChapterLongPressed: (UIManga, UIChapter) -> Unit,
+    uiChapter: com.melonhead.data_core_manga_ui.UIChapter,
+    uiManga: com.melonhead.data_core_manga_ui.UIManga,
+    refreshStatus: com.melonhead.data_core_manga_ui.MangaRefreshStatus,
+    onChapterClicked: (com.melonhead.data_core_manga_ui.UIManga, com.melonhead.data_core_manga_ui.UIChapter) -> Unit,
+    onChapterLongPressed: (com.melonhead.data_core_manga_ui.UIManga, com.melonhead.data_core_manga_ui.UIChapter) -> Unit,
 ) {
     Card(modifier = modifier
         .fillMaxWidth()
@@ -74,7 +71,7 @@ internal fun ChapterListItem(
                     fontSize = 12.sp
                 )
             }
-            if (refreshStatus !is None && uiChapter.read != true) {
+            if (refreshStatus !is com.melonhead.data_core_manga_ui.None && uiChapter.read != true) {
                 CircularProgressIndicator(modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .size(12.dp),
@@ -93,14 +90,40 @@ internal fun ChapterListItem(
 @Preview(showBackground = true)
 @Composable
 private fun ChapterPreview() {
-    MangadexFollowerTheme {
+    com.melonhead.core_ui.theme.MangadexFollowerTheme {
         val manga = Previews.previewUIManga()
         Column {
-            ChapterListItem(uiChapter = Previews.previewUIChapters().first(), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
-            ChapterListItem(uiChapter = Previews.previewUIChapters().first().copy(read = false), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
-            ChapterListItem(uiChapter = Previews.previewUIChapters().first().copy(read = false), uiManga = manga, refreshStatus = None, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
-            ChapterListItem(uiChapter = Previews.previewUIChapters().first().copy(chapter = "101"), uiManga = manga.copy(lastChapter = "101"), refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
-            ChapterListItem(uiChapter = Previews.previewUIChapters().first().copy(title = "Test Title with an extremely long title that may or may not wrap"), uiManga = manga, refreshStatus = ReadStatus, onChapterClicked = { _, _ -> }, onChapterLongPressed = { _, _ -> })
+            ChapterListItem(
+                uiChapter = Previews.previewUIChapters().first(),
+                uiManga = manga,
+                refreshStatus = com.melonhead.data_core_manga_ui.ReadStatus,
+                onChapterClicked = { _, _ -> },
+                onChapterLongPressed = { _, _ -> })
+            ChapterListItem(
+                uiChapter = Previews.previewUIChapters().first().copy(read = false),
+                uiManga = manga,
+                refreshStatus = com.melonhead.data_core_manga_ui.ReadStatus,
+                onChapterClicked = { _, _ -> },
+                onChapterLongPressed = { _, _ -> })
+            ChapterListItem(
+                uiChapter = Previews.previewUIChapters().first().copy(read = false),
+                uiManga = manga,
+                refreshStatus = com.melonhead.data_core_manga_ui.None,
+                onChapterClicked = { _, _ -> },
+                onChapterLongPressed = { _, _ -> })
+            ChapterListItem(
+                uiChapter = Previews.previewUIChapters().first().copy(chapter = "101"),
+                uiManga = manga.copy(lastChapter = "101"),
+                refreshStatus = com.melonhead.data_core_manga_ui.ReadStatus,
+                onChapterClicked = { _, _ -> },
+                onChapterLongPressed = { _, _ -> })
+            ChapterListItem(
+                uiChapter = Previews.previewUIChapters().first()
+                    .copy(title = "Test Title with an extremely long title that may or may not wrap"),
+                uiManga = manga,
+                refreshStatus = com.melonhead.data_core_manga_ui.ReadStatus,
+                onChapterClicked = { _, _ -> },
+                onChapterLongPressed = { _, _ -> })
         }
     }
 }
