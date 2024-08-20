@@ -1,61 +1,108 @@
 [versions]
-gradlePlugin = "8.5.2"
-androidPlugin = "8.5.2"
-kotlinGradlePlugin = "2.0.0"
-kspPlugin = "2.0.0-1.0.21"
-googleServicesPlugin = "4.4.2"
-crashlyticsGradlePlugin = "3.0.2"
+gradlePluginVersion = "8.5.2"
+androidPluginVersion = "8.5.2"
+kotlinGradlePluginVersion = "2.0.0"
+kspPluginVersion = "2.0.0-1.0.21"
+googleServicesPluginVersion = "4.4.2"
+crashlyticsGradlePluginVersion = "3.0.2"
 
-workKtx = "2.9.0"
-swipeRefresh = "0.27.0"
+workKtxVersion = "2.9.0"
+swipeRefreshVersion = "0.27.0"
 
-ktor = "2.1.3"
-koinKtor = "3.2.2"
-kotlinxSerialization = "1.7.1"
+ktorVersion = "2.1.3"
+koinKtorVersion = "3.2.2"
+kotlinxSerializationVersion = "1.7.1"
 
-firebaseBom = "33.1.1"
-crashlytics = "19.0.2"
+firebaseBomVersion = "33.1.1"
+crashlyticsVersion = "19.0.2"
 
-koinAndroid = "3.3.0"
+koinAndroidVersion = "3.3.0"
 
-room = "2.6.1"
-kotlinxDatetime = "0.4.0"
+roomVersion = "2.6.1"
+kotlinxDatetimeVersion = "0.4.0"
 
+datastorePreferencesVersion = "1.1.1"
+
+activityComposeVersion = "1.9.0"
+coilComposeVersion = "2.2.2"
+material3Version = "1.2.1"
+composeVersion = "1.6.8"
+
+appcompatVersion = "1.7.0"
+coreKtxVersion = "1.13.1"
+espressoCoreVersion = "3.6.1"
+firebaseAnalyticsKtxVersion = "22.0.2"
+junitVersion = "4.13.2"
+junitExtVersion = "1.2.1"
+lifecycleRuntimeKtxVersion = "2.8.3"
+materialVersion = "1.12.0"
 
 [libraries]
-work-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workKtx" }
-accompanist-swiperefresh = { group = "com.google.accompanist", name = "accompanist-swiperefresh", version.ref = "swipeRefresh" }
+work-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workKtxVersion" }
+accompanist-swiperefresh = { group = "com.google.accompanist", name = "accompanist-swiperefresh", version.ref = "swipeRefreshVersion" }
 
-ktor-client = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
-ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
-ktor-serialization = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
-koin-ktor = { group = "io.insert-koin", name = "koin-ktor", version.ref = "koinKtor" }
+ktor-client = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktorVersion" }
+ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktorVersion" }
+ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktorVersion" }
+ktor-serialization = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktorVersion" }
+koin-ktor = { group = "io.insert-koin", name = "koin-ktor", version.ref = "koinKtorVersion" }
 
-kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationVersion" }
 
-firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
-firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx", version.ref = "crashlytics" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBomVersion" }
+firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx", version.ref = "crashlyticsVersion" }
 
-koinAndroid = { group = "io.insert-koin", name = "koin-android", version.ref = "koinAndroid" }
-koinCompose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koinAndroid" }
+koinAndroid = { group = "io.insert-koin", name = "koin-android", version.ref = "koinAndroidVersion" }
+koinCompose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koinAndroidVersion" }
 
-roomRuntime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
-roomKtx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomVersion" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
+room-compiler = { module = "androidx.room:room-compiler", name = "room-compiler", version.ref = "roomVersion" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetimeVersion" }
 firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx" }
-google-firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx" }
-kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+
+datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferencesVersion" }
+
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilComposeVersion" }
+material3 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }
+material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "composeVersion" }
+runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version.ref = "composeVersion" }
+compose-ui = { module = "androidx.compose.ui:ui", version.ref = "composeVersion" }
+compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "composeVersion" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "composeVersion" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "composeVersion" }
+
+androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
+espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
+ext-junit = { module = "androidx.test.ext:junit", version.ref = "junitExtVersion" }
+lib-junit = { module = "junit:junit", version.ref = "junitVersion" }
+firebase-analytics-ktx = { module = "com.google.firebase-analytics-ktx:firebase", version.ref = "firebaseAnalyticsKtxVersion" }
+lifecycle-common = { module = "androidx.lifecycle:lifecycle-common", version.ref = "lifecycleRuntimeKtxVersion" }
+lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
+lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleRuntimeKtxVersion" }
+lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
+android-material = { module = "com.google.android.material:material", version.ref = "materialVersion" }
 
 
+[bundles]
+ktor = ["ktor-client", "ktor-client-content-negotiation", "ktor-client-logging", "ktor-serialization", "koin-ktor", "kotlinx-serialization"]
+koin = ["koinAndroid", "koinCompose"]
+compose = ["coil-compose", "material3", "activity-compose", "material-icons-extended", "runtime-livedata", "compose-ui", "compose-ui-tooling-preview"]
+compose-debug = ["compose-ui-test-manifest", "compose-ui-tooling"]
+firebase = ["firebase-crashlytics-ktx", "firebase-analytics-ktx", "firebase-database-ktx"]
 
+common = ["androidx-core-ktx", "androidx-appcompat", "android-material", "kotlinx-datetime", "lifecycle-common", "lifecycle-livedata-ktx", "lifecycle-process", "lifecycle-runtime-ktx"]
+common-test = ["lib-junit"]
+common-android-test = ["ext-junit", "espresso-core"]
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "androidPlugin" }
-android-library = { id = "com.android.library", version.ref = "androidPlugin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinGradlePlugin" }
-kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinGradlePlugin" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "kspPlugin" }
-compose-plugin = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinGradlePlugin" }
-google-services = { id = "com.google.gms.google-services", version.ref = "googleServicesPlugin" }
-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsGradlePlugin"}
+android-application = { id = "com.android.application", version.ref = "androidPluginVersion" }
+android-library = { id = "com.android.library", version.ref = "androidPluginVersion" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinGradlePluginVersion" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinGradlePluginVersion" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "kspPluginVersion" }
+compose-plugin = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinGradlePluginVersion" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServicesPluginVersion" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsGradlePluginVersion"}

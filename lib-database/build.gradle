@@ -38,8 +38,8 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation libs.firebase.database.ktx
 
-    implementation libs.roomRuntime
-    implementation libs.roomKtx
+    implementation libs.room.runtime
+    implementation libs.room.ktx
     annotationProcessor libs.room.compiler
     ksp libs.room.compiler
 
@@ -48,7 +48,7 @@ dependencies {
     implementation project(":lib-di")
 
     api platform(libs.firebase.bom)
-    api libs.google.firebase.database.ktx
+    api libs.firebase.database.ktx
     api libs.kotlinx.datetime
 
 }

@@ -1,6 +1,6 @@
 buildscript {
     dependencies {
-        classpath "com.android.tools.build:gradle:${libs.versions.gradlePlugin}"
+        classpath "com.android.tools.build:gradle:${libs.versions.gradlePluginVersion}"
     }
 }
 
