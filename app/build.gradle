@@ -64,8 +64,8 @@ tasks.register('generateVersionTxt') {
 }
 
 dependencies {
-    implementation "androidx.work:work-runtime-ktx:2.9.0"
-    implementation 'com.google.accompanist:accompanist-swiperefresh:0.27.0'
+    implementation libs.work.ktx
+    implementation libs.accompanist.swiperefresh
 
     implementation project(":core")
     implementation project(":core-ui")
