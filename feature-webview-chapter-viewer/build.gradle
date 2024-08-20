@@ -33,6 +33,9 @@ android {
 }
 
 dependencies {
+    implementation libs.bundles.common
+    testImplementation libs.bundles.common.test
+
     implementation project(":core")
     implementation project(":core-ui")
     implementation project(":data-core-manga-ui")

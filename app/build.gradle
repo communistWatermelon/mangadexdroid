@@ -64,6 +64,8 @@ tasks.register('generateVersionTxt') {
 }
 
 dependencies {
+    implementation libs.bundles.common
+    testImplementation libs.bundles.common.test
     implementation libs.work.ktx
     implementation libs.accompanist.swiperefresh
 

@@ -30,7 +30,9 @@ android {
 }
 
 dependencies {
-    implementation project(":core")
+    implementation libs.bundles.common
+    testImplementation libs.bundles.common.test
+
     implementation project(":lib-di")
     implementation project(":lib-logging")
 }

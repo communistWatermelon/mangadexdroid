@@ -31,8 +31,8 @@ android {
 
 dependencies {
     implementation libs.bundles.koin
-
-    implementation project(":core")
+    implementation libs.bundles.common
+    testImplementation libs.bundles.common.test
 
     api libs.bundles.koin
 

@@ -36,7 +36,9 @@ dependencies {
     implementation libs.bundles.compose
     debugImplementation libs.bundles.compose.debug
 
-    implementation project(":core")
+    implementation libs.bundles.common
+    testImplementation libs.bundles.common.test
+
     implementation project(":data-core-manga-ui")
 
     api libs.bundles.compose

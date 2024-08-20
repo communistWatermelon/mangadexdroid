@@ -31,6 +31,9 @@ android {
 }
 
 dependencies {
+    implementation libs.bundles.common
+    testImplementation libs.bundles.common.test
+
     implementation project(":core")
     implementation project(":lib-app-context")
     implementation project(":lib-di")

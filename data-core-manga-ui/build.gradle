@@ -34,5 +34,6 @@ android {
 
 dependencies {
     implementation libs.bundles.ktor
-    implementation project(":core")
+    implementation libs.bundles.common
+    testImplementation libs.bundles.common.test
 }

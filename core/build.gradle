@@ -35,9 +35,4 @@ dependencies {
     implementation libs.bundles.common
     testImplementation libs.bundles.common.test
     androidTestImplementation libs.bundles.common.android.test
-
-    api platform(libs.firebase.bom)
-    api libs.bundles.common
-    testApi libs.bundles.common.test
-    androidTestApi libs.bundles.common.android.test
 }

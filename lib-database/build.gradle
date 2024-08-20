@@ -36,6 +36,7 @@ dependencies {
     implementation libs.bundles.firebase
 
     implementation libs.bundles.common
+    testImplementation libs.bundles.common.test
 
     implementation libs.room.runtime
     implementation libs.room.ktx
