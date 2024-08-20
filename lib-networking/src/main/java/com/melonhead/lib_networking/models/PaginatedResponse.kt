@@ -3,6 +3,7 @@ package com.melonhead.lib_networking.models
 import com.melonhead.lib_logging.Clog
 import io.ktor.client.call.*
 import io.ktor.client.statement.*
+import io.ktor.http.HttpStatusCode
 
 @kotlinx.serialization.Serializable
 data class PaginatedResponse<T>(val limit: Int, val offset: Int, val total: Int, val data: List<T>)
@@ -16,6 +17,10 @@ suspend inline fun <reified T> handlePagination(
     val allItems = mutableSetOf<T>()
     while (allItems.count() < total) {
         val result = request(allItems.count()) ?: continue
+        if (result.status == HttpStatusCode.Unauthorized) {
+            Clog.i("handlePagination: Unauthorized")
+            continue
+        }
         val items = try {
             val response = result.body<PaginatedResponse<T>>()
             if (fetchAll) total = response.total
