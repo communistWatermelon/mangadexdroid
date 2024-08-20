@@ -78,7 +78,7 @@ androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtxV
 espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
 ext-junit = { module = "androidx.test.ext:junit", version.ref = "junitExtVersion" }
 lib-junit = { module = "junit:junit", version.ref = "junitVersion" }
-firebase-analytics-ktx = { module = "com.google.firebase-analytics-ktx:firebase", version.ref = "firebaseAnalyticsKtxVersion" }
+firebase-analytics-ktx = { module = "com.google.firebase:firebase-analytics-ktx", version.ref = "firebaseAnalyticsKtxVersion" }
 lifecycle-common = { module = "androidx.lifecycle:lifecycle-common", version.ref = "lifecycleRuntimeKtxVersion" }
 lifecycle-livedata-ktx = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleRuntimeKtxVersion" }
 lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleRuntimeKtxVersion" }

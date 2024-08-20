@@ -30,12 +30,10 @@ android {
 }
 
 dependencies {
-    implementation libs.koinAndroid
-    implementation libs.koinCompose
+    implementation libs.bundles.koin
 
     implementation project(":core")
 
-    api libs.koinAndroid
-    api libs.koinCompose
+    api libs.bundles.koin
 
 }

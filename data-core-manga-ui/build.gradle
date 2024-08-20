@@ -33,6 +33,6 @@ android {
 }
 
 dependencies {
-    implementation libs.ktor.serialization
+    implementation libs.bundles.ktor
     implementation project(":core")
 }

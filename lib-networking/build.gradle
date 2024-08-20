@@ -31,22 +31,12 @@ android {
 }
 
 dependencies {
-    implementation libs.koin.ktor
-    implementation libs.ktor.client
-    implementation libs.ktor.client.content.negotiation
-    implementation libs.ktor.client.logging
-    implementation libs.ktor.serialization
-    implementation libs.kotlinx.serialization
+    implementation libs.bundles.ktor
 
     implementation project(":core")
     implementation project(":lib-logging")
     implementation project(":lib-di")
     implementation project(":lib-app-events")
 
-    api libs.koin.ktor
-    api libs.ktor.client
-    api libs.ktor.client.content.negotiation
-    api libs.ktor.client.logging
-    api libs.ktor.serialization
-    api libs.kotlinx.serialization
+    api libs.bundles.ktor
 }

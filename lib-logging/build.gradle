@@ -31,10 +31,9 @@ android {
 
 dependencies {
     // Import the BoM for the Firebase platform
-    implementation libs.ktor.client
-    implementation libs.koin.ktor
+    implementation libs.bundles.ktor
     implementation platform(libs.firebase.bom)
-    implementation libs.firebase.crashlytics.ktx
+    implementation libs.bundles.firebase
 
     implementation project(":core")
 }
