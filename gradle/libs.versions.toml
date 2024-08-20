@@ -1,0 +1,22 @@
+[versions]
+gradleVersion = "8.5.2"
+androidApplication = "8.5.2"
+androidLibrary = "8.5.2"
+kotlinAndroid = "2.0.0"
+kotlinxSerialization = "2.0.0"
+ksp = "2.0.0-1.0.21"
+composePlugin = "2.0.0"
+googleServices = "4.4.2"
+crashlyticsGradle = "3.0.2"
+
+[libraries]
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "androidApplication" }
+android-library = { id = "com.android.library", version.ref = "androidLibrary" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinAndroid" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinxSerialization" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+compose-plugin = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "composePlugin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsGradle"}
