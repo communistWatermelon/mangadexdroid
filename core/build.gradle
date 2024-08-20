@@ -47,7 +47,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics-ktx:19.0.2'
     implementation 'com.google.firebase:firebase-analytics-ktx:22.0.2'
     // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:33.1.1')
+    implementation platform(libs.firebase.bom)
     // Add the dependency for the Realtime Database library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-database-ktx'
@@ -68,7 +68,7 @@ dependencies {
     api 'com.google.firebase:firebase-crashlytics-ktx:19.0.2'
     api 'com.google.firebase:firebase-analytics-ktx:22.0.2'
     // Import the BoM for the Firebase platform
-    api platform('com.google.firebase:firebase-bom:33.1.1')
+    api platform(libs.firebase.bom)
     // Add the dependency for the Realtime Database library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     api 'com.google.firebase:firebase-database-ktx'

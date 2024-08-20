@@ -16,23 +16,36 @@ kotlinxSerialization = "1.7.1"
 firebaseBom = "33.1.1"
 crashlytics = "19.0.2"
 
+koinAndroid = "3.3.0"
 
+room = "2.6.1"
+kotlinxDatetime = "0.4.0"
 
 
 [libraries]
 work-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workKtx" }
 accompanist-swiperefresh = { group = "com.google.accompanist", name = "accompanist-swiperefresh", version.ref = "swipeRefresh" }
 
-koin-ktor = { group = "io.insert-koin", name = "koin-ktor", version.ref = "koinKtor" }
 ktor-client = { group = "io.ktor", name = "ktor-client-cio", version.ref = "ktor" }
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
 ktor-serialization = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+koin-ktor = { group = "io.insert-koin", name = "koin-ktor", version.ref = "koinKtor" }
 
 kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-crashlytics-ktx = { group = "com.google.firebase", name = "firebase-crashlytics-ktx", version.ref = "crashlytics" }
+
+koinAndroid = { group = "io.insert-koin", name = "koin-android", version.ref = "koinAndroid" }
+koinCompose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koinAndroid" }
+
+roomRuntime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+roomKtx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx" }
+google-firebase-database-ktx = { module = "com.google.firebase:firebase-database-ktx" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 
 
 
