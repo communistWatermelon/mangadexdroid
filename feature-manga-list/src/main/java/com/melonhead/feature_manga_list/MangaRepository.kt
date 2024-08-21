@@ -7,7 +7,7 @@ import com.melonhead.lib_core.models.*
 import com.melonhead.data_app_data.AppDataService
 import com.melonhead.data_at_home.AtHomeService
 import com.melonhead.data_user.services.UserService
-import com.melonhead.feature_chapter_cache.ChapterCacheMechanism
+import com.melonhead.lib_chapter_cache.ChapterCacheMechanism
 import com.melonhead.feature_manga_list.services.MangaService
 import com.melonhead.lib_app_context.AppContext
 import com.melonhead.lib_app_events.AppEventsRepository

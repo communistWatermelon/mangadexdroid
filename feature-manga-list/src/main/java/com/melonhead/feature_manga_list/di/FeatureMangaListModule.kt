@@ -1,20 +1,19 @@
 package com.melonhead.feature_manga_list.di
 
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.melonhead.data_app_data.di.AppDataServiceModule
-import com.melonhead.data_at_home.di.DataAtHomeServiceModule
+import com.melonhead.data_app_data.di.DataAppDataModule
+import com.melonhead.data_at_home.di.DataAtHomeModule
 import com.melonhead.feature_manga_list.MangaRepository
 import com.melonhead.feature_manga_list.MangaRepositoryImpl
 import com.melonhead.feature_manga_list.services.MangaService
 import com.melonhead.feature_manga_list.services.MangaServiceImpl
-import com.melonhead.data_user.di.UserServiceModule
-import com.melonhead.feature_chapter_cache.di.ChapterCacheModule
+import com.melonhead.data_user.di.DataUserModule
+import com.melonhead.lib_chapter_cache.di.LibChapterCacheModule
 import com.melonhead.feature_manga_list.navigation.MangaListScreenResolver
 import com.melonhead.feature_manga_list.viewmodels.MangaListViewModel
 import com.melonhead.lib_app_context.di.LibAppContextModule
 import com.melonhead.lib_app_events.di.LibAppEventsModule
-import com.melonhead.lib_database.di.DBModule
-import com.melonhead.lib_networking.di.NetworkingModule
+import com.melonhead.lib_database.di.LibDbModule
+import com.melonhead.lib_networking.di.LibNetworkingModule
 import com.melonhead.lib_notifications.di.LibNotificationsModule
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -23,13 +22,13 @@ val FeatureMangaListModule = module {
     includes(LibAppEventsModule)
     includes(LibNotificationsModule)
     includes(LibAppContextModule)
-    includes(DBModule)
-    includes(ChapterCacheModule)
-    includes(NetworkingModule)
+    includes(LibDbModule)
+    includes(LibChapterCacheModule)
+    includes(LibNetworkingModule)
 
-    includes(UserServiceModule)
-    includes(AppDataServiceModule)
-    includes(DataAtHomeServiceModule)
+    includes(DataUserModule)
+    includes(DataAppDataModule)
+    includes(DataAtHomeModule)
 
     single<MangaService> {
         MangaServiceImpl(get())

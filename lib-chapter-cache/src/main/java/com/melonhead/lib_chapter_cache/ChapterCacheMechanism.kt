@@ -1,4 +1,4 @@
-package com.melonhead.feature_chapter_cache
+package com.melonhead.lib_chapter_cache
 
 import com.melonhead.lib_database.chapter.ChapterEntity
 

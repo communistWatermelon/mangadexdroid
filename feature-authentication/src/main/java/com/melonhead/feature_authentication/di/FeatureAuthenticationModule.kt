@@ -1,8 +1,8 @@
 package com.melonhead.feature_authentication.di
 
-import com.melonhead.data_app_data.di.AppDataServiceModule
+import com.melonhead.data_app_data.di.DataAppDataModule
 import com.melonhead.data_authentication.di.DataAuthenticationModule
-import com.melonhead.data_user.di.UserServiceModule
+import com.melonhead.data_user.di.DataUserModule
 import com.melonhead.feature_authentication.AuthRepository
 import com.melonhead.feature_authentication.AuthRepositoryImpl
 import com.melonhead.feature_authentication.navigation.LoginScreenResolver
@@ -21,9 +21,8 @@ val FeatureAuthenticationModule = module {
     includes(LibAppContextModule)
 
     includes(DataAuthenticationModule)
-
-    includes(AppDataServiceModule)
-    includes(UserServiceModule)
+    includes(DataAppDataModule)
+    includes(DataUserModule)
 
     single<AuthRepository> { AuthRepositoryImpl(get(), get(), get(), get(), get(), get(), get(), get()) }
     single<LoginScreenResolver>(createdAtStart = true) { LoginScreenResolver() }

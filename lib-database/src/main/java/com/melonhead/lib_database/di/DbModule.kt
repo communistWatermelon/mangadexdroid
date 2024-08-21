@@ -7,7 +7,7 @@ import com.melonhead.lib_database.manga.MangaDatabase
 import com.melonhead.lib_database.readmarkers.ReadMarkerDatabase
 import org.koin.dsl.module
 
-val DBModule = module {
+val LibDbModule = module {
     single(createdAtStart = true) {
         Room.databaseBuilder(
             get(),

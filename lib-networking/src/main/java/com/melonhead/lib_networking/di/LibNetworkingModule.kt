@@ -19,7 +19,7 @@ import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import kotlin.time.DurationUnit
 
-val NetworkingModule = module {
+val LibNetworkingModule = module {
     single {
         HttpClient(CIO) {
             install(RateLimit) {

@@ -6,7 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.koin.dsl.module
 
-val AppDataServiceModule = module {
+val DataAppDataModule = module {
     factory { CoroutineScope(Dispatchers.IO) }
     single<AppDataService> {
         AppDataServiceImpl(get(), get())
