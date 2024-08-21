@@ -1,4 +1,4 @@
-package com.melonhead.feature_native_chapter_viewer
+package com.melonhead.feature_native_chapter_viewer.ui.scenes
 
 import android.content.Context
 import androidx.compose.foundation.clickable

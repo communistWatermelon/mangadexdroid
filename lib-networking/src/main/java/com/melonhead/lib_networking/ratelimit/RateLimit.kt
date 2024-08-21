@@ -7,7 +7,7 @@ import io.ktor.client.request.*
 import io.ktor.util.*
 import io.ktor.util.pipeline.*
 
-class RateLimit(private val rules: List<RateLimitRule>) {
+internal class RateLimit(private val rules: List<RateLimitRule>) {
     suspend fun handleRequest(request: HttpRequestBuilder) {
         rules.firstOrNull { rule -> rule.isMatch(request) }?.onSendRequest(request)
     }

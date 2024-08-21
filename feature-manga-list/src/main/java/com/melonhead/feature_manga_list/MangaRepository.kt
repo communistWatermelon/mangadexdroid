@@ -43,10 +43,11 @@ internal class MangaRepositoryImpl(
     private val chapterDb: ChapterDao,
     private val mangaDb: MangaDao,
     private val readMarkerDb: ReadMarkerDao,
-    private val appContext: Context,
+    private val context: Context,
     private val chapterCache: ChapterCacheMechanism,
     private val appEventsRepository: AppEventsRepository,
     private val newChapterNotificationChannel: NewChapterNotificationChannel,
+    private val appContext: AppContext,
 ): MangaRepository, KoinComponent {
     private val mangaService: MangaService by inject()
 
@@ -197,8 +198,8 @@ internal class MangaRepositoryImpl(
     }
 
     private suspend fun notifyOfNewChapters() {
-        if (AppContext.isInForeground) return
-        val notificationManager = NotificationManagerCompat.from(appContext)
+        if (appContext.isInForeground) return
+        val notificationManager = NotificationManagerCompat.from(context)
         if (!notificationManager.areNotificationsEnabled()) return
         val installDateSeconds = appDataService.installDateSeconds.firstOrNull() ?: 0L
         Clog.i("notifyOfNewChapters")
@@ -207,7 +208,7 @@ internal class MangaRepositoryImpl(
         val manga = mangaDb.getAllSync()
         val notifyChapters = generateUIManga(manga, newChapters)
         chapterCache.cacheImagesForChapters(newChapters)
-        newChapterNotificationChannel.post(appContext, notifyChapters, installDateSeconds)
+        newChapterNotificationChannel.post(context, notifyChapters, installDateSeconds)
     }
 
     private suspend fun refreshReadStatus() {
@@ -254,7 +255,7 @@ internal class MangaRepositoryImpl(
             val token = appDataService.token.firstOrNull() ?: return@launch
             val entity = readMarkerDb.getEntity(uiManga.id, uiChapter.chapter) ?: return@launch
             if (read) {
-                newChapterNotificationChannel.dismissNotification(appContext, uiManga, uiChapter)
+                newChapterNotificationChannel.dismissNotification(context, uiManga, uiChapter)
             }
             readMarkerDb.update(entity.copy(readStatus = read))
             mangaService.changeReadStatus(token, uiManga, uiChapter, read)

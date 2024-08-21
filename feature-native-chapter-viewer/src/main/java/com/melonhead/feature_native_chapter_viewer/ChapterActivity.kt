@@ -7,6 +7,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.melonhead.feature_native_chapter_viewer.ui.scenes.ChapterScreen
+import com.melonhead.feature_native_chapter_viewer.viewmodels.ChapterViewModel
 import com.melonhead.lib_core.models.UIChapter
 import com.melonhead.lib_core.models.UIManga
 import com.melonhead.lib_core.theme.MangadexFollowerTheme

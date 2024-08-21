@@ -1,15 +1,16 @@
-package com.melonhead.feature_webview_chapter_viewer
+package com.melonhead.feature_webview_chapter_viewer.viewmodels
 
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.melonhead.feature_webview_chapter_viewer.WebViewActivity
 import com.melonhead.lib_core.extensions.asLiveData
 import com.melonhead.lib_core.models.UIChapter
 import com.melonhead.lib_core.models.UIManga
 import com.melonhead.lib_app_events.AppEventsRepository
 import com.melonhead.lib_app_events.events.UserEvent
 
-class WebViewViewModel(
+internal class WebViewViewModel(
     private val appEventsRepository: AppEventsRepository,
 ): ViewModel() {
     private val mutableUrl: MutableLiveData<String?> = MutableLiveData(null)

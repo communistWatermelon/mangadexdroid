@@ -2,7 +2,7 @@ package com.melonhead.lib_networking.ratelimit.core
 
 import kotlin.time.DurationUnit
 
-data class RateInfo(
+internal data class RateInfo(
     /**
      * Number of permits for a given [period].
      */

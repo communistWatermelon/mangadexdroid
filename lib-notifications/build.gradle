@@ -32,9 +32,9 @@ android {
 dependencies {
     implementation libs.bundles.common
     testImplementation libs.bundles.common.test
-    implementation project(':lib-core')
+    implementation libs.bundles.koin
 
-    implementation project(":lib-di")
+    implementation project(':lib-core')
     implementation project(":lib-logging")
     implementation project(":lib-navigation")
 }

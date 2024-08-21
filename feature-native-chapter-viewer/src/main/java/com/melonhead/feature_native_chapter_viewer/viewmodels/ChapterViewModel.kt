@@ -1,4 +1,4 @@
-package com.melonhead.feature_native_chapter_viewer
+package com.melonhead.feature_native_chapter_viewer.viewmodels
 
 import android.app.Activity
 import android.content.Intent
@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.melonhead.lib_core.models.UIChapter
 import com.melonhead.lib_core.models.UIManga
 import com.melonhead.data_app_data.AppDataService
+import com.melonhead.feature_native_chapter_viewer.ChapterActivity
 import com.melonhead.lib_app_events.AppEventsRepository
 import com.melonhead.lib_app_events.events.UserEvent
 import com.melonhead.lib_logging.Clog

@@ -5,7 +5,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
 
-class RateLimitHandler(rates: List<RateInfo>) {
+internal class RateLimitHandler(rates: List<RateInfo>) {
     private val rates = RateContainer.fromAll(rates)
     private val mutex = Mutex()
 

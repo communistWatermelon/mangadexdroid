@@ -35,9 +35,9 @@ android {
 dependencies {
     implementation libs.bundles.common
     testImplementation libs.bundles.common.test
-    implementation project(':lib-core')
+    implementation libs.bundles.koin
 
+    implementation project(':lib-core')
     implementation project(":lib-app-events")
-    implementation project(":lib-di")
     implementation project(":lib-navigation")
 }

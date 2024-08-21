@@ -1,7 +1,8 @@
-package com.melonhead.feature_native_chapter_viewer
+package com.melonhead.feature_native_chapter_viewer.navigation
 
 import android.content.Context
 import android.content.Intent
+import com.melonhead.feature_native_chapter_viewer.ChapterActivity
 import com.melonhead.lib_navigation.keys.ActivityKey
 import com.melonhead.lib_navigation.resolvers.ActivityResolver
 

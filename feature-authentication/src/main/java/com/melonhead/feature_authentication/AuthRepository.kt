@@ -22,12 +22,13 @@ interface AuthRepository {
 }
 
 internal class AuthRepositoryImpl(
-    private val appContext: Context,
+    private val context: Context,
     private val appDataService: AppDataService,
     private val loginService: LoginService,
     private val userService: UserService,
     private val appEventsRepository: AppEventsRepository,
     private val authFailedNotificationChannel: AuthFailedNotificationChannel,
+    private val appContext: AppContext,
     externalScope: CoroutineScope,
 ) : AuthRepository {
     init {
@@ -49,10 +50,10 @@ internal class AuthRepositoryImpl(
         suspend fun signOut() {
             Clog.e("Signing out, refresh failed", Exception())
             appEventsRepository.postEvent(AuthenticationEvent.LoggedOut)
-            if (AppContext.isInForeground) return
-            val notificationManager = NotificationManagerCompat.from(appContext)
+            if (appContext.isInForeground) return
+            val notificationManager = NotificationManagerCompat.from(context)
             if (!notificationManager.areNotificationsEnabled()) return
-            authFailedNotificationChannel.postAuthFailed(appContext)
+            authFailedNotificationChannel.postAuthFailed(context)
             appDataService.updateUserId("")
         }
 

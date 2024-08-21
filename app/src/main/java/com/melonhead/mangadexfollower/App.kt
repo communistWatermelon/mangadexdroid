@@ -25,6 +25,7 @@ import kotlin.time.toJavaDuration
 class App: Application() {
     private val appEventsRepository: AppEventsRepository by inject()
     private val appNavigationMap: AppNavigationMap by inject()
+    private val appContext: AppContext by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -50,13 +51,13 @@ class App: Application() {
         ProcessLifecycleOwner.get().lifecycle.addObserver(object: DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 super.onStart(owner)
-                AppContext.isInForeground = true
+                appContext.isInForeground = true
                 appEventsRepository.postEvent(AppLifecycleEvent.AppForegrounded)
             }
 
             override fun onStop(owner: LifecycleOwner) {
                 super.onStop(owner)
-                AppContext.isInForeground = false
+                appContext.isInForeground = false
                 appEventsRepository.postEvent(AppLifecycleEvent.AppBackgrounded)
                 Clog.i("onStop: Creating background task")
                 val refreshWorkRequest = PeriodicWorkRequestBuilder<RefreshWorker>(15.minutes.toJavaDuration()).build()

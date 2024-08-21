@@ -5,7 +5,7 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 
-class RateContainer(private val info: RateInfo) {
+internal class RateContainer(private val info: RateInfo) {
     val permits by info::permits
 
     @OptIn(ExperimentalTime::class)

@@ -1,12 +1,11 @@
 package com.melonhead.lib_networking.ratelimit.impl
 import io.ktor.client.request.*
 
-fun interface RequestKeySelector {
+internal fun interface RequestKeySelector {
     operator fun invoke(request: HttpRequestBuilder): RequestKey
 }
 
-
-class NoRequestKeySelector : RequestKeySelector {
+internal class NoRequestKeySelector : RequestKeySelector {
     private val requestKey = Any()
 
     override fun invoke(request: HttpRequestBuilder): RequestKey {
@@ -14,5 +13,4 @@ class NoRequestKeySelector : RequestKeySelector {
     }
 }
 
-
-typealias RequestKey = Any
+internal typealias RequestKey = Any

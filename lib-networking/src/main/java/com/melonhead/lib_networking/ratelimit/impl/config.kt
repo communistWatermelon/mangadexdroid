@@ -3,24 +3,24 @@ package com.melonhead.lib_networking.ratelimit.impl
 import com.melonhead.lib_networking.ratelimit.RateLimit
 import kotlin.time.DurationUnit
 
-class RateLimitRuleBuilder(val config: RateLimit.Config) {
+internal class RateLimitRuleBuilder(val config: RateLimit.Config) {
     var matcher: RequestMatcher = NoRequestMatcher()
     var keySelector: RequestKeySelector = NoRequestKeySelector()
 }
 
 
-interface RateLimitRuleBuilderWrapper {
+internal interface RateLimitRuleBuilderWrapper {
     val builder: RateLimitRuleBuilder
 }
 
-class RequestMatcherWrapping(
+internal class RequestMatcherWrapping(
     override val builder: RateLimitRuleBuilder
 ) : RateLimitRuleBuilderWrapper
 
 /**
  * Matches requests by the given [matcher] function.
  */
-fun RateLimit.Config.select(
+internal fun RateLimit.Config.select(
     matcher: RequestMatcher
 ): RequestMatcherWrapping = RequestMatcherWrapping(
     RateLimitRuleBuilder(this).apply {
@@ -31,14 +31,14 @@ fun RateLimit.Config.select(
 /**
  * Matches any given request (aka `else` branch in `when`).
  */
-fun RateLimit.Config.default() =
+internal fun RateLimit.Config.default() =
     select { true }
 
 
 /**
  * Sets the rate.
  */
-fun RateLimitRuleBuilderWrapper.rate(block: MultiRateBuilder.() -> Unit) {
+internal fun RateLimitRuleBuilderWrapper.rate(block: MultiRateBuilder.() -> Unit) {
     val rules = MultiRateBuilder().apply(block).toRates()
     builder.config.rule(DefaultRateLimitRule(builder.matcher, builder.keySelector, rules))
 }
@@ -46,7 +46,7 @@ fun RateLimitRuleBuilderWrapper.rate(block: MultiRateBuilder.() -> Unit) {
 /**
  * Sets the rate.
  */
-fun RateLimitRuleBuilderWrapper.rate(
+internal fun RateLimitRuleBuilderWrapper.rate(
     permits: Int,
     period: Int,
     unit: DurationUnit,

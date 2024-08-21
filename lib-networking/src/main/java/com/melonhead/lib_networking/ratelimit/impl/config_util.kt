@@ -3,7 +3,7 @@ package com.melonhead.lib_networking.ratelimit.impl
 import com.melonhead.lib_networking.ratelimit.core.RateInfo
 import kotlin.time.DurationUnit
 
-class MultiRateBuilder {
+internal class MultiRateBuilder {
     private val rates = ArrayList<RateInfo>()
 
     private fun add(rate: RateInfo) {

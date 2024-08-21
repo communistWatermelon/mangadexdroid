@@ -5,7 +5,7 @@ import com.melonhead.lib_networking.ratelimit.core.RateLimitRule
 import io.ktor.client.request.*
 import io.ktor.util.collections.*
 
-class DefaultRateLimitRule(
+internal class DefaultRateLimitRule(
     val matcher: RequestMatcher,
     val keySelector: RequestKeySelector,
     override val rates: List<RateInfo>,

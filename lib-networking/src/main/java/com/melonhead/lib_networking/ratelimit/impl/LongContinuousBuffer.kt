@@ -1,6 +1,6 @@
 package com.melonhead.lib_networking.ratelimit.impl
 
-class LongContinuousBuffer(private val capacity: Int) {
+internal class LongContinuousBuffer(private val capacity: Int) {
     private val backend = LongArray(capacity)
     private var head = 0
     var size = 0
@@ -42,14 +42,14 @@ class LongContinuousBuffer(private val capacity: Int) {
     }
 }
 
-fun LongContinuousBuffer.oldest(): Long {
+internal fun LongContinuousBuffer.oldest(): Long {
     if (isEmpty())
         throw NoSuchElementException("LongContinuousBuffer is empty.")
 
     return get(0)
 }
 
-fun LongContinuousBuffer.newest(): Long {
+internal fun LongContinuousBuffer.newest(): Long {
     if (isEmpty())
         throw NoSuchElementException("LongContinuousBuffer is empty.")
 

@@ -34,9 +34,9 @@ dependencies {
     implementation libs.bundles.common
     testImplementation libs.bundles.common.test
     implementation libs.bundles.ktor
+    implementation libs.bundles.koin
 
     implementation project(":lib-logging")
-    implementation project(":lib-di")
     implementation project(":lib-app-events")
 
     api libs.bundles.ktor

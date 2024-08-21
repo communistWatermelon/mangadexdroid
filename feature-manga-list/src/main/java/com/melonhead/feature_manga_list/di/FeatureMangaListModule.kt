@@ -11,6 +11,7 @@ import com.melonhead.data_user.di.UserServiceModule
 import com.melonhead.feature_chapter_cache.di.ChapterCacheModule
 import com.melonhead.feature_manga_list.navigation.MangaListScreenResolver
 import com.melonhead.feature_manga_list.viewmodels.MangaListViewModel
+import com.melonhead.lib_app_context.di.LibAppContextModule
 import com.melonhead.lib_app_events.di.LibAppEventsModule
 import com.melonhead.lib_database.di.DBModule
 import com.melonhead.lib_networking.di.NetworkingModule
@@ -19,14 +20,16 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val FeatureMangaListModule = module {
+    includes(LibAppEventsModule)
+    includes(LibNotificationsModule)
+    includes(LibAppContextModule)
+    includes(DBModule)
+    includes(ChapterCacheModule)
     includes(NetworkingModule)
+
     includes(UserServiceModule)
     includes(AppDataServiceModule)
     includes(DataAtHomeServiceModule)
-    includes(DBModule)
-    includes(ChapterCacheModule)
-    includes(LibAppEventsModule)
-    includes(LibNotificationsModule)
 
     single<MangaService> {
         MangaServiceImpl(get())
@@ -34,6 +37,7 @@ val FeatureMangaListModule = module {
 
     single<MangaRepository> {
         MangaRepositoryImpl(
+            get(),
             get(),
             get(),
             get(),

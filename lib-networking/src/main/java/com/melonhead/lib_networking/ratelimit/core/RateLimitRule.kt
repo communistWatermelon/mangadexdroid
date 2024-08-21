@@ -2,7 +2,7 @@ package com.melonhead.lib_networking.ratelimit.core
 
 import io.ktor.client.request.*
 
-interface RateLimitRule {
+internal interface RateLimitRule {
     /**
      * The list of rates.
      */

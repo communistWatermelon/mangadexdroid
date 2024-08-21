@@ -1,5 +1,9 @@
 package com.melonhead.lib_app_context
 
-object AppContext {
-    var isInForeground: Boolean = false
+interface AppContext {
+    var isInForeground: Boolean
+}
+
+internal class AppContextImpl: AppContext {
+    override var isInForeground: Boolean = false
 }

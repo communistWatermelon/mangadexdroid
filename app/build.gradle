@@ -67,6 +67,7 @@ dependencies {
     implementation libs.bundles.common
     testImplementation libs.bundles.common.test
     implementation libs.work.ktx
+    implementation libs.bundles.koin
 
     // note: this should not contain any dependencies on ':data-X' modules, those should only be used by features
 
@@ -77,7 +78,6 @@ dependencies {
     implementation project(":lib-navigation")
     implementation project(":lib-database")
     implementation project(":lib-app-context")
-    implementation project(":lib-di")
     implementation project(':lib-chapter-cache')
     implementation project(":lib-networking")
 

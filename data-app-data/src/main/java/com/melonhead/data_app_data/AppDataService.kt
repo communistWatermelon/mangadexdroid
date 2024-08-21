@@ -52,7 +52,7 @@ interface AppDataService {
     suspend fun setShowReadChapterCount(readChapterCount: Int)
 }
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth")
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth")
 
 internal class AppDataServiceImpl(
     private val appContext: Context,
