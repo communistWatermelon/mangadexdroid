@@ -79,7 +79,7 @@ internal fun MangaListScreen(
         LoadingScreen(refreshStatus)
     } else {
 
-        val itemState = remember(viewModel.manga, refreshStatus) {
+        val itemState = remember(manga, refreshStatus) {
             val items = mutableListOf<Any>()
             manga.forEach { manga ->
                 items.add(manga)

@@ -33,8 +33,8 @@ internal class MangaListViewModel(
     private val navigator: Navigator,
     private val appEventsRepository: AppEventsRepository,
 ): ViewModel() {
-    val manga = mangaRepository.manga.asLiveData()
-    val refreshStatus = mangaRepository.refreshStatus.asLiveData()
+    val manga = mangaRepository.manga.asLiveData(viewModelScope.coroutineContext)
+    val refreshStatus = mangaRepository.refreshStatus.asLiveData(viewModelScope.coroutineContext)
     val readMangaCount = userAppDataService.showReadChapterCount
 
     private val mutableRefreshText = MutableLiveData<String>()
