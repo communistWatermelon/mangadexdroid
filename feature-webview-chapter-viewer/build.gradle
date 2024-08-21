@@ -38,8 +38,7 @@ dependencies {
 
     implementation project(":core")
     implementation project(":core-ui")
-    implementation project(":data-core-manga-ui")
-    implementation project(":data-manga")
+    implementation project(":lib-app-events")
     implementation project(":lib-di")
     implementation project(":lib-navigation")
 }

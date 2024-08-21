@@ -5,14 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.melonhead.core_ui.models.UIChapter
+import com.melonhead.core_ui.models.UIManga
 import com.melonhead.data_app_data.AppDataService
-import com.melonhead.data_core_manga_ui.UIChapter
-import com.melonhead.data_core_manga_ui.UIManga
-import com.melonhead.data_manga.MangaRepository
+import com.melonhead.lib_app_events.AppEventsRepository
+import com.melonhead.lib_app_events.events.UserEvent
 import com.melonhead.lib_logging.Clog
 import com.melonhead.lib_navigation.Navigator
 import com.melonhead.lib_navigation.keys.ActivityKey
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -23,7 +23,7 @@ import java.lang.Integer.max
 import java.lang.Integer.min
 
 internal class ChapterViewModel(
-    private val mangaRepository: MangaRepository,
+    private val appEventsRepository: AppEventsRepository,
     private val navigator: Navigator,
     appDataService: AppDataService
 ): ViewModel() {
@@ -37,21 +37,18 @@ internal class ChapterViewModel(
 
     private lateinit var manga: UIManga
     private lateinit var chapter: UIChapter
+    private lateinit var chapterPagesData: List<String>
 
     private val chapterLoadMutex = Mutex()
 
-    private fun loadChapter(activity: Activity, chapterId: String) {
+    private fun loadChapter(activity: Activity) {
         viewModelScope.launch {
             chapterLoadMutex.withLock {
                 if (mutableChapterData.value != null) return@withLock
-                val pages = if (manga.useWebview) null else mangaRepository.getChapterData(chapterId)
+                val pages = if (manga.useWebview) null else chapterPagesData
                 if (pages != null) {
                     mutableChapterData.value = pages
                 } else {
-                    // use secondary render style
-                    if (!manga.useWebview) {
-                        mangaRepository.setUseWebview(manga, true)
-                    }
                     Clog.i("Falling back to webview")
                     // fallback to secondary render style
                     val intent = navigator.intentForKey(activity, ActivityKey.WebViewActivity(Bundle().apply {
@@ -78,10 +75,11 @@ internal class ChapterViewModel(
     fun parseIntent(activity: Activity, intent: Intent) {
         manga = intent.getParcelableExtra(ChapterActivity.EXTRA_UIMANGA)!!
         chapter = intent.getParcelableExtra(ChapterActivity.EXTRA_UICHAPTER)!!
-        loadChapter(activity, chapter.id)
+        chapterPagesData = intent.getStringArrayExtra(ChapterActivity.EXTRA_UICHAPTER_DATA)!!.toList()
+        loadChapter(activity)
     }
 
     fun markAsRead() {
-        mangaRepository.markChapterRead(manga, chapter)
+        appEventsRepository.postEvent(UserEvent.SetMarkChapterRead(chapter, manga, true))
     }
 }

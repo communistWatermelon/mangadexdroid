@@ -7,9 +7,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import com.melonhead.core_ui.models.UIChapter
+import com.melonhead.core_ui.models.UIManga
 import com.melonhead.core_ui.theme.MangadexFollowerTheme
-import com.melonhead.data_core_manga_ui.UIChapter
-import com.melonhead.data_core_manga_ui.UIManga
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 internal class ChapterActivity: ComponentActivity() {
@@ -44,12 +44,14 @@ internal class ChapterActivity: ComponentActivity() {
 
     companion object {
         const val EXTRA_UICHAPTER = "EXTRA_UICHAPTER"
+        const val EXTRA_UICHAPTER_DATA = "EXTRA_UICHAPTER_DATA"
         const val EXTRA_UIMANGA = "EXTRA_UIMANGA"
 
-        internal fun newIntent(context: Context, chapter: UIChapter, manga: UIManga): Intent {
+        internal fun newIntent(context: Context, chapter: UIChapter, manga: UIManga, chapterData: List<String>): Intent {
             val intent = Intent(context, ChapterActivity::class.java)
             intent.putExtra(EXTRA_UIMANGA, manga)
             intent.putExtra(EXTRA_UICHAPTER, chapter)
+            intent.putExtra(EXTRA_UICHAPTER_DATA, chapterData.toTypedArray())
             return intent
         }
     }

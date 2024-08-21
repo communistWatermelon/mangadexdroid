@@ -12,9 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.melonhead.data_core_manga_ui.MangaRefreshStatus
-import com.melonhead.data_core_manga_ui.None
-import com.melonhead.data_core_manga_ui.ReadStatus
+import com.melonhead.core_ui.models.MangaRefreshStatus
+import com.melonhead.core_ui.models.None
+import com.melonhead.core_ui.models.ReadStatus
 
 @Composable
 fun LoadingScreen(refreshStatus: MangaRefreshStatus?) {

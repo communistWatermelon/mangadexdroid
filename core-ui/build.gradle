@@ -2,6 +2,7 @@ plugins {
     alias libs.plugins.android.library
     alias libs.plugins.kotlin.android
     alias libs.plugins.compose.plugin
+    id 'kotlin-parcelize'
 }
 
 android {
@@ -38,8 +39,6 @@ dependencies {
 
     implementation libs.bundles.common
     testImplementation libs.bundles.common.test
-
-    implementation project(":data-core-manga-ui")
 
     api libs.bundles.compose
     debugApi libs.bundles.compose.debug

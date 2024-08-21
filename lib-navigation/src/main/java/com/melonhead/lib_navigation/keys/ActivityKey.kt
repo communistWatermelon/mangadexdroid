@@ -14,6 +14,7 @@ sealed class ActivityKey {
         companion object {
             const val PARAM_MANGA = "manga"
             const val PARAM_CHAPTER = "chapter"
+            const val PARAM_CHAPTER_DATA = "chapter_data"
         }
     }
 }

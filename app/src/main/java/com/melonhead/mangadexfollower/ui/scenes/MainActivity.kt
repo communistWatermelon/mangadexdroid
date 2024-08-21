@@ -16,14 +16,16 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
-import com.melonhead.mangadexfollower.ui.scenes.home.HomeScreen
 import com.melonhead.core_ui.scenes.LoadingScreen
-import com.melonhead.data_core_manga_ui.UIChapter
-import com.melonhead.data_core_manga_ui.UIManga
+import com.melonhead.core_ui.models.None
+import com.melonhead.core_ui.models.UIChapter
+import com.melonhead.core_ui.models.UIManga
+import com.melonhead.core_ui.theme.MangadexFollowerTheme
 import com.melonhead.feature_authentication.models.LoginStatus
 import com.melonhead.lib_navigation.Navigator
 import com.melonhead.lib_navigation.keys.ScreenKey
 import com.melonhead.lib_notifications.NewChapterNotificationChannel
+import com.melonhead.mangadexfollower.BuildConfig
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
 import kotlinx.serialization.json.Json
 import org.koin.android.ext.android.inject
@@ -47,7 +49,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            com.melonhead.core_ui.theme.MangadexFollowerTheme {
+            MangadexFollowerTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -55,7 +57,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val loginStatus by viewModel.loginStatus.observeAsState()
                     val manga by viewModel.manga.observeAsState(listOf())
-                    val refreshStatus by viewModel.refreshStatus.observeAsState(com.melonhead.data_core_manga_ui.None)
+                    val refreshStatus by viewModel.refreshStatus.observeAsState(None)
                     val refreshText by viewModel.refreshText.observeAsState("")
                     val context = LocalContext.current
 
@@ -64,8 +66,10 @@ class MainActivity : ComponentActivity() {
                             if (manga.isEmpty()) {
                                 LoadingScreen(refreshStatus)
                             } else {
-                                HomeScreen(
-                                    manga,
+                                navigator.ComposeWithKey(screenKey = ScreenKey.MangaListScreen(
+                                    buildVersionName = BuildConfig.VERSION_NAME,
+                                    buildVersionCode = BuildConfig.VERSION_CODE.toString(),
+                                    manga = manga,
                                     readMangaCount = viewModel.readMangaCount,
                                     refreshText = refreshText,
                                     refreshStatus = refreshStatus,
@@ -94,6 +98,7 @@ class MainActivity : ComponentActivity() {
                                             title
                                         )
                                     },
+                                )
                                 )
                             }
                         }

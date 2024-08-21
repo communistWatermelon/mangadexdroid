@@ -4,12 +4,13 @@ import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.melonhead.core.extensions.asLiveData
-import com.melonhead.data_core_manga_ui.UIChapter
-import com.melonhead.data_core_manga_ui.UIManga
-import com.melonhead.data_manga.MangaRepository
+import com.melonhead.core_ui.models.UIChapter
+import com.melonhead.core_ui.models.UIManga
+import com.melonhead.lib_app_events.AppEventsRepository
+import com.melonhead.lib_app_events.events.UserEvent
 
 class WebViewViewModel(
-    private val mangaRepository: MangaRepository,
+    private val appEventsRepository: AppEventsRepository,
 ): ViewModel() {
     private val mutableUrl: MutableLiveData<String?> = MutableLiveData(null)
     val url = mutableUrl.asLiveData()
@@ -25,6 +26,6 @@ class WebViewViewModel(
     }
 
     fun markAsRead() {
-        mangaRepository.markChapterRead(manga, chapter)
+        appEventsRepository.postEvent(UserEvent.SetMarkChapterRead(chapter, manga, true))
     }
 }

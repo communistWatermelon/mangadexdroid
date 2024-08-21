@@ -10,9 +10,9 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.melonhead.data_app_data.AppDataService
 import com.melonhead.data_app_data.RenderStyle
-import com.melonhead.data_core_manga_ui.UIChapter
-import com.melonhead.data_core_manga_ui.UIManga
-import com.melonhead.data_manga.MangaRepository
+import com.melonhead.core_ui.models.UIChapter
+import com.melonhead.core_ui.models.UIManga
+import com.melonhead.feature_manga_list.MangaRepository
 import com.melonhead.feature_authentication.AuthRepository
 import com.melonhead.feature_authentication.models.LoginStatus
 import com.melonhead.core.extensions.asLiveData
@@ -88,33 +88,48 @@ class MainViewModel(
         authRepository.authenticate(email, password)
     }
 
+    private fun navigateToWebView(context: Context, uiManga: UIManga, uiChapter: UIChapter): Intent {
+        return navigator.intentForKey(context, ActivityKey.WebViewActivity(
+            Bundle().apply {
+                putParcelable(ActivityKey.WebViewActivity.PARAM_MANGA, uiManga)
+                putParcelable(ActivityKey.WebViewActivity.PARAM_CHAPTER, uiChapter)
+            }
+        ))
+    }
+
     fun onChapterClicked(context: Context, uiManga: UIManga, uiChapter: UIChapter) {
-        // mark chapter as read on tap only for browse style rendering
-        if (userAppDataService.renderStyle == RenderStyle.Browser) {
-            mangaRepository.markChapterRead(uiManga, uiChapter)
-        }
-
-        val intent = when (userAppDataService.renderStyle) {
-            RenderStyle.Native -> navigator.intentForKey(context, ActivityKey.ChapterActivity(
-                Bundle().apply {
-                    putParcelable(ActivityKey.ChapterActivity.PARAM_MANGA, uiManga)
-                    putParcelable(ActivityKey.ChapterActivity.PARAM_CHAPTER, uiChapter)
+        viewModelScope.launch {
+            val intent = when (userAppDataService.renderStyle) {
+                RenderStyle.Native -> {
+                    val chapterData = mangaRepository.getChapterData(uiChapter.id)
+                    // use secondary render style
+                    if (chapterData.isNullOrEmpty()) {
+                        appEventsRepository.postEvent(UserEvent.SetUseWebView(uiManga, true))
+                        navigateToWebView(context, uiManga, uiChapter)
+                    } else {
+                        navigator.intentForKey(context, ActivityKey.ChapterActivity(
+                            Bundle().apply {
+                                putParcelable(ActivityKey.ChapterActivity.PARAM_MANGA, uiManga)
+                                putParcelable(ActivityKey.ChapterActivity.PARAM_CHAPTER, uiChapter)
+                                putStringArray(ActivityKey.ChapterActivity.PARAM_CHAPTER_DATA, chapterData.toTypedArray())
+                            }
+                        ))
+                    }
                 }
-            ))
-            RenderStyle.WebView -> navigator.intentForKey(context, ActivityKey.WebViewActivity(
-                Bundle().apply {
-                    putParcelable(ActivityKey.WebViewActivity.PARAM_MANGA, uiManga)
-                    putParcelable(ActivityKey.WebViewActivity.PARAM_CHAPTER, uiChapter)
+                RenderStyle.WebView -> navigateToWebView(context, uiManga, uiChapter)
+                RenderStyle.Browser -> {
+                    // mark chapter as read on tap only for browse style rendering
+                    appEventsRepository.postEvent(UserEvent.SetMarkChapterRead(uiChapter, uiManga, !uiChapter.read!!))
+                    Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(uiChapter.webAddress) }
                 }
-            ))
-            RenderStyle.Browser -> Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(uiChapter.webAddress) }
-        }
+            }
 
-        context.startActivity(intent)
+            context.startActivity(intent)
+        }
     }
 
     fun toggleChapterRead(uiManga: UIManga, uiChapter: UIChapter) = viewModelScope.launch(Dispatchers.IO) {
-        mangaRepository.toggleChapterRead(uiManga, uiChapter)
+        appEventsRepository.postEvent(UserEvent.SetMarkChapterRead(uiChapter, uiManga, !uiChapter.read!!))
     }
 
     fun refreshContent() = viewModelScope.launch {
@@ -123,10 +138,10 @@ class MainViewModel(
     }
 
     fun toggleMangaWebview(uiManga: UIManga) = viewModelScope.launch {
-        mangaRepository.setUseWebview(uiManga, !uiManga.useWebview)
+        appEventsRepository.postEvent(UserEvent.SetUseWebView(uiManga, !uiManga.useWebview))
     }
 
     fun setMangaTitle(uiManga: UIManga, newTitle: String) = viewModelScope.launch {
-        mangaRepository.updateChosenTitle(uiManga, newTitle)
+        appEventsRepository.postEvent(UserEvent.UpdateChosenMangaTitle(uiManga, newTitle))
     }
 }

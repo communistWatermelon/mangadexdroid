@@ -20,10 +20,9 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.lifecycleScope
+import com.melonhead.core_ui.models.UIChapter
+import com.melonhead.core_ui.models.UIManga
 import com.melonhead.core_ui.scenes.CloseBanner
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 internal class WebViewActivity : ComponentActivity() {
@@ -56,7 +55,7 @@ internal class WebViewActivity : ComponentActivity() {
         const val EXTRA_UICHAPTER = "EXTRA_UICHAPTER"
         const val EXTRA_UIMANGA = "EXTRA_UIMANGA"
 
-        internal fun newIntent(context: Context, uiChapter: com.melonhead.data_core_manga_ui.UIChapter, uiManga: com.melonhead.data_core_manga_ui.UIManga): Intent {
+        internal fun newIntent(context: Context, uiChapter: UIChapter, uiManga: UIManga): Intent {
             val intent = Intent(context, WebViewActivity::class.java)
             intent.putExtra(EXTRA_UICHAPTER, uiChapter)
             intent.putExtra(EXTRA_UIMANGA, uiManga)

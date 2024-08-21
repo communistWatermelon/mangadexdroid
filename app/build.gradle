@@ -67,7 +67,6 @@ dependencies {
     implementation libs.bundles.common
     testImplementation libs.bundles.common.test
     implementation libs.work.ktx
-    implementation libs.accompanist.swiperefresh
 
     implementation project(":core")
     implementation project(":core-ui")
@@ -79,14 +78,12 @@ dependencies {
     implementation project(":lib-app-context")
     implementation project(":lib-di")
     implementation project(":lib-networking")
-    implementation project(":data-core-manga")
-    implementation project(":data-core-manga-ui")
-    implementation project(':data-manga')
     implementation project(':data-at-home')
     implementation project(':data-app-data')
     implementation project(':data-user')
     implementation project(':feature-authentication')
     implementation project(':lib-chapter-cache')
+    implementation project(':feature-manga-list')
     implementation project(':feature-native-chapter-viewer')
     implementation project(':feature-webview-chapter-viewer')
 }

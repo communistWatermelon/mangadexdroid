@@ -2,6 +2,7 @@ package com.melonhead.mangadexfollower.di
 
 import com.melonhead.data_app_data.di.AppDataServiceModule
 import com.melonhead.feature_authentication.di.FeatureAuthenticationModule
+import com.melonhead.feature_manga_list.di.FeatureMangaListModule
 import com.melonhead.feature_native_chapter_viewer.di.FeatureNativeChapterViewerModule
 import com.melonhead.feature_webview_chapter_viewer.di.FeatureWebViewChapterViewerModule
 import com.melonhead.lib_app_events.di.LibAppEventsModule
@@ -19,6 +20,7 @@ val AppModule = module {
     includes(AppDataServiceModule)
 
     includes(FeatureAuthenticationModule)
+    includes(FeatureMangaListModule)
     includes(FeatureNativeChapterViewerModule)
     includes(FeatureWebViewChapterViewerModule)
 
@@ -27,5 +29,5 @@ val AppModule = module {
     }
 
     single(createdAtStart = true) { MainActivityResolver() }
-    single(createdAtStart = true) { AppNavigationMap(get(), get(), get(), get(), get()) }
+    single(createdAtStart = true) { AppNavigationMap(get(), get(), get(), get(), get(), get()) }
 }
