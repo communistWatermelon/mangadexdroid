@@ -32,8 +32,8 @@ android {
 dependencies {
     implementation libs.bundles.common
     testImplementation libs.bundles.common.test
+    implementation project(':lib-core')
 
-    implementation project(":core-ui")
     implementation project(":lib-di")
     implementation project(":lib-logging")
     implementation project(":lib-navigation")

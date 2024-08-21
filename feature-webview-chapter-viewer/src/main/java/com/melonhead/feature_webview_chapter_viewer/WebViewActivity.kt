@@ -20,9 +20,9 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
-import com.melonhead.core_ui.models.UIChapter
-import com.melonhead.core_ui.models.UIManga
-import com.melonhead.core_ui.scenes.CloseBanner
+import com.melonhead.lib_core.models.UIChapter
+import com.melonhead.lib_core.models.UIManga
+import com.melonhead.lib_core.scenes.CloseBanner
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 internal class WebViewActivity : ComponentActivity() {
@@ -33,7 +33,7 @@ internal class WebViewActivity : ComponentActivity() {
 
 
         setContent {
-            com.melonhead.core_ui.theme.MangadexFollowerTheme {
+            com.melonhead.lib_core.theme.MangadexFollowerTheme {
                 val url by viewModel.url.observeAsState()
 
                 WebView(url = url, callClose = {

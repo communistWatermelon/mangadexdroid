@@ -14,9 +14,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.melonhead.core_ui.extensions.Previews
-import com.melonhead.core.extensions.dateOrTimeString
-import com.melonhead.core_ui.models.*
+import com.melonhead.lib_core.extensions.Previews
+import com.melonhead.lib_core.extensions.dateOrTimeString
+import com.melonhead.lib_core.models.*
 import kotlinx.datetime.Instant
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -91,7 +91,7 @@ internal fun ChapterListItem(
 @Preview(showBackground = true)
 @Composable
 private fun ChapterPreview() {
-    com.melonhead.core_ui.theme.MangadexFollowerTheme {
+    com.melonhead.lib_core.theme.MangadexFollowerTheme {
         val manga = Previews.previewUIManga()
         Column {
             ChapterListItem(

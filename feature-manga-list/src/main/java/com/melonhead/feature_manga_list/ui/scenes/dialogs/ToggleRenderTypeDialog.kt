@@ -5,8 +5,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import com.melonhead.core_ui.extensions.Previews
-import com.melonhead.core_ui.models.UIManga
+import com.melonhead.lib_core.extensions.Previews
+import com.melonhead.lib_core.models.UIManga
 
 @Composable
 internal fun ToggleRenderTypeDialog(
@@ -45,7 +45,7 @@ internal fun ToggleRenderTypeDialog(
 @Preview
 @Composable
 private fun ToggleRenderTypePreview() {
-    com.melonhead.core_ui.theme.MangadexFollowerTheme {
+    com.melonhead.lib_core.theme.MangadexFollowerTheme {
         ToggleRenderTypeDialog(
             Previews.previewUIManga(),
             onRenderTypeToggled = { },

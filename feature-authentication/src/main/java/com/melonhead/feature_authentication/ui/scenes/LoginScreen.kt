@@ -170,7 +170,7 @@ internal fun LoginScreen(
 @Preview(showBackground = true)
 @Composable
 private fun LoginPreview() {
-    com.melonhead.core_ui.theme.MangadexFollowerTheme {
+    com.melonhead.lib_core.theme.MangadexFollowerTheme {
         LoginScreen(onLoginTapped = { _, _ -> })
     }
 }

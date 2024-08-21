@@ -1,8 +1,8 @@
 package com.melonhead.lib_app_events.events
 
 import android.content.Context
-import com.melonhead.core_ui.models.UIChapter
-import com.melonhead.core_ui.models.UIManga
+import com.melonhead.lib_core.models.UIChapter
+import com.melonhead.lib_core.models.UIManga
 
 sealed class UserEvent: AppEvent {
     data object RefreshManga: UserEvent()

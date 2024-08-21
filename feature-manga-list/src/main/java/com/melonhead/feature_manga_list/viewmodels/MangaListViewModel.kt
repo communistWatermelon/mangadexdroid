@@ -8,10 +8,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.melonhead.core.extensions.asLiveData
-import com.melonhead.core.extensions.dateOrTimeString
-import com.melonhead.core_ui.models.UIChapter
-import com.melonhead.core_ui.models.UIManga
+import com.melonhead.lib_core.extensions.asLiveData
+import com.melonhead.lib_core.extensions.dateOrTimeString
+import com.melonhead.lib_core.models.UIChapter
+import com.melonhead.lib_core.models.UIManga
 import com.melonhead.data_app_data.AppDataService
 import com.melonhead.data_app_data.RenderStyle
 import com.melonhead.feature_manga_list.MangaRepository

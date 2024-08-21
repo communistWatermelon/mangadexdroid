@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import coil.imageLoader
 import coil.request.ImageRequest
-import com.melonhead.core_ui.scenes.CloseBanner
-import com.melonhead.core_ui.scenes.LoadingScreen
+import com.melonhead.lib_core.scenes.CloseBanner
+import com.melonhead.lib_core.scenes.LoadingScreen
 import com.melonhead.lib_logging.Clog
 import java.lang.Integer.min
 

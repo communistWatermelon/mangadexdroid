@@ -21,11 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.melonhead.core_ui.models.MangaRefreshStatus
-import com.melonhead.core_ui.models.None
-import com.melonhead.core_ui.models.UIChapter
-import com.melonhead.core_ui.models.UIManga
-import com.melonhead.core_ui.scenes.LoadingScreen
+import com.melonhead.lib_core.models.None
+import com.melonhead.lib_core.models.UIChapter
+import com.melonhead.lib_core.models.UIManga
+import com.melonhead.lib_core.scenes.LoadingScreen
 import com.melonhead.feature_manga_list.ui.scenes.dialogs.MarkChapterReadDialog
 import com.melonhead.feature_manga_list.ui.scenes.dialogs.ShowMangaDescriptionDialog
 import com.melonhead.feature_manga_list.ui.scenes.dialogs.TitleChangeDialog

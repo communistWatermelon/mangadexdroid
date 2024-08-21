@@ -1,7 +1,7 @@
 package com.melonhead.feature_manga_list.services
 
-import com.melonhead.core_ui.models.UIChapter
-import com.melonhead.core_ui.models.UIManga
+import com.melonhead.lib_core.models.UIChapter
+import com.melonhead.lib_core.models.UIManga
 import com.melonhead.data_authentication.models.AuthToken
 import com.melonhead.data_core_manga.models.Manga
 import com.melonhead.feature_manga_list.models.MangaReadMarkersResponse

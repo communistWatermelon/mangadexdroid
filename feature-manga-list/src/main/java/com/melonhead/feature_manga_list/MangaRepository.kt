@@ -2,8 +2,8 @@ package com.melonhead.feature_manga_list
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import com.melonhead.core.extensions.throttleLatest
-import com.melonhead.core_ui.models.*
+import com.melonhead.lib_core.extensions.throttleLatest
+import com.melonhead.lib_core.models.*
 import com.melonhead.data_app_data.AppDataService
 import com.melonhead.data_at_home.AtHomeService
 import com.melonhead.data_user.services.UserService

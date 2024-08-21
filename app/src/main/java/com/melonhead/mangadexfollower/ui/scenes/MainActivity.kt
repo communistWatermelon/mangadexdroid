@@ -14,20 +14,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
-import com.melonhead.core_ui.scenes.LoadingScreen
-import com.melonhead.core_ui.models.None
-import com.melonhead.core_ui.models.UIChapter
-import com.melonhead.core_ui.models.UIManga
-import com.melonhead.core_ui.theme.MangadexFollowerTheme
+import com.melonhead.lib_core.scenes.LoadingScreen
+import com.melonhead.lib_core.theme.MangadexFollowerTheme
 import com.melonhead.feature_authentication.models.LoginStatus
 import com.melonhead.lib_navigation.Navigator
 import com.melonhead.lib_navigation.keys.ScreenKey
-import com.melonhead.lib_notifications.NewChapterNotificationChannel
 import com.melonhead.mangadexfollower.BuildConfig
 import com.melonhead.mangadexfollower.ui.viewmodels.MainViewModel
-import kotlinx.serialization.json.Json
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

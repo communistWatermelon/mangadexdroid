@@ -5,8 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.melonhead.core_ui.models.UIChapter
-import com.melonhead.core_ui.models.UIManga
+import com.melonhead.lib_core.models.UIChapter
+import com.melonhead.lib_core.models.UIManga
 import com.melonhead.data_app_data.AppDataService
 import com.melonhead.lib_app_events.AppEventsRepository
 import com.melonhead.lib_app_events.events.UserEvent

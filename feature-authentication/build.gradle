@@ -49,8 +49,8 @@ android {
 dependencies {
     implementation libs.bundles.common
     testImplementation libs.bundles.common.test
+    implementation project(':lib-core')
 
-    implementation project(":core-ui")
     implementation project(":lib-networking")
     implementation project(":lib-logging")
     implementation project(":lib-notifications")
@@ -62,4 +62,5 @@ dependencies {
     implementation project(":data-app-data")
 
     api project(":data-authentication")
+    api project(":data-app-data")
 }

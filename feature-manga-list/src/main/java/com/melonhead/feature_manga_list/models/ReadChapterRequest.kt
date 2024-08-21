@@ -1,6 +1,6 @@
 package com.melonhead.feature_manga_list.models
 
-import com.melonhead.core_ui.models.UIChapter
+import com.melonhead.lib_core.models.UIChapter
 
 @kotlinx.serialization.Serializable
 internal data class ReadChapterRequest(

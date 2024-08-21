@@ -2,15 +2,13 @@ package com.melonhead.mangadexfollower.ui.viewmodels
 
 import android.content.Context
 import android.content.Intent
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.melonhead.core_ui.models.UIChapter
-import com.melonhead.core_ui.models.UIManga
+import com.melonhead.lib_core.models.UIChapter
+import com.melonhead.lib_core.models.UIManga
 import com.melonhead.feature_authentication.AuthRepository
 import com.melonhead.feature_authentication.models.LoginStatus
-import com.melonhead.core.extensions.asLiveData
 import com.melonhead.lib_app_events.AppEventsRepository
 import com.melonhead.lib_app_events.events.AuthenticationEvent
 import com.melonhead.lib_app_events.events.UserEvent

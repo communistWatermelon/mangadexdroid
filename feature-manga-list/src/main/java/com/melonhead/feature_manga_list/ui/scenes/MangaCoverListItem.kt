@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
-import com.melonhead.core_ui.extensions.Previews
-import com.melonhead.core_ui.models.UIManga
+import com.melonhead.lib_core.extensions.Previews
+import com.melonhead.lib_core.models.UIManga
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
@@ -153,7 +153,7 @@ private fun TagText(text: String, overrideColor: Color? = null) {
 @Preview(showBackground = true)
 @Composable
 private fun MangaPreview() {
-    com.melonhead.core_ui.theme.MangadexFollowerTheme {
+    com.melonhead.lib_core.theme.MangadexFollowerTheme {
         Column(modifier = Modifier.fillMaxWidth()) {
             MangaCoverListItem(
                 uiManga = Previews.previewUIManga(),

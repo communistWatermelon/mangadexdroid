@@ -68,8 +68,9 @@ dependencies {
     testImplementation libs.bundles.common.test
     implementation libs.work.ktx
 
-    implementation project(":core")
-    implementation project(":core-ui")
+    // note: this should not contain any dependencies on ':data-X' modules, those should only be used by features
+
+    implementation project(':lib-core')
     implementation project(":lib-app-events")
     implementation project(":lib-logging")
     implementation project(":lib-notifications")
@@ -77,12 +78,10 @@ dependencies {
     implementation project(":lib-database")
     implementation project(":lib-app-context")
     implementation project(":lib-di")
-    implementation project(":lib-networking")
-    implementation project(':data-at-home')
-    implementation project(':data-app-data')
-    implementation project(':data-user')
-    implementation project(':feature-authentication')
     implementation project(':lib-chapter-cache')
+    implementation project(":lib-networking")
+
+    implementation project(':feature-authentication')
     implementation project(':feature-manga-list')
     implementation project(':feature-native-chapter-viewer')
     implementation project(':feature-webview-chapter-viewer')
