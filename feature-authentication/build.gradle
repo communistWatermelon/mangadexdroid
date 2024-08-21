@@ -57,10 +57,8 @@ dependencies {
     implementation project(":lib-navigation")
     implementation project(":lib-app-context")
     implementation project(":lib-app-events")
-    implementation project(":data-authentication")
     implementation project(":data-user")
     implementation project(":data-app-data")
 
-    api project(":data-authentication")
     api project(":data-app-data")
 }

@@ -38,4 +38,6 @@ dependencies {
     implementation project(":lib-logging")
     implementation project(":data-authentication")
     implementation project(":data-core-manga")
+
+    api project(":data-authentication")
 }

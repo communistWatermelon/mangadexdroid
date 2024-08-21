@@ -50,7 +50,6 @@ dependencies {
     implementation project(':lib-chapter-cache')
     implementation project(':lib-navigation')
     implementation project(":data-core-manga")
-    implementation project(":data-authentication")
     implementation project(":data-user")
     implementation project(":data-app-data")
     implementation project(":data-at-home")

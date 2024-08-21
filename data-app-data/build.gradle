@@ -40,4 +40,6 @@ dependencies {
     implementation project(":data-authentication")
     implementation project(":lib-logging")
     implementation project(":lib-database")
+
+    api project(":data-authentication")
 }

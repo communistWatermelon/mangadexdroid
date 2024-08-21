@@ -37,4 +37,7 @@ dependencies {
     implementation project(":lib-networking")
     implementation project(":lib-logging")
     implementation project(":data-authentication")
+
+    api project(":data-authentication")
+
 }
