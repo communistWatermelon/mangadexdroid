@@ -25,7 +25,7 @@ val AppModule = module {
     includes(FeatureWebViewChapterViewerModule)
 
     viewModel {
-        MainViewModel(get(), get(), get(), get(), get())
+        MainViewModel(get(), get())
     }
 
     single(createdAtStart = true) { MainActivityResolver() }

@@ -29,13 +29,13 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-interface MangaRepository {
+internal interface MangaRepository {
     val manga: Flow<List<UIManga>>
     val refreshStatus: Flow<MangaRefreshStatus>
     suspend fun getChapterData(chapterId: String): List<String>?
 }
 
-class MangaRepositoryImpl(
+internal class MangaRepositoryImpl(
     private val externalScope: CoroutineScope,
     private val userService: UserService,
     private val appDataService: AppDataService,

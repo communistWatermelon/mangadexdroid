@@ -11,15 +11,6 @@ class MangaListScreenResolver: ScreenResolver<ScreenKey.MangaListScreen> {
         MangaListScreen(
             buildVersionName = key.buildVersionName,
             buildVersionCode = key.buildVersionCode,
-            manga = key.manga,
-            readMangaCount = key.readMangaCount,
-            refreshText = key.refreshText,
-            refreshStatus = key.refreshStatus,
-            onChapterClicked = key.onChapterClicked,
-            onToggleChapterRead = key.onToggleChapterRead,
-            onSwipeRefresh = key.onSwipeRefresh,
-            onToggleMangaRenderType = key.onToggleMangaRenderType,
-            onChangeMangaTitle = key.onChangeMangaTitle,
         )
     }
 }

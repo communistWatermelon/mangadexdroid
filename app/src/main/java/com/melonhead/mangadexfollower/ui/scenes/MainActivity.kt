@@ -56,51 +56,15 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val loginStatus by viewModel.loginStatus.observeAsState()
-                    val manga by viewModel.manga.observeAsState(listOf())
-                    val refreshStatus by viewModel.refreshStatus.observeAsState(None)
-                    val refreshText by viewModel.refreshText.observeAsState("")
-                    val context = LocalContext.current
 
                     when (loginStatus) {
                         LoginStatus.LoggedIn -> {
-                            if (manga.isEmpty()) {
-                                LoadingScreen(refreshStatus)
-                            } else {
-                                navigator.ComposeWithKey(screenKey = ScreenKey.MangaListScreen(
+                            navigator.ComposeWithKey(
+                                screenKey = ScreenKey.MangaListScreen(
                                     buildVersionName = BuildConfig.VERSION_NAME,
                                     buildVersionCode = BuildConfig.VERSION_CODE.toString(),
-                                    manga = manga,
-                                    readMangaCount = viewModel.readMangaCount,
-                                    refreshText = refreshText,
-                                    refreshStatus = refreshStatus,
-                                    onChapterClicked = { uiManga, chapter ->
-                                        viewModel.onChapterClicked(
-                                            context,
-                                            uiManga,
-                                            chapter
-                                        )
-                                    },
-                                    onToggleChapterRead = { uiManga, uiChapter ->
-                                        viewModel.toggleChapterRead(
-                                            uiManga,
-                                            uiChapter
-                                        )
-                                    },
-                                    onSwipeRefresh = { viewModel.refreshContent() },
-                                    onToggleMangaRenderType = { uiManga ->
-                                        viewModel.toggleMangaWebview(
-                                            uiManga
-                                        )
-                                    },
-                                    onChangeMangaTitle = { uiManga, title ->
-                                        viewModel.setMangaTitle(
-                                            uiManga,
-                                            title
-                                        )
-                                    },
                                 )
-                                )
-                            }
+                            )
                         }
 
                         LoginStatus.LoggedOut, null -> {
@@ -120,12 +84,9 @@ class MainActivity : ComponentActivity() {
 
         onNewIntent(intent)
     }
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        val mangaJson = intent.getStringExtra(NewChapterNotificationChannel.MANGA_EXTRA) ?: return
-        val chapterJson = intent.getStringExtra(NewChapterNotificationChannel.CHAPTER_EXTRA) ?: return
-        val manga: UIManga = Json.decodeFromString(mangaJson)
-        val chapter: UIChapter = Json.decodeFromString(chapterJson)
-        viewModel.onChapterClicked(this, manga, chapter)
+        viewModel.parseIntent(this, intent)
     }
 }

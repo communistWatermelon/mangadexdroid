@@ -1,5 +1,6 @@
 package com.melonhead.feature_manga_list.di
 
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.melonhead.data_app_data.di.AppDataServiceModule
 import com.melonhead.data_at_home.di.DataAtHomeServiceModule
 import com.melonhead.feature_manga_list.MangaRepository
@@ -9,10 +10,12 @@ import com.melonhead.feature_manga_list.services.MangaServiceImpl
 import com.melonhead.data_user.di.UserServiceModule
 import com.melonhead.feature_chapter_cache.di.ChapterCacheModule
 import com.melonhead.feature_manga_list.navigation.MangaListScreenResolver
+import com.melonhead.feature_manga_list.viewmodels.MangaListViewModel
 import com.melonhead.lib_app_events.di.LibAppEventsModule
 import com.melonhead.lib_database.di.DBModule
 import com.melonhead.lib_networking.di.NetworkingModule
 import com.melonhead.lib_notifications.di.LibNotificationsModule
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val FeatureMangaListModule = module {
@@ -44,6 +47,8 @@ val FeatureMangaListModule = module {
             get(),
         )
     }
+
+    viewModel { MangaListViewModel(get(), get(), get(), get()) }
 
     single<MangaListScreenResolver>(createdAtStart = true) { MangaListScreenResolver() }
 }
