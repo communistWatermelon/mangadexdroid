@@ -13,6 +13,7 @@ import com.melonhead.lib_app_events.events.UserEvent
 import com.melonhead.lib_logging.Clog
 import com.melonhead.lib_notifications.AuthFailedNotificationChannel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -35,9 +36,11 @@ internal class AuthRepositoryImpl(
             refreshToken(logoutOnFail = false)
         }
 
-        externalScope.launch {
+        externalScope.launch(context = Dispatchers.IO) {
             appEventsRepository.events.collectLatest {
-                if (it is AuthenticationEvent.RefreshToken) refreshToken(logoutOnFail = it.logoutOnFail)
+                launch {
+                    if (it is AuthenticationEvent.RefreshToken) refreshToken(logoutOnFail = it.logoutOnFail)
+                }
             }
         }
     }
