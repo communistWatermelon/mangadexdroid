@@ -61,3 +61,12 @@ Backgronud refreshes are using WorkManager, which means the update timing is mor
 
 Manga series and chapter information is stored on a local DB to avoid loading on app start, and because I hadn't done a lot of DB work previously.
 Cover images are cached and stored on device.
+
+
+## Modules
+
+This app is split into many modules, which fall into the following categories
+- **lib**: Various segments of the architecture, expected to be used in multiple places. Should not depend on any data or feature modules. Examples: lib-navigation, lib-networking
+- **data**: Responsible for holding services that features may need to interact with. Should not hold state. Should not depend on any feature modules. Examples: data-authentication, data-user  
+- **feature**: Responsible for the UI and business logic for a feature. Features should not depend on each other. Some examples: feature-authentication, feature-manga-list
+- **app**: Application lifecycle logic. Should only depend on libs and features
