@@ -153,7 +153,7 @@ internal class MangaRepositoryImpl(
     private fun refreshManga(@Suppress("UNUSED_PARAMETER") unit: Unit) = externalScope.launch {
         // refresh auth
         appEventsRepository.postEvent(AuthenticationEvent.RefreshToken())
-        val token = appDataService.token.firstOrNull()
+        val token = appDataService.getToken()
         if (token == null) {
             Clog.i("Failed to refresh token")
             return@launch
@@ -181,7 +181,7 @@ internal class MangaRepositoryImpl(
             Clog.i("New manga: ${mangaIds.count()}")
 
             if (mangaIds.isNotEmpty()) {
-                val mangaSeries = mangaService.getManga(token, mangaIds.toList())
+                val mangaSeries = mangaService.getManga(mangaIds.toList())
                 val manga = mangaSeries.map {
                     // grab the chosen title from the DB
                     MangaEntity.from(it, mangaDb.getMangaById(it.id).first()?.chosenTitle)
@@ -216,8 +216,6 @@ internal class MangaRepositoryImpl(
     }
 
     private suspend fun refreshReadStatus() {
-        // make sure we have a token
-        val token = appDataService.token.firstOrNull() ?: return
         Clog.i("refreshReadStatus")
         val manga = mangaDb.getAllSync()
         val chapters = chapterDb.getAllSync()
@@ -226,7 +224,7 @@ internal class MangaRepositoryImpl(
         val readMarkers = chapters.map { ReadMarkerEntity.from(it, null) }
         readMarkerDb.insertAll(*readMarkers.toTypedArray())
 
-        val readChapters = mangaService.getReadChapters(token, manga.map { it.id })
+        val readChapters = mangaService.getReadChapters(manga.map { it.id })
         val chaptersToUpdate = chapters
             // filter out chapters already marked as read in the db
             .filter {
@@ -270,14 +268,13 @@ internal class MangaRepositoryImpl(
 
     private fun markChapterRead(uiManga: UIManga, uiChapter: UIChapter, read: Boolean) {
         externalScope.launch {
-            val token = appDataService.token.firstOrNull() ?: return@launch
             val entity = readMarkerDb.getEntity(uiManga.id, uiChapter.chapter) ?: return@launch
             if (read) {
                 newChapterNotificationChannel.dismissNotification(context, uiManga, uiChapter)
                 chapterCache.clearChapterFromCache(uiManga.id, uiChapter.id)
             }
             readMarkerDb.update(entity.copy(readStatus = read))
-            mangaService.changeReadStatus(token, uiManga, uiChapter, read)
+            mangaService.changeReadStatus(uiManga, uiChapter, read)
         }
     }
 

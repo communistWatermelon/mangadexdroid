@@ -31,7 +31,7 @@ val FeatureMangaListModule = module {
     includes(DataAtHomeModule)
 
     single<MangaService> {
-        MangaServiceImpl(get())
+        MangaServiceImpl(get(), get())
     }
 
     single<MangaRepository> {

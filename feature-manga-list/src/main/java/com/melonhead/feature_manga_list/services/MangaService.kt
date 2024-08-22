@@ -1,5 +1,6 @@
 package com.melonhead.feature_manga_list.services
 
+import com.melonhead.data_app_data.AppDataService
 import com.melonhead.lib_core.models.UIChapter
 import com.melonhead.lib_core.models.UIManga
 import com.melonhead.data_authentication.models.AuthToken
@@ -19,15 +20,17 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 
 internal interface MangaService {
-    suspend fun getManga(token: AuthToken, mangaIds: List<String>): List<Manga>
-    suspend fun getReadChapters(token: AuthToken, mangaIds: List<String>): List<String>
-    suspend fun changeReadStatus(token: AuthToken, uiManga: UIManga, uiChapter: UIChapter, readStatus: Boolean)
+    suspend fun getManga(mangaIds: List<String>): List<Manga>
+    suspend fun getReadChapters(mangaIds: List<String>): List<String>
+    suspend fun changeReadStatus(uiManga: UIManga, uiChapter: UIChapter, readStatus: Boolean)
 }
 
 internal class MangaServiceImpl(
     private val client: HttpClient,
+    private val appDataService: AppDataService,
 ): MangaService {
-    override suspend fun getManga(token: AuthToken, mangaIds: List<String>): List<Manga> {
+    override suspend fun getManga(mangaIds: List<String>): List<Manga> {
+        val token = appDataService.getToken() ?: return emptyList()
         Clog.i("getManga: ${mangaIds.count()}")
         val result: List<Manga?> = handlePagination(mangaIds.count()) { offset ->
             client.catching("getManga") {
@@ -48,7 +51,8 @@ internal class MangaServiceImpl(
         return result.filterNotNull()
     }
 
-    override suspend fun getReadChapters(token: AuthToken, mangaIds: List<String>): List<String> {
+    override suspend fun getReadChapters(mangaIds: List<String>): List<String> {
+        val token = appDataService.getToken() ?: return emptyList()
         Clog.i("getReadChapters: total ${mangaIds.count()}")
         val allChapters = mutableListOf<String>()
         mangaIds.chunked(100).map { list ->
@@ -72,7 +76,8 @@ internal class MangaServiceImpl(
         return allChapters
     }
 
-    override suspend fun changeReadStatus(token: AuthToken, uiManga: UIManga, uiChapter: UIChapter, readStatus: Boolean) {
+    override suspend fun changeReadStatus(uiManga: UIManga, uiChapter: UIChapter, readStatus: Boolean) {
+        val token = appDataService.getToken() ?: return
         Clog.i("changeReadStatus: chapter ${uiChapter.title} readStatus $readStatus")
         client.catchingSuccess("changeReadStatus") {
             client.post(MANGA_READ_CHAPTER_MARKERS_URL.replace(ID_PLACEHOLDER, uiManga.id)) {
