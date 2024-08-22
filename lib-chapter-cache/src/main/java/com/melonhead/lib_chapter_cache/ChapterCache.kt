@@ -28,8 +28,7 @@ internal class ChapterCacheImpl(
 ) : ChapterCache {
 
     private suspend fun getChapterData(chapterId: String): List<String>? {
-        val token = appDataService.token.firstOrNull() ?: return null
-        val chapterData = atHomeService.getChapterData(token, chapterId)
+        val chapterData = atHomeService.getChapterData(chapterId)
         return if (appDataService.useDataSaver) {
             chapterData?.pagesDataSaver()
         } else {

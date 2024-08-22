@@ -260,8 +260,7 @@ internal class MangaRepositoryImpl(
         if (chapterFiles.isNotEmpty()) return chapterFiles
 
         Clog.e("Chapter not found in cache", RuntimeException("Chapter not found in cache"))
-        val token = appDataService.token.firstOrNull() ?: return null
-        val chapterData = atHomeService.getChapterData(token, chapterId)
+        val chapterData = atHomeService.getChapterData(chapterId)
         return if (appDataService.useDataSaver) {
             chapterData?.pagesDataSaver()
         } else {
