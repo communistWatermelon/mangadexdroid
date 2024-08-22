@@ -1,4 +1,4 @@
-package com.melonhead.lib_core.models
+package com.melonhead.data_shared.models.ui
 
 sealed class MangaRefreshStatus {
     val text: String

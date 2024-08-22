@@ -11,10 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.melonhead.data_shared.models.ui.*
 import com.melonhead.lib_core.extensions.Previews
 import com.melonhead.lib_core.extensions.dateOrTimeString
 import com.melonhead.lib_core.models.*

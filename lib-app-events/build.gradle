@@ -34,6 +34,6 @@ dependencies {
     testImplementation libs.bundles.common.test
     implementation libs.bundles.koin
 
-    implementation project(':lib-core')
     implementation project(":lib-logging")
+    implementation project(':data-shared')
 }

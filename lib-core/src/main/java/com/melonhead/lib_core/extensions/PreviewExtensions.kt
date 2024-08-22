@@ -1,7 +1,7 @@
 package com.melonhead.lib_core.extensions
 
-import com.melonhead.lib_core.models.UIChapter
-import com.melonhead.lib_core.models.UIManga
+import com.melonhead.data_shared.models.ui.UIChapter
+import com.melonhead.data_shared.models.ui.UIManga
 import kotlinx.datetime.Clock
 
 object Previews {

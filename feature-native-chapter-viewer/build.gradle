@@ -43,6 +43,9 @@ dependencies {
     implementation project(":lib-navigation")
     implementation project(":lib-chapter-cache")
     implementation project(':lib-app-data')
+
+    implementation project(':data-shared')
+
     api project(':lib-app-data')
 
 }

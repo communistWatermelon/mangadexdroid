@@ -40,4 +40,6 @@ dependencies {
     implementation project(':lib-core')
     implementation project(":lib-app-events")
     implementation project(":lib-navigation")
+
+    implementation project(":data-shared")
 }

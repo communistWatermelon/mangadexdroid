@@ -6,8 +6,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.melonhead.lib_core.extensions.Previews
-import com.melonhead.lib_core.models.UIChapter
-import com.melonhead.lib_core.models.UIManga
+import com.melonhead.data_shared.models.ui.UIChapter
+import com.melonhead.data_shared.models.ui.UIManga
 
 @Composable
 internal fun MarkChapterReadDialog(

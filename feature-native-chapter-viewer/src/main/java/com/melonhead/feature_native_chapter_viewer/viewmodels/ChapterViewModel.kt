@@ -5,8 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.melonhead.lib_core.models.UIChapter
-import com.melonhead.lib_core.models.UIManga
+import com.melonhead.data_shared.models.ui.UIChapter
+import com.melonhead.data_shared.models.ui.UIManga
 import com.melonhead.lib_app_data.AppData
 import com.melonhead.feature_native_chapter_viewer.ChapterActivity
 import com.melonhead.lib_app_events.AppEventsRepository

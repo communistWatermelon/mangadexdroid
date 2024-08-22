@@ -1,4 +1,4 @@
-package com.melonhead.lib_core.models
+package com.melonhead.data_shared.models.ui
 
 import android.os.Parcelable
 import kotlinx.parcelize.IgnoredOnParcel

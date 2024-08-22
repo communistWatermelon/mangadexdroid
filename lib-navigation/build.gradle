@@ -37,6 +37,4 @@ dependencies {
     implementation libs.bundles.common
     testImplementation libs.bundles.common.test
     implementation libs.bundles.koin
-
-    implementation project(':lib-core')
 }

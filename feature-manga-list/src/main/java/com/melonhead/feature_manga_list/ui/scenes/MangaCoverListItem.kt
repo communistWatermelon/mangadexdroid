@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.melonhead.lib_core.extensions.Previews
-import com.melonhead.lib_core.models.UIManga
+import com.melonhead.data_shared.models.ui.UIManga
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable

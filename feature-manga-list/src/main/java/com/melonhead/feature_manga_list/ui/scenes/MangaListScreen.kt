@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.melonhead.lib_core.models.None
-import com.melonhead.lib_core.models.UIChapter
-import com.melonhead.lib_core.models.UIManga
+import com.melonhead.data_shared.models.ui.None
+import com.melonhead.data_shared.models.ui.UIChapter
+import com.melonhead.data_shared.models.ui.UIManga
 import com.melonhead.lib_core.scenes.LoadingScreen
 import com.melonhead.feature_manga_list.ui.scenes.dialogs.MarkChapterReadDialog
 import com.melonhead.feature_manga_list.ui.scenes.dialogs.ShowMangaDescriptionDialog

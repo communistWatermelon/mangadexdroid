@@ -10,8 +10,8 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
-import com.melonhead.lib_core.models.UIChapter
-import com.melonhead.lib_core.models.UIManga
+import com.melonhead.data_shared.models.ui.UIChapter
+import com.melonhead.data_shared.models.ui.UIManga
 import com.melonhead.lib_logging.Clog
 import com.melonhead.lib_navigation.Navigator
 import com.melonhead.lib_navigation.keys.ActivityKey

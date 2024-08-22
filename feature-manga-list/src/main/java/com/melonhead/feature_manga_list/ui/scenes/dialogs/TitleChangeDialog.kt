@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.melonhead.lib_core.extensions.Previews
-import com.melonhead.lib_core.models.UIManga
+import com.melonhead.data_shared.models.ui.UIManga
 
 @Composable
 internal fun TitleChangeDialog(

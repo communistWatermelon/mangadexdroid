@@ -3,12 +3,12 @@ package com.melonhead.feature_manga_list
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import com.melonhead.lib_core.extensions.throttleLatest
-import com.melonhead.lib_core.models.*
 import com.melonhead.lib_app_data.AppData
 import com.melonhead.data_at_home.AtHomeService
 import com.melonhead.data_user.services.UserService
 import com.melonhead.lib_chapter_cache.ChapterCache
 import com.melonhead.data_manga.services.MangaService
+import com.melonhead.data_shared.models.ui.*
 import com.melonhead.lib_app_context.AppContext
 import com.melonhead.lib_app_events.AppEventsRepository
 import com.melonhead.lib_app_events.events.AppLifecycleEvent
@@ -269,13 +269,20 @@ internal class MangaRepositoryImpl(
     private fun markChapterRead(mangaId: String, chapterId: String, read: Boolean) {
         externalScope.launch {
             val chapter = chapterDb.getChapterForId(chapterId)
-            val entity = readMarkerDb.getEntityByChapter(mangaId, chapter.chapter) ?: return@launch
+            val entity = readMarkerDb.getEntityByChapter(
+                mangaId = mangaId,
+                chapter = chapter.chapter
+            ) ?: return@launch
             if (read) {
                 newChapterNotificationChannel.dismissNotification(context, mangaId, chapterId)
-                chapterCache.clearChapterFromCache(mangaId, chapterId)
+                chapterCache.clearChapterFromCache(mangaId = mangaId, chapterId = chapterId)
             }
             readMarkerDb.update(entity.copy(readStatus = read))
-            mangaService.changeReadStatus(mangaId, mangaId, read)
+            mangaService.changeReadStatus(
+                mangaId = mangaId,
+                chapterId = chapterId,
+                readStatus = read
+            )
         }
     }
 

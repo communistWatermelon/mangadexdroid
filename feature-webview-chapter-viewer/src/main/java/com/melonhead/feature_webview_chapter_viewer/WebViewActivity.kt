@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import com.melonhead.feature_webview_chapter_viewer.viewmodels.WebViewViewModel
-import com.melonhead.lib_core.models.UIChapter
-import com.melonhead.lib_core.models.UIManga
+import com.melonhead.data_shared.models.ui.UIChapter
+import com.melonhead.data_shared.models.ui.UIManga
 import com.melonhead.lib_core.scenes.CloseBanner
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
