@@ -17,6 +17,7 @@ interface ChapterCache {
     fun cacheImagesForChapters(manga: List<MangaEntity>, chapters: List<ChapterEntity>)
     fun getChapterFromCache(mangaId: String, chapterId: String): List<String>
     fun clearChapterFromCache(mangaId: String, chapterId: String)
+    fun getChapterPageCountFromCache(mangaId: String, chapterId: String): Int?
 }
 
 internal class ChapterCacheImpl(
@@ -37,7 +38,7 @@ internal class ChapterCacheImpl(
     }
 
     override fun cacheImagesForChapters(manga: List<MangaEntity>, chapters: List<ChapterEntity>) {
-        Clog.d("Caching images for ${chapters.size} chapters")
+        Clog.d("Caching images for ${chapters.count()} chapters")
         for (chapter in chapters) {
             val mangaForChapter = manga.find { it.id == chapter.mangaId } ?: continue
             if (mangaForChapter.useWebview) continue
@@ -58,8 +59,10 @@ internal class ChapterCacheImpl(
                     chapterDirectory.mkdir()
                 }
 
-                val oldFiles = chapterDirectory.listFiles()?.size ?: 0
-                if (oldFiles != chapterData.size) {
+                if (chapterDirectory.listFiles(FileFilter { it.extension == "pages" })?.isNotEmpty() == true) return@launch
+
+                val oldFiles = chapterDirectory.listFiles() ?: arrayOf()
+                if (oldFiles.none { it.extension == "pages" } && oldFiles.count() != chapterData.count()) {
                     for (file in chapterDirectory.listFiles()!!) {
                         file.delete()
                     }
@@ -84,6 +87,12 @@ internal class ChapterCacheImpl(
                         Clog.e("Error downloading page", e)
                     }
                 }
+
+                val newFiles = chapterDirectory.listFiles() ?: return@launch
+                if (newFiles.count() == chapterData.count()) {
+                    val successFile = File(chapterDirectory, "${chapterData.count()}.pages")
+                    successFile.createNewFile()
+                }
             }
         }
     }
@@ -101,11 +110,21 @@ internal class ChapterCacheImpl(
         val cacheDirectory = appContext.cacheDir
         val mangaDirectory = File(cacheDirectory, mangaId)
         val chapterDirectory = File(mangaDirectory, chapterId)
-        return if (chapterDirectory.exists()) {
-            chapterDirectory.listFiles()?.map { it.absolutePath } ?: emptyList()
+        val successFiles = chapterDirectory.listFiles(FileFilter { it.extension == "pages" }) ?: emptyArray()
+        return if (chapterDirectory.exists() && successFiles.size == 1) {
+            chapterDirectory.listFiles( FileFilter { it.extension != "pages" } ) ?.map { it.absolutePath } ?: emptyList()
         } else {
             emptyList()
         }
+    }
+
+    override fun getChapterPageCountFromCache(mangaId: String, chapterId: String): Int? {
+        val cacheDirectory = appContext.cacheDir
+        val mangaDirectory = File(cacheDirectory, mangaId)
+        val chapterDirectory = File(mangaDirectory, chapterId)
+        val successFiles = chapterDirectory.listFiles(FileFilter { it.extension == "pages" }) ?: return null
+        if (successFiles.isEmpty()) return null
+        return successFiles.first().nameWithoutExtension.toInt()
     }
 
     override fun clearChapterFromCache(mangaId: String, chapterId: String) {

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,6 +62,15 @@ internal fun ChapterListItem(
                             fontSize = 12.sp
                         )
                     }
+
+                    if (uiChapter.cachedPages != null) {
+                        Text(
+                            text = "${uiChapter.cachedPages} pages",
+                            color = MaterialTheme.colorScheme.tertiary,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 10.sp,
+                        )
+                    }
                 }
                 Text(text = uiChapter.title ?: "",
                     fontWeight = FontWeight.Normal,
@@ -107,13 +117,13 @@ private fun ChapterPreview() {
                 onChapterClicked = { _, _ -> },
                 onChapterLongPressed = { _, _ -> })
             ChapterListItem(
-                uiChapter = Previews.previewUIChapters().first().copy(read = false),
+                uiChapter = Previews.previewUIChapters().first().copy(read = false, cachedPages = 5),
                 uiManga = manga,
                 refreshStatus = None,
                 onChapterClicked = { _, _ -> },
                 onChapterLongPressed = { _, _ -> })
             ChapterListItem(
-                uiChapter = Previews.previewUIChapters().first().copy(chapter = "101"),
+                uiChapter = Previews.previewUIChapters().first().copy(chapter = "101", cachedPages = 5),
                 uiManga = manga.copy(lastChapter = "101"),
                 refreshStatus = ReadStatus,
                 onChapterClicked = { _, _ -> },

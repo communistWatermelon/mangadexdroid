@@ -69,30 +69,32 @@ internal class MangaRepositoryImpl(
             try {
                 // TODO: it's easy to miss necessary events with this pattern, it would be better to include a way to pass in the list of expected events
                 appEventsRepository.events.collectLatest {
-                    when (it) {
-                        is AuthenticationEvent.LoggedIn -> {
-                            if (!isLoggedIn) {
-                                isLoggedIn = true
+                    launch {
+                        when (it) {
+                            is AuthenticationEvent.LoggedIn -> {
+                                if (!isLoggedIn) {
+                                    isLoggedIn = true
+                                    forceRefresh()
+                                }
+                            }
+                            is AuthenticationEvent.LoggedOut -> {
+                                isLoggedIn = false
+                            }
+                            is AppLifecycleEvent.AppForegrounded -> {
                                 forceRefresh()
                             }
-                        }
-                        is AuthenticationEvent.LoggedOut -> {
-                            isLoggedIn = false
-                        }
-                        is AppLifecycleEvent.AppForegrounded -> {
-                            forceRefresh()
-                        }
-                        is UserEvent.RefreshManga -> {
-                            forceRefresh()
-                        }
-                        is UserEvent.SetMarkChapterRead -> {
-                            markChapterRead(it.manga, it.chapter, it.read)
-                        }
-                        is UserEvent.SetUseWebView -> {
-                            setUseWebview(it.manga, it.useWebView)
-                        }
-                        is UserEvent.UpdateChosenMangaTitle -> {
-                            updateChosenTitle(it.manga, it.title)
+                            is UserEvent.RefreshManga -> {
+                                forceRefresh()
+                            }
+                            is UserEvent.SetMarkChapterRead -> {
+                                markChapterRead(it.manga, it.chapter, it.read)
+                            }
+                            is UserEvent.SetUseWebView -> {
+                                setUseWebview(it.manga, it.useWebView)
+                            }
+                            is UserEvent.UpdateChosenMangaTitle -> {
+                                updateChosenTitle(it.manga, it.title)
+                            }
                         }
                     }
                 }
@@ -119,7 +121,8 @@ internal class MangaRepositoryImpl(
                     title = chapter.chapterTitle,
                     createdDate = chapter.createdAt.epochSeconds,
                     read = read,
-                    externalUrl = chapter.externalUrl
+                    externalUrl = chapter.externalUrl,
+                    cachedPages = chapterCache.getChapterPageCountFromCache(manga.id, chapter.id)
                 )
             }
             if (chapters.isEmpty()) return@mapNotNull null
@@ -150,7 +153,7 @@ internal class MangaRepositoryImpl(
     private fun refreshManga(@Suppress("UNUSED_PARAMETER") unit: Unit) = externalScope.launch {
         // refresh auth
         appEventsRepository.postEvent(AuthenticationEvent.RefreshToken())
-        val token = appDataService.token.firstOrNull() ?: return@launch
+        val token = appDataService.token.firstOrNull()
         if (token == null) {
             Clog.i("Failed to refresh token")
             return@launch
@@ -251,6 +254,21 @@ internal class MangaRepositoryImpl(
         handleUnreadChapters()
     }
 
+    // currently trying to deprecate this function, and use chapterCache directly
+    override suspend fun getChapterData(mangaId: String, chapterId: String): List<String>? {
+        val chapterFiles = chapterCache.getChapterFromCache(mangaId, chapterId)
+        if (chapterFiles.isNotEmpty()) return chapterFiles
+
+        Clog.e("Chapter not found in cache", RuntimeException("Chapter not found in cache"))
+        val token = appDataService.token.firstOrNull() ?: return null
+        val chapterData = atHomeService.getChapterData(token, chapterId)
+        return if (appDataService.useDataSaver) {
+            chapterData?.pagesDataSaver()
+        } else {
+            chapterData?.pages()
+        }
+    }
+
     private fun markChapterRead(uiManga: UIManga, uiChapter: UIChapter, read: Boolean) {
         externalScope.launch {
             val token = appDataService.token.firstOrNull() ?: return@launch
@@ -264,28 +282,18 @@ internal class MangaRepositoryImpl(
         }
     }
 
-    override suspend fun getChapterData(mangaId: String, chapterId: String): List<String>? {
-        val chapterFiles = chapterCache.getChapterFromCache(mangaId, chapterId)
-        if (chapterFiles.isNotEmpty()) return chapterFiles
-
-        Clog.e("Chapter not found in cache", RuntimeException())
-        val token = appDataService.token.firstOrNull() ?: return null
-        val chapterData = atHomeService.getChapterData(token, chapterId)
-        return if (appDataService.useDataSaver) {
-            chapterData?.pagesDataSaver()
-        } else {
-            chapterData?.pages()
+    private fun setUseWebview(manga: UIManga, useWebView: Boolean) {
+        externalScope.launch {
+            val entity = mangaDb.mangaById(manga.id).first() ?: return@launch
+            mangaDb.update(entity.copy(useWebview = useWebView))
         }
     }
 
-    private suspend fun setUseWebview(manga: UIManga, useWebView: Boolean) {
-        val entity = mangaDb.mangaById(manga.id).first() ?: return
-        mangaDb.update(entity.copy(useWebview = useWebView))
-    }
-
-    private suspend fun updateChosenTitle(manga: UIManga, chosenTitle: String) {
-        val entity = mangaDb.mangaById(manga.id).first() ?: return
-        if (!entity.mangaTitles.contains(chosenTitle)) return
-        mangaDb.update(entity.copy(chosenTitle = chosenTitle))
+    private fun updateChosenTitle(manga: UIManga, chosenTitle: String) {
+        externalScope.launch {
+            val entity = mangaDb.mangaById(manga.id).first() ?: return@launch
+            if (!entity.mangaTitles.contains(chosenTitle)) return@launch
+            mangaDb.update(entity.copy(chosenTitle = chosenTitle))
+        }
     }
 }
