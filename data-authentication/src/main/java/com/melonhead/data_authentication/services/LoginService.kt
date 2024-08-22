@@ -1,5 +1,6 @@
 package com.melonhead.data_authentication.services
 
+import com.melonhead.data_app_data.AppDataService
 import com.melonhead.data_authentication.models.AuthRequest
 import com.melonhead.data_authentication.models.AuthResponse
 import com.melonhead.data_authentication.models.AuthToken
@@ -19,11 +20,12 @@ import io.ktor.http.contentType
 
 interface LoginService {
     suspend fun authenticate(email: String, password: String): AuthToken?
-    suspend fun refreshToken(token: AuthToken, logoutOnFail: Boolean): AuthToken?
+    suspend fun refreshToken(logoutOnFail: Boolean): AuthToken?
 }
 
 internal class LoginServiceImpl(
     private val client: HttpClient,
+    private val appDataService: AppDataService,
 ) : LoginService {
     override suspend fun authenticate(email: String, password: String): AuthToken? {
         val response: AuthResponse? = client.catching("authenticate") {
@@ -37,21 +39,22 @@ internal class LoginServiceImpl(
         return if (response?.result == "ok") response.token else null
     }
 
-    override suspend fun refreshToken(token: AuthToken, logoutOnFail: Boolean): AuthToken? {
+    override suspend fun refreshToken(logoutOnFail: Boolean): AuthToken? {
+        val (session, refresh) = appDataService.getToken() ?: return null
         return try {
             // note: not using catching call intentionally, prevents networking errors from forcing logout
             val result = client.post(REFRESH_TOKEN_URL) {
                 headers {
                     contentType(ContentType.Application.Json)
-                    bearerAuth(token.session)
+                    bearerAuth(session)
                 }
-                setBody(RefreshTokenRequest(token.refresh))
+                setBody(RefreshTokenRequest(refresh))
             }
             val response: AuthResponse? = result.body()
             if (response?.result == "ok") response.token else null
         } catch (e: Exception) {
             Clog.w(e.localizedMessage ?: "Unknown error")
-            if (logoutOnFail) null else token
+            if (logoutOnFail) null else AuthToken(session, refresh)
         }
     }
 }

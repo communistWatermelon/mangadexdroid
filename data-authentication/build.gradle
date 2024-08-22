@@ -34,6 +34,7 @@ dependencies {
     implementation libs.bundles.common
     testImplementation libs.bundles.common.test
 
+    implementation project(":data-app-data")
     implementation project(":lib-networking")
     implementation project(":lib-logging")
 }

@@ -63,8 +63,8 @@ internal class AuthRepositoryImpl(
             return null
         }
 
-        val newToken = loginService.refreshToken(currentToken, logoutOnFail)
-        appDataService.updateToken(newToken)
+        val newToken = loginService.refreshToken(logoutOnFail)
+        appDataService.updateToken(session = newToken?.session, refresh = newToken?.refresh)
         if (newToken == null) {
             signOut()
         } else {
@@ -84,7 +84,7 @@ internal class AuthRepositoryImpl(
         Clog.i("authenticate")
         appEventsRepository.postEvent(AuthenticationEvent.LoggingIn)
         val token = loginService.authenticate(email, password)
-        appDataService.updateToken(token)
+        appDataService.updateToken(session = token?.session, refresh = token?.refresh)
         appEventsRepository.postEvent(AuthenticationEvent.LoggedIn)
         appEventsRepository.postEvent(UserEvent.RefreshManga)
     }

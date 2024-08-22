@@ -59,6 +59,7 @@ dependencies {
     implementation project(":lib-app-events")
     implementation project(":data-user")
     implementation project(":data-app-data")
+    implementation project(":data-authentication")
 
     api project(":data-app-data")
 }

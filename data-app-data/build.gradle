@@ -37,9 +37,6 @@ dependencies {
     implementation libs.datastore.preferences
     implementation libs.bundles.koin
 
-    implementation project(":data-authentication")
     implementation project(":lib-logging")
     implementation project(":lib-database")
-
-    api project(":data-authentication")
 }

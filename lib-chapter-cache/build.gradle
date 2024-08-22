@@ -36,7 +36,6 @@ dependencies {
 
     implementation project(":lib-database")
     implementation project(":lib-logging")
-    implementation project(":data-authentication")
     implementation project(":data-app-data")
     implementation project(":data-at-home")
 }

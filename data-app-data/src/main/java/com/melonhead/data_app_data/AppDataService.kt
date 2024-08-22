@@ -11,9 +11,8 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.melonhead.lib_database.firebase.FirebaseDbUser
-import com.melonhead.data_authentication.models.AuthToken
 import com.melonhead.lib_database.extensions.addValueEventListenerFlow
+import com.melonhead.lib_database.firebase.FirebaseDbUser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
@@ -28,7 +27,7 @@ enum class RenderStyle {
 }
 
 interface AppDataService {
-    val token: Flow<AuthToken?>
+    val token: Flow<Pair<String, String>?>
     val installDateSeconds: Flow<Long?>
     val lastRefreshDateSeconds: Flow<Long?>
     val userIdFlow: Flow<String?>
@@ -38,14 +37,16 @@ interface AppDataService {
     val chapterTapAreaSize: Dp
     val showReadChapterCount: Int
 
-    suspend fun updateToken(token: AuthToken?)
+    suspend fun updateToken(session: String?, refresh: String?)
     suspend fun updateInstallTime()
     suspend fun updateLastRefreshDate()
     suspend fun updateUserId(id: String)
     suspend fun updateRenderStyle(renderStyle: RenderStyle)
     suspend fun setUseDataSaver(useDataSaver: Boolean)
     suspend fun setShowReadChapterCount(readChapterCount: Int)
-    suspend fun getToken(): AuthToken?
+    suspend fun getToken(): Pair<String, String>?
+    suspend fun getSession(): String?
+    suspend fun getRefresh(): String?
 }
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth")
@@ -112,9 +113,9 @@ internal class AppDataServiceImpl(
         it?.lastRefreshDateSeconds
     }.distinctUntilChanged()
 
-    override var token: Flow<AuthToken?> = authTokenFlow.combine(refreshTokenFlow) { auth, refresh ->
+    override var token: Flow<Pair<String, String>?> = authTokenFlow.combine(refreshTokenFlow) { auth, refresh ->
         if (auth.isBlank() || refresh.isBlank()) return@combine null
-        AuthToken(auth, refresh)
+        auth to refresh
     }.distinctUntilChanged()
 
     override val renderStyle: RenderStyle
@@ -129,14 +130,14 @@ internal class AppDataServiceImpl(
     override val showReadChapterCount: Int
         get() = 1
 
-    override suspend fun updateToken(token: AuthToken?) {
+    override suspend fun updateToken(session: String?, refresh: String?) {
         tokenMutex.withLock {
             appContext.dataStore.edit { settings ->
-                if (settings[AUTH_TOKEN] != token?.session)
-                    settings[AUTH_TOKEN] = token?.session ?: ""
+                if (settings[AUTH_TOKEN] != session)
+                    settings[AUTH_TOKEN] = session ?: ""
 
-                if (settings[REFRESH_TOKEN] != token?.refresh)
-                    settings[REFRESH_TOKEN] = token?.refresh ?: ""
+                if (settings[REFRESH_TOKEN] != refresh)
+                    settings[REFRESH_TOKEN] = refresh ?: ""
             }
         }
     }
@@ -169,9 +170,21 @@ internal class AppDataServiceImpl(
         }
     }
 
-    override suspend fun getToken(): AuthToken? {
+    override suspend fun getToken(): Pair<String, String>? {
         tokenMutex.withLock {
             return token.first()
+        }
+    }
+
+    override suspend fun getSession(): String? {
+        tokenMutex.withLock {
+            return token.first()?.first
+        }
+    }
+
+    override suspend fun getRefresh(): String? {
+        tokenMutex.withLock {
+            return token.first()?.second
         }
     }
 
