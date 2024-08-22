@@ -1,4 +1,4 @@
-package com.melonhead.feature_manga_list.models
+package com.melonhead.data_manga.models
 
 import com.melonhead.lib_core.models.UIChapter
 

@@ -53,7 +53,9 @@ dependencies {
     implementation project(":data-user")
     implementation project(":data-app-data")
     implementation project(":data-at-home")
+    implementation project(":data-manga")
 
     api project(":data-core-manga")
+    api project(":data-manga")
     api project(":data-app-data")
 }

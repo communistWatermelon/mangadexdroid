@@ -1,4 +1,4 @@
-package com.melonhead.feature_manga_list.routes
+package com.melonhead.data_manga.routes
 
 import com.melonhead.lib_networking.routes.HttpRoutes.BASE_URL
 

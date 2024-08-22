@@ -1,13 +1,13 @@
-package com.melonhead.feature_manga_list.services
+package com.melonhead.data_manga.services
 
 import com.melonhead.data_app_data.AppDataService
 import com.melonhead.data_core_manga.models.Manga
-import com.melonhead.feature_manga_list.models.MangaReadMarkersResponse
-import com.melonhead.feature_manga_list.models.ReadChapterRequest
-import com.melonhead.feature_manga_list.routes.HttpRoutes.ID_PLACEHOLDER
-import com.melonhead.feature_manga_list.routes.HttpRoutes.MANGA_READ_CHAPTER_MARKERS_URL
-import com.melonhead.feature_manga_list.routes.HttpRoutes.MANGA_READ_MARKERS_URL
-import com.melonhead.feature_manga_list.routes.HttpRoutes.MANGA_URL
+import com.melonhead.data_manga.models.MangaReadMarkersResponse
+import com.melonhead.data_manga.models.ReadChapterRequest
+import com.melonhead.data_manga.routes.HttpRoutes.ID_PLACEHOLDER
+import com.melonhead.data_manga.routes.HttpRoutes.MANGA_READ_CHAPTER_MARKERS_URL
+import com.melonhead.data_manga.routes.HttpRoutes.MANGA_READ_MARKERS_URL
+import com.melonhead.data_manga.routes.HttpRoutes.MANGA_URL
 import com.melonhead.lib_core.models.UIChapter
 import com.melonhead.lib_core.models.UIManga
 import com.melonhead.lib_logging.Clog
@@ -19,7 +19,7 @@ import io.ktor.client.request.*
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 
-internal interface MangaService {
+interface MangaService {
     suspend fun getManga(mangaIds: List<String>): List<Manga>
     suspend fun getReadChapters(mangaIds: List<String>): List<String>
     suspend fun changeReadStatus(uiManga: UIManga, uiChapter: UIChapter, readStatus: Boolean)
