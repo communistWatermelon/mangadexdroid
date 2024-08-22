@@ -88,7 +88,7 @@ internal class MangaListViewModel(
         viewModelScope.launch {
             val intent = when (userAppDataService.renderStyle) {
                 RenderStyle.Native -> {
-                    val chapterData = mangaRepository.getChapterData(uiChapter.id)
+                    val chapterData = mangaRepository.getChapterData(uiManga.id, uiChapter.id)
                     // use secondary render style
                     if (chapterData.isNullOrEmpty()) {
                         appEventsRepository.postEvent(UserEvent.SetUseWebView(uiManga, true))

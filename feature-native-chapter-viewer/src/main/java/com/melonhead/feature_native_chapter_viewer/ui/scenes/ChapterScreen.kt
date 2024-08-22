@@ -44,6 +44,10 @@ internal fun ChapterScreen(
         val (width, height) = getWidthHeight()
 
         fun preloadImage(url: String, currentPageIndex: Int) {
+            if (!(url.contains("http") || url.contains("https"))) {
+                // don't preload images stored on disk
+                return
+            }
             val request = url.preloadImageRequest(currentPageIndex, context, width, height)
             context.imageLoader.enqueue(request)
         }
@@ -156,7 +160,13 @@ private fun ChapterView(
                 var retryHash by remember { mutableStateOf(false) }
                 val (width, height) = getWidthHeight()
                 SubcomposeAsyncImage(
-                    model = currentPageUrl.preloadImageRequest(pageIndex = currentPageIndex, LocalContext.current, width, height, retryHash) {
+                    model = currentPageUrl.preloadImageRequest(
+                        pageIndex = currentPageIndex,
+                        LocalContext.current,
+                        width,
+                        height,
+                        retryHash
+                    ) {
                         Clog.i("Retrying due to load failure")
                         retryHash = !retryHash
                     },

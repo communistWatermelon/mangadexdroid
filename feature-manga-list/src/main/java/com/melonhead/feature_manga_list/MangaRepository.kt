@@ -7,7 +7,7 @@ import com.melonhead.lib_core.models.*
 import com.melonhead.data_app_data.AppDataService
 import com.melonhead.data_at_home.AtHomeService
 import com.melonhead.data_user.services.UserService
-import com.melonhead.lib_chapter_cache.ChapterCacheMechanism
+import com.melonhead.lib_chapter_cache.ChapterCache
 import com.melonhead.feature_manga_list.services.MangaService
 import com.melonhead.lib_app_context.AppContext
 import com.melonhead.lib_app_events.AppEventsRepository
@@ -32,7 +32,7 @@ import org.koin.core.component.inject
 internal interface MangaRepository {
     val manga: Flow<List<UIManga>>
     val refreshStatus: Flow<MangaRefreshStatus>
-    suspend fun getChapterData(chapterId: String): List<String>?
+    suspend fun getChapterData(mangaId: String,chapterId: String): List<String>?
 }
 
 internal class MangaRepositoryImpl(
@@ -44,7 +44,7 @@ internal class MangaRepositoryImpl(
     private val mangaDb: MangaDao,
     private val readMarkerDb: ReadMarkerDao,
     private val context: Context,
-    private val chapterCache: ChapterCacheMechanism,
+    private val chapterCache: ChapterCache,
     private val appEventsRepository: AppEventsRepository,
     private val newChapterNotificationChannel: NewChapterNotificationChannel,
     private val appContext: AppContext,
@@ -197,17 +197,18 @@ internal class MangaRepositoryImpl(
         appDataService.updateLastRefreshDate()
     }
 
-    private suspend fun notifyOfNewChapters() {
+    private suspend fun handleUnreadChapters() {
+        val manga = mangaDb.getAllSync()
+        val newChapters = chapterDb.getAllSync().filter { readMarkerDb.isRead(it.mangaId, it.chapter) != true }
+        chapterCache.cacheImagesForChapters(manga, newChapters)
+
         if (appContext.isInForeground) return
         val notificationManager = NotificationManagerCompat.from(context)
         if (!notificationManager.areNotificationsEnabled()) return
         val installDateSeconds = appDataService.installDateSeconds.firstOrNull() ?: 0L
-        Clog.i("notifyOfNewChapters")
+        Clog.i("Posting notification for new chapters")
 
-        val newChapters = chapterDb.getAllSync().filter { readMarkerDb.isRead(it.mangaId, it.chapter) != true }
-        val manga = mangaDb.getAllSync()
         val notifyChapters = generateUIManga(manga, newChapters)
-        chapterCache.cacheImagesForChapters(newChapters)
         newChapterNotificationChannel.post(context, notifyChapters, installDateSeconds)
     }
 
@@ -231,7 +232,7 @@ internal class MangaRepositoryImpl(
             }
 
         if (chaptersToUpdate.isEmpty()) {
-            notifyOfNewChapters()
+            handleUnreadChapters()
             return
         }
 
@@ -247,7 +248,7 @@ internal class MangaRepositoryImpl(
         readMarkerDb.update(*readMarkersToUpdate.toTypedArray())
 
         // notify user of new chapters
-        notifyOfNewChapters()
+        handleUnreadChapters()
     }
 
     private fun markChapterRead(uiManga: UIManga, uiChapter: UIChapter, read: Boolean) {
@@ -256,13 +257,18 @@ internal class MangaRepositoryImpl(
             val entity = readMarkerDb.getEntity(uiManga.id, uiChapter.chapter) ?: return@launch
             if (read) {
                 newChapterNotificationChannel.dismissNotification(context, uiManga, uiChapter)
+                chapterCache.clearChapterFromCache(uiManga.id, uiChapter.id)
             }
             readMarkerDb.update(entity.copy(readStatus = read))
             mangaService.changeReadStatus(token, uiManga, uiChapter, read)
         }
     }
 
-    override suspend fun getChapterData(chapterId: String): List<String>? {
+    override suspend fun getChapterData(mangaId: String, chapterId: String): List<String>? {
+        val chapterFiles = chapterCache.getChapterFromCache(mangaId, chapterId)
+        if (chapterFiles.isNotEmpty()) return chapterFiles
+
+        Clog.e("Chapter not found in cache", RuntimeException())
         val token = appDataService.token.firstOrNull() ?: return null
         val chapterData = atHomeService.getChapterData(token, chapterId)
         return if (appDataService.useDataSaver) {
