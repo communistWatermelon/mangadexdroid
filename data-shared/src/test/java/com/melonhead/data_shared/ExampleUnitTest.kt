@@ -1,4 +1,4 @@
-package com.melonhead.data_core_manga
+package com.melonhead.data_shared
 
 import org.junit.Test
 

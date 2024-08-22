@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.melonhead.data_core_manga'
+    namespace 'com.melonhead.data_shared'
     compileSdk 34
 
     defaultConfig {

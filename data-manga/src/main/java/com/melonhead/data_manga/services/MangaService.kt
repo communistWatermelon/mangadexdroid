@@ -1,7 +1,7 @@
 package com.melonhead.data_manga.services
 
 import com.melonhead.lib_app_data.AppData
-import com.melonhead.data_core_manga.models.Manga
+import com.melonhead.data_shared.models.Manga
 import com.melonhead.data_manga.models.MangaReadMarkersResponse
 import com.melonhead.data_manga.models.ReadChapterRequest
 import com.melonhead.data_manga.routes.HttpRoutes.ID_PLACEHOLDER

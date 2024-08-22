@@ -3,8 +3,8 @@ package com.melonhead.lib_database.extensions
 import com.melonhead.lib_database.chapter.ChapterEntity
 import com.melonhead.lib_database.manga.MangaEntity
 import com.melonhead.lib_database.manga.MangaTag
-import com.melonhead.data_core_manga.models.Chapter
-import com.melonhead.data_core_manga.models.Manga
+import com.melonhead.data_shared.models.Chapter
+import com.melonhead.data_shared.models.Manga
 
 fun ChapterEntity.Companion.from(chapter: Chapter): ChapterEntity {
     return ChapterEntity(

@@ -1,4 +1,6 @@
-package com.melonhead.data_core_manga.models
+package com.melonhead.data_shared.models
 
-@kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Chapter(val id: String, val attributes: ChapterAttributes, val relationships: List<ChapterRelationships>?)

@@ -1,4 +1,4 @@
-package com.melonhead.data_core_manga.models
+package com.melonhead.data_shared.models
 
 import kotlinx.datetime.Instant
 

@@ -43,8 +43,8 @@ dependencies {
     implementation libs.room.ktx
     annotationProcessor libs.room.compiler
     ksp libs.room.compiler
+    implementation project(':data-shared')
 
-    implementation project(":data-core-manga")
 
     api platform(libs.firebase.bom)
     api libs.bundles.firebase

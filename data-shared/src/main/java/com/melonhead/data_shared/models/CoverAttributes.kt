@@ -1,4 +1,4 @@
-package com.melonhead.data_core_manga.models
+package com.melonhead.data_shared.models
 
 @kotlinx.serialization.Serializable
 data class CoverAttributes(val fileName: String)

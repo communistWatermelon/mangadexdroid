@@ -1,7 +1,7 @@
 package com.melonhead.data_user.services
 
 import com.melonhead.lib_app_data.AppData
-import com.melonhead.data_core_manga.models.Chapter
+import com.melonhead.data_shared.models.Chapter
 import com.melonhead.data_user.models.UserResponse
 import com.melonhead.data_user.routes.HttpRoutes
 import com.melonhead.lib_logging.Clog
