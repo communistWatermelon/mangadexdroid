@@ -1,14 +1,13 @@
 package com.melonhead.lib_chapter_cache
 
 import android.content.Context
-import com.melonhead.data_app_data.AppDataService
+import com.melonhead.lib_app_data.AppData
 import com.melonhead.data_at_home.AtHomeService
 import com.melonhead.lib_database.chapter.ChapterEntity
 import com.melonhead.lib_database.manga.MangaEntity
 import com.melonhead.lib_logging.Clog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.io.*
 import java.net.URL
@@ -21,7 +20,7 @@ interface ChapterCache {
 }
 
 internal class ChapterCacheImpl(
-    private val appDataService: AppDataService,
+    private val appData: AppData,
     private val atHomeService: AtHomeService,
     private val externalScope: CoroutineScope,
     private val appContext: Context,
@@ -29,7 +28,7 @@ internal class ChapterCacheImpl(
 
     private suspend fun getChapterData(chapterId: String): List<String>? {
         val chapterData = atHomeService.getChapterData(chapterId)
-        return if (appDataService.useDataSaver) {
+        return if (appData.useDataSaver) {
             chapterData?.pagesDataSaver()
         } else {
             chapterData?.pages()

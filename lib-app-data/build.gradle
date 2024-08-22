@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace 'com.melonhead.data_app_data'
+    namespace 'com.melonhead.lib_app_data'
     compileSdk 34
 
     defaultConfig {

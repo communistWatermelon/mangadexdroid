@@ -1,18 +1,17 @@
-package com.melonhead.data_app_data
+package com.melonhead.lib_app_data
 
 import android.content.Context
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.melonhead.lib_app_data.models.RenderStyle
 import com.melonhead.lib_database.extensions.addValueEventListenerFlow
 import com.melonhead.lib_database.firebase.FirebaseDbUser
+import dataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
@@ -22,11 +21,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
 
-enum class RenderStyle {
-    Native, WebView, Browser
-}
-
-interface AppDataService {
+interface AppData {
     val token: Flow<Pair<String, String>?>
     val installDateSeconds: Flow<Long?>
     val lastRefreshDateSeconds: Flow<Long?>
@@ -49,12 +44,10 @@ interface AppDataService {
     suspend fun getRefresh(): String?
 }
 
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth")
-
-internal class AppDataServiceImpl(
+internal class AppDataImpl(
     private val appContext: Context,
     externalScope: CoroutineScope,
-): AppDataService {
+): AppData {
     private val firebaseDb = Firebase.database
 
     private val AUTH_TOKEN = stringPreferencesKey("auth_token")

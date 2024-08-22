@@ -1,6 +1,6 @@
 package com.melonhead.feature_authentication.di
 
-import com.melonhead.data_app_data.di.DataAppDataModule
+import com.melonhead.lib_app_data.di.LibAppDataModule
 import com.melonhead.data_authentication.di.DataAuthenticationModule
 import com.melonhead.data_user.di.DataUserModule
 import com.melonhead.feature_authentication.AuthRepository
@@ -19,9 +19,9 @@ val FeatureAuthenticationModule = module {
     includes(LibAppEventsModule)
     includes(LibNotificationsModule)
     includes(LibAppContextModule)
+    includes(LibAppDataModule)
 
     includes(DataAuthenticationModule)
-    includes(DataAppDataModule)
     includes(DataUserModule)
 
     single<AuthRepository> { AuthRepositoryImpl(get(), get(), get(), get(), get(), get(), get(), get()) }

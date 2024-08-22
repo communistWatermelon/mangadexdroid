@@ -36,5 +36,5 @@ dependencies {
 
     implementation project(":lib-networking")
     implementation project(":lib-logging")
-    implementation project(":data-app-data")
+    implementation project(':lib-app-data')
 }

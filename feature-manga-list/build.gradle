@@ -49,13 +49,13 @@ dependencies {
     implementation project(":lib-app-events")
     implementation project(':lib-chapter-cache')
     implementation project(':lib-navigation')
+    implementation project(':lib-app-data')
     implementation project(":data-core-manga")
     implementation project(":data-user")
-    implementation project(":data-app-data")
     implementation project(":data-at-home")
     implementation project(":data-manga")
 
     api project(":data-core-manga")
     api project(":data-manga")
-    api project(":data-app-data")
+    api project(':lib-app-data')
 }

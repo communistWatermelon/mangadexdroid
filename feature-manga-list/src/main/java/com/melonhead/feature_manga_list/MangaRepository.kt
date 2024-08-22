@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import com.melonhead.lib_core.extensions.throttleLatest
 import com.melonhead.lib_core.models.*
-import com.melonhead.data_app_data.AppDataService
+import com.melonhead.lib_app_data.AppData
 import com.melonhead.data_at_home.AtHomeService
 import com.melonhead.data_user.services.UserService
 import com.melonhead.lib_chapter_cache.ChapterCache
@@ -38,7 +38,7 @@ internal interface MangaRepository {
 internal class MangaRepositoryImpl(
     private val externalScope: CoroutineScope,
     private val userService: UserService,
-    private val appDataService: AppDataService,
+    private val appData: AppData,
     private val atHomeService: AtHomeService,
     private val chapterDb: ChapterDao,
     private val mangaDb: MangaDao,
@@ -153,7 +153,7 @@ internal class MangaRepositoryImpl(
     private fun refreshManga(@Suppress("UNUSED_PARAMETER") unit: Unit) = externalScope.launch {
         // refresh auth
         appEventsRepository.postEvent(AuthenticationEvent.RefreshToken())
-        val token = appDataService.getToken()
+        val token = appData.getToken()
         if (token == null) {
             Clog.i("Failed to refresh token")
             return@launch
@@ -197,7 +197,7 @@ internal class MangaRepositoryImpl(
         refreshReadStatus()
 
         mutableRefreshStatus.value = None
-        appDataService.updateLastRefreshDate()
+        appData.updateLastRefreshDate()
     }
 
     private suspend fun handleUnreadChapters() {
@@ -208,7 +208,7 @@ internal class MangaRepositoryImpl(
         if (appContext.isInForeground) return
         val notificationManager = NotificationManagerCompat.from(context)
         if (!notificationManager.areNotificationsEnabled()) return
-        val installDateSeconds = appDataService.installDateSeconds.firstOrNull() ?: 0L
+        val installDateSeconds = appData.installDateSeconds.firstOrNull() ?: 0L
         Clog.i("Posting notification for new chapters")
 
         val notifyChapters = generateUIManga(manga, newChapters)
@@ -259,7 +259,7 @@ internal class MangaRepositoryImpl(
 
         Clog.e("Chapter not found in cache", RuntimeException("Chapter not found in cache"))
         val chapterData = atHomeService.getChapterData(chapterId)
-        return if (appDataService.useDataSaver) {
+        return if (appData.useDataSaver) {
             chapterData?.pagesDataSaver()
         } else {
             chapterData?.pages()

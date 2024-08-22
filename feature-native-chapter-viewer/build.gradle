@@ -42,7 +42,7 @@ dependencies {
     implementation project(":lib-logging")
     implementation project(":lib-navigation")
     implementation project(":lib-chapter-cache")
-    implementation project(":data-app-data")
+    implementation project(':lib-app-data')
+    api project(':lib-app-data')
 
-    api project(":data-app-data")
 }

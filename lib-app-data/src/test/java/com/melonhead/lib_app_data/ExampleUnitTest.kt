@@ -1,4 +1,4 @@
-package com.melonhead.data_app_data
+package com.melonhead.lib_app_data
 
 import org.junit.Test
 

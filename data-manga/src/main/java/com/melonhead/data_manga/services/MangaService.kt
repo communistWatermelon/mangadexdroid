@@ -1,6 +1,6 @@
 package com.melonhead.data_manga.services
 
-import com.melonhead.data_app_data.AppDataService
+import com.melonhead.lib_app_data.AppData
 import com.melonhead.data_core_manga.models.Manga
 import com.melonhead.data_manga.models.MangaReadMarkersResponse
 import com.melonhead.data_manga.models.ReadChapterRequest
@@ -25,10 +25,10 @@ interface MangaService {
 
 internal class MangaServiceImpl(
     private val client: HttpClient,
-    private val appDataService: AppDataService,
+    private val appData: AppData,
 ): MangaService {
     override suspend fun getManga(mangaIds: List<String>): List<Manga> {
-        val session = appDataService.getSession() ?: return emptyList()
+        val session = appData.getSession() ?: return emptyList()
         Clog.i("getManga: ${mangaIds.count()}")
         val result: List<Manga?> = handlePagination(mangaIds.count()) { offset ->
             client.catching("getManga") {
@@ -50,7 +50,7 @@ internal class MangaServiceImpl(
     }
 
     override suspend fun getReadChapters(mangaIds: List<String>): List<String> {
-        val session = appDataService.getSession() ?: return emptyList()
+        val session = appData.getSession() ?: return emptyList()
         Clog.i("getReadChapters: total ${mangaIds.count()}")
         val allChapters = mutableListOf<String>()
         mangaIds.chunked(100).map { list ->
@@ -75,7 +75,7 @@ internal class MangaServiceImpl(
     }
 
     override suspend fun changeReadStatus(mangaId: String, chapterId: String, readStatus: Boolean) {
-        val session = appDataService.getSession() ?: return
+        val session = appData.getSession() ?: return
         Clog.i("changeReadStatus: chapter $chapterId readStatus $readStatus")
         client.catchingSuccess("changeReadStatus") {
             client.post(MANGA_READ_CHAPTER_MARKERS_URL.replace(ID_PLACEHOLDER, mangaId)) {

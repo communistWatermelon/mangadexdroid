@@ -1,6 +1,6 @@
 package com.melonhead.data_authentication.services
 
-import com.melonhead.data_app_data.AppDataService
+import com.melonhead.lib_app_data.AppData
 import com.melonhead.data_authentication.models.AuthRequest
 import com.melonhead.data_authentication.models.AuthResponse
 import com.melonhead.data_authentication.models.AuthToken
@@ -25,7 +25,7 @@ interface LoginService {
 
 internal class LoginServiceImpl(
     private val client: HttpClient,
-    private val appDataService: AppDataService,
+    private val appData: AppData,
 ) : LoginService {
     override suspend fun authenticate(email: String, password: String): AuthToken? {
         val response: AuthResponse? = client.catching("authenticate") {
@@ -40,7 +40,7 @@ internal class LoginServiceImpl(
     }
 
     override suspend fun refreshToken(logoutOnFail: Boolean): AuthToken? {
-        val (session, refresh) = appDataService.getToken() ?: return null
+        val (session, refresh) = appData.getToken() ?: return null
         return try {
             // note: not using catching call intentionally, prevents networking errors from forcing logout
             val result = client.post(REFRESH_TOKEN_URL) {

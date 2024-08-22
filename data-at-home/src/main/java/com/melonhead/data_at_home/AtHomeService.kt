@@ -1,6 +1,6 @@
 package com.melonhead.data_at_home
 
-import com.melonhead.data_app_data.AppDataService
+import com.melonhead.lib_app_data.AppData
 import com.melonhead.data_at_home.models.AtHomeChapterResponse
 import com.melonhead.data_at_home.routes.HttpRoutes
 import com.melonhead.lib_logging.Clog
@@ -18,10 +18,10 @@ interface AtHomeService {
 
 internal class AtHomeServiceImpl(
     private val client: HttpClient,
-    private val appDataService: AppDataService,
+    private val appData: AppData,
 ): AtHomeService {
     override suspend fun getChapterData(chapterId: String): AtHomeChapterResponse? {
-        val session = appDataService.getSession() ?: return null
+        val session = appData.getSession() ?: return null
         Clog.i("getChapterData: $chapterId")
         return client.catching("getChapterData") {
             client.get(HttpRoutes.CHAPTER_DATA_URL + chapterId) {

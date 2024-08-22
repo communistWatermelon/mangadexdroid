@@ -1,6 +1,6 @@
 package com.melonhead.feature_manga_list.di
 
-import com.melonhead.data_app_data.di.DataAppDataModule
+import com.melonhead.lib_app_data.di.LibAppDataModule
 import com.melonhead.data_at_home.di.DataAtHomeModule
 import com.melonhead.data_manga.di.DataMangaModule
 import com.melonhead.data_user.di.DataUserModule
@@ -22,9 +22,9 @@ val FeatureMangaListModule = module {
     includes(LibAppContextModule)
     includes(LibDbModule)
     includes(LibChapterCacheModule)
+    includes(LibAppDataModule)
 
     includes(DataUserModule)
-    includes(DataAppDataModule)
     includes(DataAtHomeModule)
     includes(DataMangaModule)
 

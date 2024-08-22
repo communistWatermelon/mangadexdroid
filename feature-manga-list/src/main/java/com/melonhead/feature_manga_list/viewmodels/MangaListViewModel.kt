@@ -12,8 +12,8 @@ import com.melonhead.lib_core.extensions.asLiveData
 import com.melonhead.lib_core.extensions.dateOrTimeString
 import com.melonhead.lib_core.models.UIChapter
 import com.melonhead.lib_core.models.UIManga
-import com.melonhead.data_app_data.AppDataService
-import com.melonhead.data_app_data.RenderStyle
+import com.melonhead.lib_app_data.AppData
+import com.melonhead.lib_app_data.models.RenderStyle
 import com.melonhead.feature_manga_list.MangaRepository
 import com.melonhead.lib_app_events.AppEventsRepository
 import com.melonhead.lib_app_events.events.UserEvent
@@ -29,13 +29,13 @@ import kotlinx.datetime.Instant
 
 internal class MangaListViewModel(
     private val mangaRepository: MangaRepository,
-    private val userAppDataService: AppDataService,
+    private val userAppData: AppData,
     private val navigator: Navigator,
     private val appEventsRepository: AppEventsRepository,
 ): ViewModel() {
     val manga = mangaRepository.manga.asLiveData(viewModelScope.coroutineContext)
     val refreshStatus = mangaRepository.refreshStatus.asLiveData(viewModelScope.coroutineContext)
-    val readMangaCount = userAppDataService.showReadChapterCount
+    val readMangaCount = userAppData.showReadChapterCount
 
     private val mutableRefreshText = MutableLiveData<String>()
     val refreshText = mutableRefreshText.asLiveData()
@@ -58,7 +58,7 @@ internal class MangaListViewModel(
 
         viewModelScope.launch {
             try {
-                userAppDataService.lastRefreshDateSeconds.collectLatest {
+                userAppData.lastRefreshDateSeconds.collectLatest {
                     updateRefreshText()
                 }
             } catch (e: Exception) {
@@ -77,7 +77,7 @@ internal class MangaListViewModel(
     }
 
     private suspend fun updateRefreshText() {
-        val lastRefreshDateSecond = userAppDataService.lastRefreshDateSeconds.first()
+        val lastRefreshDateSecond = userAppData.lastRefreshDateSeconds.first()
         mutableRefreshText.value = if (lastRefreshDateSecond != null)
             Instant.fromEpochSeconds(lastRefreshDateSecond).dateOrTimeString(useRelative = true)
         else
@@ -86,7 +86,7 @@ internal class MangaListViewModel(
 
     fun onChapterClicked(context: Context, uiManga: UIManga, uiChapter: UIChapter) {
         viewModelScope.launch {
-            val intent = when (userAppDataService.renderStyle) {
+            val intent = when (userAppData.renderStyle) {
                 RenderStyle.Native -> {
                     val chapterData = mangaRepository.getChapterData(uiManga.id, uiChapter.id)
                     // use secondary render style

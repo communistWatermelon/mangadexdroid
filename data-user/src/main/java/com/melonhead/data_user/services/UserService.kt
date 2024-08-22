@@ -1,6 +1,6 @@
 package com.melonhead.data_user.services
 
-import com.melonhead.data_app_data.AppDataService
+import com.melonhead.lib_app_data.AppData
 import com.melonhead.data_core_manga.models.Chapter
 import com.melonhead.data_user.models.UserResponse
 import com.melonhead.data_user.routes.HttpRoutes
@@ -21,10 +21,10 @@ interface UserService {
 
 internal class UserServiceImpl(
     private val client: HttpClient,
-    private val appDataService: AppDataService,
+    private val appData: AppData,
 ): UserService {
     override suspend fun getFollowedChapters(): List<Chapter> {
-        val session = appDataService.getSession() ?: return emptyList()
+        val session = appData.getSession() ?: return emptyList()
         Clog.i("getFollowedChapters")
         return handlePagination(50, fetchAll = false) { offset ->
             client.catching("getFollowedChapters") {
@@ -45,7 +45,7 @@ internal class UserServiceImpl(
     }
 
     override suspend fun getInfo(): UserResponse? {
-        val session = appDataService.getSession() ?: return null
+        val session = appData.getSession() ?: return null
         Clog.i("Get user")
         return client.catching("getInfo") {
             client.get(HttpRoutes.USER_ME_URL) {

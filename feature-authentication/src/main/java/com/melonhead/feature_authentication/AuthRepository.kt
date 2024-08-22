@@ -2,7 +2,7 @@ package com.melonhead.feature_authentication
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import com.melonhead.data_app_data.AppDataService
+import com.melonhead.lib_app_data.AppData
 import com.melonhead.data_authentication.models.AuthToken
 import com.melonhead.data_authentication.services.LoginService
 import com.melonhead.data_user.services.UserService
@@ -23,7 +23,7 @@ interface AuthRepository {
 
 internal class AuthRepositoryImpl(
     private val context: Context,
-    private val appDataService: AppDataService,
+    private val appData: AppData,
     private val loginService: LoginService,
     private val userService: UserService,
     private val appEventsRepository: AppEventsRepository,
@@ -33,7 +33,7 @@ internal class AuthRepositoryImpl(
 ) : AuthRepository {
     init {
         externalScope.launch {
-            appEventsRepository.postEvent(if (appDataService.token.firstOrNull() != null) AuthenticationEvent.LoggedIn else AuthenticationEvent.LoggedOut)
+            appEventsRepository.postEvent(if (appData.token.firstOrNull() != null) AuthenticationEvent.LoggedIn else AuthenticationEvent.LoggedOut)
             refreshToken(logoutOnFail = false)
         }
 
@@ -54,17 +54,17 @@ internal class AuthRepositoryImpl(
             val notificationManager = NotificationManagerCompat.from(context)
             if (!notificationManager.areNotificationsEnabled()) return
             authFailedNotificationChannel.postAuthFailed(context)
-            appDataService.updateUserId("")
+            appData.updateUserId("")
         }
 
-        val currentToken = appDataService.token.firstOrNull()
+        val currentToken = appData.token.firstOrNull()
         if (currentToken == null) {
             signOut()
             return null
         }
 
         val newToken = loginService.refreshToken(logoutOnFail)
-        appDataService.updateToken(session = newToken?.session, refresh = newToken?.refresh)
+        appData.updateToken(session = newToken?.session, refresh = newToken?.refresh)
         if (newToken == null) {
             signOut()
         } else {
@@ -74,7 +74,7 @@ internal class AuthRepositoryImpl(
                 Clog.i("userResponse = ${userResponse?.toString()}")
                 Clog.e("User info returned null", RuntimeException("User info returned null"))
             }
-            appDataService.updateUserId(userId ?: "")
+            appData.updateUserId(userId ?: "")
             appEventsRepository.postEvent(AuthenticationEvent.LoggedIn)
         }
         return newToken
@@ -84,7 +84,7 @@ internal class AuthRepositoryImpl(
         Clog.i("authenticate")
         appEventsRepository.postEvent(AuthenticationEvent.LoggingIn)
         val token = loginService.authenticate(email, password)
-        appDataService.updateToken(session = token?.session, refresh = token?.refresh)
+        appData.updateToken(session = token?.session, refresh = token?.refresh)
         appEventsRepository.postEvent(AuthenticationEvent.LoggedIn)
         appEventsRepository.postEvent(UserEvent.RefreshManga)
     }

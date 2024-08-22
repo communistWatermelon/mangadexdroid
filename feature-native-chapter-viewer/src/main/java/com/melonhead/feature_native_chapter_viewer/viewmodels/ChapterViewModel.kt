@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.melonhead.lib_core.models.UIChapter
 import com.melonhead.lib_core.models.UIManga
-import com.melonhead.data_app_data.AppDataService
+import com.melonhead.lib_app_data.AppData
 import com.melonhead.feature_native_chapter_viewer.ChapterActivity
 import com.melonhead.lib_app_events.AppEventsRepository
 import com.melonhead.lib_app_events.events.UserEvent
@@ -26,12 +26,12 @@ import java.lang.Integer.min
 internal class ChapterViewModel(
     private val appEventsRepository: AppEventsRepository,
     private val navigator: Navigator,
-    appDataService: AppDataService
+    appData: AppData
 ): ViewModel() {
     private val mutableChapterData = MutableStateFlow<List<String>?>(null)
     val chapterData = mutableChapterData.asStateFlow()
 
-    val chapterTapAreaSize = appDataService.chapterTapAreaSize
+    val chapterTapAreaSize = appData.chapterTapAreaSize
 
     private val mutablePageIndex = MutableStateFlow(0)
     val currentPage = mutableChapterData.combine(mutablePageIndex) { data, index -> data?.getOrNull(index) }
