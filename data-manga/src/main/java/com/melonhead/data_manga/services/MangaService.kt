@@ -8,8 +8,6 @@ import com.melonhead.data_manga.routes.HttpRoutes.ID_PLACEHOLDER
 import com.melonhead.data_manga.routes.HttpRoutes.MANGA_READ_CHAPTER_MARKERS_URL
 import com.melonhead.data_manga.routes.HttpRoutes.MANGA_READ_MARKERS_URL
 import com.melonhead.data_manga.routes.HttpRoutes.MANGA_URL
-import com.melonhead.lib_core.models.UIChapter
-import com.melonhead.lib_core.models.UIManga
 import com.melonhead.lib_logging.Clog
 import com.melonhead.lib_networking.extensions.catching
 import com.melonhead.lib_networking.extensions.catchingSuccess
@@ -22,7 +20,7 @@ import io.ktor.http.contentType
 interface MangaService {
     suspend fun getManga(mangaIds: List<String>): List<Manga>
     suspend fun getReadChapters(mangaIds: List<String>): List<String>
-    suspend fun changeReadStatus(uiManga: UIManga, uiChapter: UIChapter, readStatus: Boolean)
+    suspend fun changeReadStatus(mangaId: String, chapterId: String, readStatus: Boolean)
 }
 
 internal class MangaServiceImpl(
@@ -76,16 +74,16 @@ internal class MangaServiceImpl(
         return allChapters
     }
 
-    override suspend fun changeReadStatus(uiManga: UIManga, uiChapter: UIChapter, readStatus: Boolean) {
+    override suspend fun changeReadStatus(mangaId: String, chapterId: String, readStatus: Boolean) {
         val session = appDataService.getSession() ?: return
-        Clog.i("changeReadStatus: chapter ${uiChapter.title} readStatus $readStatus")
+        Clog.i("changeReadStatus: chapter $chapterId readStatus $readStatus")
         client.catchingSuccess("changeReadStatus") {
-            client.post(MANGA_READ_CHAPTER_MARKERS_URL.replace(ID_PLACEHOLDER, uiManga.id)) {
+            client.post(MANGA_READ_CHAPTER_MARKERS_URL.replace(ID_PLACEHOLDER, mangaId)) {
                 headers {
                     contentType(ContentType.Application.Json)
                     bearerAuth(session)
                 }
-                setBody(ReadChapterRequest.from(uiChapter, readStatus))
+                setBody(ReadChapterRequest.from(chapterId, readStatus))
             }
         }
     }

@@ -12,7 +12,10 @@ interface ReadMarkerDao {
     fun allMarkers() = getAll().distinctUntilChanged()
 
     @Query("SELECT * FROM readmarker WHERE manga_id = :mangaId AND chapter = :chapter")
-    fun getEntity(mangaId: String, chapter: String?): ReadMarkerEntity?
+    fun getEntityByChapter(mangaId: String, chapter: String?): ReadMarkerEntity?
+
+    @Query("SELECT * FROM readmarker WHERE manga_id = :mangaId AND id = :chapterId")
+    fun getEntityById(mangaId: String, chapterId: String): ReadMarkerEntity?
 
     @Query("SELECT read_status FROM readmarker WHERE manga_id = :mangaId AND chapter = :chapter")
     fun isRead(mangaId: String, chapter: String?): Boolean?

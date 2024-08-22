@@ -91,7 +91,7 @@ internal class MangaListViewModel(
                     val chapterData = mangaRepository.getChapterData(uiManga.id, uiChapter.id)
                     // use secondary render style
                     if (chapterData.isNullOrEmpty()) {
-                        appEventsRepository.postEvent(UserEvent.SetUseWebView(uiManga, true))
+                        appEventsRepository.postEvent(UserEvent.SetUseWebView(uiManga.id, true))
                         navigateToWebView(context, uiManga, uiChapter)
                     } else {
                         navigator.intentForKey(context, ActivityKey.ChapterActivity(
@@ -106,7 +106,7 @@ internal class MangaListViewModel(
                 RenderStyle.WebView -> navigateToWebView(context, uiManga, uiChapter)
                 RenderStyle.Browser -> {
                     // mark chapter as read on tap only for browse style rendering
-                    appEventsRepository.postEvent(UserEvent.SetMarkChapterRead(uiChapter, uiManga, !uiChapter.read!!))
+                    appEventsRepository.postEvent(UserEvent.SetMarkChapterRead(uiChapter.id, uiManga.id, !uiChapter.read!!))
                     Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(uiChapter.webAddress) }
                 }
             }
@@ -116,7 +116,7 @@ internal class MangaListViewModel(
     }
 
     fun toggleChapterRead(uiManga: UIManga, uiChapter: UIChapter) = viewModelScope.launch(Dispatchers.IO) {
-        appEventsRepository.postEvent(UserEvent.SetMarkChapterRead(uiChapter, uiManga, !uiChapter.read!!))
+        appEventsRepository.postEvent(UserEvent.SetMarkChapterRead(uiChapter.id, uiManga.id, !uiChapter.read!!))
     }
 
     fun refreshContent() = viewModelScope.launch {
@@ -125,10 +125,10 @@ internal class MangaListViewModel(
     }
 
     fun toggleMangaWebview(uiManga: UIManga) = viewModelScope.launch {
-        appEventsRepository.postEvent(UserEvent.SetUseWebView(uiManga, !uiManga.useWebview))
+        appEventsRepository.postEvent(UserEvent.SetUseWebView(uiManga.id, !uiManga.useWebview))
     }
 
     fun setMangaTitle(uiManga: UIManga, newTitle: String) = viewModelScope.launch {
-        appEventsRepository.postEvent(UserEvent.UpdateChosenMangaTitle(uiManga, newTitle))
+        appEventsRepository.postEvent(UserEvent.UpdateChosenMangaTitle(uiManga.id, newTitle))
     }
 }

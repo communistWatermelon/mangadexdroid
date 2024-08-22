@@ -27,6 +27,6 @@ internal class WebViewViewModel(
     }
 
     fun markAsRead() {
-        appEventsRepository.postEvent(UserEvent.SetMarkChapterRead(chapter, manga, true))
+        appEventsRepository.postEvent(UserEvent.SetMarkChapterRead(chapter.id, manga.id, true))
     }
 }

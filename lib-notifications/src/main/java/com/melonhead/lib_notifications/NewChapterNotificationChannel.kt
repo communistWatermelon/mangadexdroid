@@ -74,6 +74,11 @@ data class NewChapterNotificationChannel(
         notificationManager.cancel(notificationId(manga, chapter))
     }
 
+    fun dismissNotification(context: Context, mangaId: String, chapterId: String) {
+        val notificationManager = NotificationManagerCompat.from(context)
+        notificationManager.cancel(mangaId.hashCode() + chapterId.hashCode())
+    }
+
     private fun notificationId(manga: UIManga, chapter: UIChapter): Int {
         return manga.id.hashCode() + chapter.id.hashCode()
     }

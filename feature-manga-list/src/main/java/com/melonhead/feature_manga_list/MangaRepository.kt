@@ -87,13 +87,13 @@ internal class MangaRepositoryImpl(
                                 forceRefresh()
                             }
                             is UserEvent.SetMarkChapterRead -> {
-                                markChapterRead(it.manga, it.chapter, it.read)
+                                markChapterRead(it.mangaId, it.chapterId, it.read)
                             }
                             is UserEvent.SetUseWebView -> {
-                                setUseWebview(it.manga, it.useWebView)
+                                setUseWebview(it.mangaId, it.useWebView)
                             }
                             is UserEvent.UpdateChosenMangaTitle -> {
-                                updateChosenTitle(it.manga, it.title)
+                                updateChosenTitle(it.mangaId, it.title)
                             }
                         }
                     }
@@ -113,7 +113,7 @@ internal class MangaRepositoryImpl(
         val uiManga = dbSeries.mapNotNull { manga ->
             var hasExternalChapters = false
             val chapters = dbChapters.filter { it.mangaId == manga.id }.map { chapter ->
-                val read = readMarkerDb.getEntity(chapter.mangaId, chapter.chapter)?.readStatus
+                val read = readMarkerDb.getEntityByChapter(chapter.mangaId, chapter.chapter)?.readStatus
                 hasExternalChapters = hasExternalChapters || chapter.externalUrl != null
                 UIChapter(
                     id = chapter.id,
@@ -266,28 +266,28 @@ internal class MangaRepositoryImpl(
         }
     }
 
-    private fun markChapterRead(uiManga: UIManga, uiChapter: UIChapter, read: Boolean) {
+    private fun markChapterRead(mangaId: String, chapterId: String, read: Boolean) {
         externalScope.launch {
-            val entity = readMarkerDb.getEntity(uiManga.id, uiChapter.chapter) ?: return@launch
+            val entity = readMarkerDb.getEntityById(mangaId, chapterId) ?: return@launch
             if (read) {
-                newChapterNotificationChannel.dismissNotification(context, uiManga, uiChapter)
-                chapterCache.clearChapterFromCache(uiManga.id, uiChapter.id)
+                newChapterNotificationChannel.dismissNotification(context, mangaId, chapterId)
+                chapterCache.clearChapterFromCache(mangaId, chapterId)
             }
             readMarkerDb.update(entity.copy(readStatus = read))
-            mangaService.changeReadStatus(uiManga, uiChapter, read)
+            mangaService.changeReadStatus(mangaId, mangaId, read)
         }
     }
 
-    private fun setUseWebview(manga: UIManga, useWebView: Boolean) {
+    private fun setUseWebview(mangaId: String, useWebView: Boolean) {
         externalScope.launch {
-            val entity = mangaDb.mangaById(manga.id).first() ?: return@launch
+            val entity = mangaDb.mangaById(mangaId).first() ?: return@launch
             mangaDb.update(entity.copy(useWebview = useWebView))
         }
     }
 
-    private fun updateChosenTitle(manga: UIManga, chosenTitle: String) {
+    private fun updateChosenTitle(mangaId: String, chosenTitle: String) {
         externalScope.launch {
-            val entity = mangaDb.mangaById(manga.id).first() ?: return@launch
+            val entity = mangaDb.mangaById(mangaId).first() ?: return@launch
             if (!entity.mangaTitles.contains(chosenTitle)) return@launch
             mangaDb.update(entity.copy(chosenTitle = chosenTitle))
         }
