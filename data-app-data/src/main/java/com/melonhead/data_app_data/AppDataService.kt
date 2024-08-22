@@ -17,15 +17,10 @@ import com.melonhead.lib_database.extensions.addValueEventListenerFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Clock
 
 enum class RenderStyle {
@@ -50,6 +45,7 @@ interface AppDataService {
     suspend fun updateRenderStyle(renderStyle: RenderStyle)
     suspend fun setUseDataSaver(useDataSaver: Boolean)
     suspend fun setShowReadChapterCount(readChapterCount: Int)
+    suspend fun getToken(): AuthToken?
 }
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth")
@@ -70,6 +66,8 @@ internal class AppDataServiceImpl(
         // No type safety.
         preferences[AUTH_TOKEN] ?: ""
     }.distinctUntilChanged()
+
+    private val tokenMutex = Mutex()
 
     init {
         externalScope.launch(IO) {
@@ -132,12 +130,14 @@ internal class AppDataServiceImpl(
         get() = 1
 
     override suspend fun updateToken(token: AuthToken?) {
-        appContext.dataStore.edit { settings ->
-            if (settings[AUTH_TOKEN] != token?.session)
-                settings[AUTH_TOKEN] = token?.session ?: ""
+        tokenMutex.withLock {
+            appContext.dataStore.edit { settings ->
+                if (settings[AUTH_TOKEN] != token?.session)
+                    settings[AUTH_TOKEN] = token?.session ?: ""
 
-            if (settings[REFRESH_TOKEN] != token?.refresh)
-                settings[REFRESH_TOKEN] = token?.refresh ?: ""
+                if (settings[REFRESH_TOKEN] != token?.refresh)
+                    settings[REFRESH_TOKEN] = token?.refresh ?: ""
+            }
         }
     }
 
@@ -166,6 +166,12 @@ internal class AppDataServiceImpl(
     override suspend fun updateUserId(id: String) {
         appContext.dataStore.edit { settings ->
             settings[USER_ID] = id
+        }
+    }
+
+    override suspend fun getToken(): AuthToken? {
+        tokenMutex.withLock {
+            return token.first()
         }
     }
 
