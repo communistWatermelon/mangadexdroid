@@ -163,7 +163,7 @@ internal class MangaRepositoryImpl(
 
         mutableRefreshStatus.value = Following
         // fetch chapters from server
-        val chaptersResponse = userService.getFollowedChapters(token)
+        val chaptersResponse = userService.getFollowedChapters()
         val chapterEntities = chaptersResponse.map { ChapterEntity.from(it) }
         val newChapters = chapterEntities.filter { !chapterDb.containsChapter(it.id) }
 

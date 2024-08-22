@@ -68,10 +68,11 @@ internal class AuthRepositoryImpl(
         if (newToken == null) {
             signOut()
         } else {
-            val userResponse = userService.getInfo(newToken)
+            val userResponse = userService.getInfo()
             val userId = userResponse?.data?.id
             if (userId == null) {
-                Clog.e("User info returned null", RuntimeException())
+                Clog.i("userResponse = ${userResponse?.toString()}")
+                Clog.e("User info returned null", RuntimeException("User info returned null"))
             }
             appDataService.updateUserId(userId ?: "")
             appEventsRepository.postEvent(AuthenticationEvent.LoggedIn)
