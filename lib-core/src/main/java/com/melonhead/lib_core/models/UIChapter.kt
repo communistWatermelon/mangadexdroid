@@ -10,7 +10,7 @@ data class UIChapter(
     val chapter: String?,
     val title: String?,
     val createdDate: Long,
-    val read: Boolean?,
+    val read: Boolean,
     val externalUrl: String? = null,
     val cachedPages: Int? = null,
 ) :

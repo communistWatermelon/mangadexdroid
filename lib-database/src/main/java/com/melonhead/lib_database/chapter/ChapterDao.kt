@@ -17,6 +17,9 @@ interface ChapterDao {
     @Query("SELECT * FROM chapter WHERE manga_id IS :mangaId")
     fun getChaptersForManga(mangaId: String): Flow<List<ChapterEntity>>
 
+    @Query("SELECT * FROM chapter WHERE id IS :chapterId")
+    suspend fun getChapterForId(chapterId: String): ChapterEntity
+
     fun chaptersForManga(mangaId: String) = getChaptersForManga(mangaId).distinctUntilChanged()
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

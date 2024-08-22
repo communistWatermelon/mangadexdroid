@@ -113,7 +113,7 @@ internal class MangaRepositoryImpl(
         val uiManga = dbSeries.mapNotNull { manga ->
             var hasExternalChapters = false
             val chapters = dbChapters.filter { it.mangaId == manga.id }.map { chapter ->
-                val read = readMarkerDb.getEntityByChapter(chapter.mangaId, chapter.chapter)?.readStatus
+                val read = readMarkerDb.getEntityByChapter(chapter.mangaId, chapter.chapter)?.readStatus == true
                 hasExternalChapters = hasExternalChapters || chapter.externalUrl != null
                 UIChapter(
                     id = chapter.id,
@@ -268,7 +268,8 @@ internal class MangaRepositoryImpl(
 
     private fun markChapterRead(mangaId: String, chapterId: String, read: Boolean) {
         externalScope.launch {
-            val entity = readMarkerDb.getEntityById(mangaId, chapterId) ?: return@launch
+            val chapter = chapterDb.getChapterForId(chapterId)
+            val entity = readMarkerDb.getEntityByChapter(mangaId, chapter.chapter) ?: return@launch
             if (read) {
                 newChapterNotificationChannel.dismissNotification(context, mangaId, chapterId)
                 chapterCache.clearChapterFromCache(mangaId, chapterId)
