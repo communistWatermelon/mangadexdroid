@@ -33,6 +33,8 @@ internal interface MangaRepository {
     val manga: Flow<List<UIManga>>
     val refreshStatus: Flow<MangaRefreshStatus>
     suspend fun getChapterData(mangaId: String,chapterId: String): List<String>?
+    @Deprecated("Use UserEvent.RefreshManga event instead of using this directly")
+    suspend fun forceRefresh()
 }
 
 internal class MangaRepositoryImpl(
@@ -64,6 +66,7 @@ internal class MangaRepositoryImpl(
     private var isLoggedIn: Boolean = false
 
     init {
+        Clog.i("MangaRepository init")
         externalScope.launch {
             // refresh manga on login
             try {
@@ -74,17 +77,17 @@ internal class MangaRepositoryImpl(
                             is AuthenticationEvent.LoggedIn -> {
                                 if (!isLoggedIn) {
                                     isLoggedIn = true
-                                    forceRefresh()
+                                    refreshMangaThrottled(Unit)
                                 }
                             }
                             is AuthenticationEvent.LoggedOut -> {
                                 isLoggedIn = false
                             }
                             is AppLifecycleEvent.AppForegrounded -> {
-                                forceRefresh()
+                                refreshMangaThrottled(Unit)
                             }
                             is UserEvent.RefreshManga -> {
-                                forceRefresh()
+                                refreshMangaThrottled(Unit)
                             }
                             is UserEvent.SetMarkChapterRead -> {
                                 markChapterRead(it.mangaId, it.chapterId, it.read)
@@ -102,10 +105,13 @@ internal class MangaRepositoryImpl(
                 e.printStackTrace()
             }
         }
+
+        refreshMangaThrottled(Unit)
     }
 
-    private fun forceRefresh() {
-        if (isLoggedIn) refreshMangaThrottled(Unit)
+    @Deprecated("Use UserEvent.RefreshManga event instead of using this directly")
+    override suspend fun forceRefresh() {
+        refreshMangaThrottled(Unit)
     }
 
     private fun generateUIManga(dbSeries: List<MangaEntity>, dbChapters: List<ChapterEntity>): List<UIManga> {

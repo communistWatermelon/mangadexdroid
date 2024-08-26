@@ -7,6 +7,8 @@ import com.melonhead.data_user.di.DataUserModule
 import com.melonhead.feature_manga_list.MangaRepository
 import com.melonhead.feature_manga_list.MangaRepositoryImpl
 import com.melonhead.feature_manga_list.navigation.MangaListScreenResolver
+import com.melonhead.feature_manga_list.usecases.RefreshMangaUseCase
+import com.melonhead.feature_manga_list.usecases.RefreshMangaUseCaseImpl
 import com.melonhead.feature_manga_list.viewmodels.MangaListViewModel
 import com.melonhead.lib_app_context.di.LibAppContextModule
 import com.melonhead.lib_app_events.di.LibAppEventsModule
@@ -28,7 +30,7 @@ val FeatureMangaListModule = module {
     includes(DataAtHomeModule)
     includes(DataMangaModule)
 
-    single<MangaRepository> {
+    single<MangaRepository>(createdAtStart = true) {
         MangaRepositoryImpl(
             get(),
             get(),
@@ -48,4 +50,5 @@ val FeatureMangaListModule = module {
     viewModel { MangaListViewModel(get(), get(), get(), get()) }
 
     single<MangaListScreenResolver>(createdAtStart = true) { MangaListScreenResolver() }
+    factory<RefreshMangaUseCase> { RefreshMangaUseCaseImpl(get()) }
 }

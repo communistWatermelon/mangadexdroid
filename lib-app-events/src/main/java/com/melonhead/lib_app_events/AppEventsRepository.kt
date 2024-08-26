@@ -2,6 +2,7 @@ package com.melonhead.lib_app_events
 
 import com.melonhead.lib_app_events.events.AppEvent
 import com.melonhead.lib_logging.Clog
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
