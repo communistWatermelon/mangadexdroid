@@ -12,7 +12,10 @@ class RefreshWorker(appContext: Context, workerParams: WorkerParameters): Corout
     private val appEventsRepository: AppEventsRepository by inject()
 
     override suspend fun doWork(): Result {
-        appEventsRepository.postEvent(UserEvent.RefreshManga)
-        return Result.success()
+        return if (appEventsRepository.postEvent(UserEvent.RefreshManga)) {
+            Result.success()
+        } else {
+            Result.failure()
+        }
     }
 }
