@@ -2,18 +2,18 @@ package com.melonhead.feature_manga_list
 
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
-import com.melonhead.lib_core.extensions.throttleLatest
-import com.melonhead.lib_app_data.AppData
 import com.melonhead.data_at_home.AtHomeService
-import com.melonhead.data_user.services.UserService
-import com.melonhead.lib_chapter_cache.ChapterCache
 import com.melonhead.data_manga.services.MangaService
 import com.melonhead.data_shared.models.ui.*
+import com.melonhead.data_user.services.UserService
 import com.melonhead.lib_app_context.AppContext
+import com.melonhead.lib_app_data.AppData
 import com.melonhead.lib_app_events.AppEventsRepository
 import com.melonhead.lib_app_events.events.AppLifecycleEvent
 import com.melonhead.lib_app_events.events.AuthenticationEvent
 import com.melonhead.lib_app_events.events.UserEvent
+import com.melonhead.lib_chapter_cache.ChapterCache
+import com.melonhead.lib_core.extensions.throttleLatest
 import com.melonhead.lib_database.chapter.ChapterDao
 import com.melonhead.lib_database.chapter.ChapterEntity
 import com.melonhead.lib_database.extensions.from
@@ -54,7 +54,7 @@ internal class MangaRepositoryImpl(
     private val refreshMangaThrottled: (Unit) -> Unit = throttleLatest(300L, externalScope, ::refreshManga)
 
     // combine all manga series and chapters
-    override val manga = combine(mangaDb.allSeries(), chapterDb.allChapters(), readMarkerDb.allMarkers()) { dbSeries, dbChapters, _ ->
+    override val manga = combine(mangaDb.allSeries(), chapterDb.allChapters(), readMarkerDb.allMarkers(), chapterCache.cachingStatus) { dbSeries, dbChapters, _, cacheStatus ->
         generateUIManga(dbSeries, dbChapters)
     }.shareIn(externalScope, replay = 1, started = SharingStarted.WhileSubscribed())
 
