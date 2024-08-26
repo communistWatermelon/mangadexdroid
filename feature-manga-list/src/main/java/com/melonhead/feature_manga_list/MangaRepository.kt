@@ -257,6 +257,7 @@ internal class MangaRepositoryImpl(
         val chapterFiles = chapterCache.getChapterFromCache(mangaId, chapterId)
         if (chapterFiles.isNotEmpty()) return chapterFiles
 
+        Clog.i("Chapter not found in cache: $mangaId, $chapterId")
         Clog.e("Chapter not found in cache", RuntimeException("Chapter not found in cache"))
         val chapterData = atHomeService.getChapterData(chapterId)
         return if (appData.useDataSaver) {
