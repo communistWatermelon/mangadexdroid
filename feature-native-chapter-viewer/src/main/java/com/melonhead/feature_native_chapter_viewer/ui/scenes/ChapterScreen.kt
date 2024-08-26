@@ -44,10 +44,6 @@ internal fun ChapterScreen(
         val (width, height) = getWidthHeight()
 
         fun preloadImage(url: String, currentPageIndex: Int) {
-            if (!(url.contains("http") || url.contains("https"))) {
-                // don't preload images stored on disk
-                return
-            }
             val request = url.preloadImageRequest(currentPageIndex, context, width, height)
             context.imageLoader.enqueue(request)
         }
