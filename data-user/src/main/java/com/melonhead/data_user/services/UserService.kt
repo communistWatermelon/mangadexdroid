@@ -8,6 +8,7 @@ import com.melonhead.lib_logging.Clog
 import com.melonhead.lib_networking.extensions.catching
 import com.melonhead.lib_networking.models.handlePagination
 import io.ktor.client.HttpClient
+import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -31,6 +32,7 @@ internal class UserServiceImpl(
                 client.get(HttpRoutes.USER_FOLLOW_CHAPTERS_URL) {
                     headers {
                         contentType(ContentType.Application.Json)
+                        accept(ContentType.Application.Json)
                         bearerAuth(session)
                     }
                     url {
