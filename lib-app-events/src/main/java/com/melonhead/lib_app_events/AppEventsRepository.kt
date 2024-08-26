@@ -8,17 +8,20 @@ import kotlinx.coroutines.flow.asSharedFlow
 
 interface AppEventsRepository {
     val events: Flow<AppEvent>
-    fun postEvent(appEvent: AppEvent)
+    fun postEvent(appEvent: AppEvent): Boolean
 }
 
 internal class AppEventsRepositoryImpl: AppEventsRepository {
     private val mutableEvents = MutableSharedFlow<AppEvent>(3)
     override val events: Flow<AppEvent> = mutableEvents.asSharedFlow()
 
-    override fun postEvent(appEvent: AppEvent) {
+    override fun postEvent(appEvent: AppEvent): Boolean {
         val result = mutableEvents.tryEmit(appEvent)
-        if (!result) {
+        if (result) {
+            Clog.d("Posted event: $appEvent")
+        } else {
             Clog.w("Failed to post event: $appEvent")
         }
+        return result
     }
 }
