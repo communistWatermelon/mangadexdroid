@@ -8,6 +8,6 @@ import org.koin.dsl.module
 val LibChapterCacheModule = module {
     includes(LibDbModule)
     single<ChapterCache> {
-        ChapterCacheImpl(get(), get(), get(), get())
+        ChapterCacheImpl(get(), get(), get(), get(), get())
     }
 }

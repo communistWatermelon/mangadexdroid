@@ -30,7 +30,7 @@ val LibNetworkingModule = module {
                 level = LogLevel.BODY
                 logger = object: Logger {
                     override fun log(message: String) {
-                        Clog.i(message)
+                        Clog.d(message)
                     }
                 }
             }
