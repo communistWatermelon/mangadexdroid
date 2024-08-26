@@ -3,8 +3,14 @@ package com.melonhead.lib_networking.extensions
 import com.melonhead.lib_logging.Clog
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.prepareGet
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.contentLength
+import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.core.isEmpty
+import io.ktor.utils.io.core.readBytes
+import java.io.File
 import kotlin.random.Random
 
 // this is bad, but we need to refactor out an event system to avoid it
@@ -49,5 +55,19 @@ suspend inline fun HttpClient.catchingSuccess(logMessage: String, function: Http
             Clog.e("$logMessage: ${response?.bodyAsText() ?: ""}", e)
         }
         false
+    }
+}
+
+suspend fun HttpClient.downloadFile(outputFile: File, url: String): Boolean {
+    return prepareGet(url).execute { httpResponse ->
+        val channel: ByteReadChannel = httpResponse.body()
+        while (!channel.isClosedForRead) {
+            val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
+            while (!packet.isEmpty) {
+                val bytes = packet.readBytes()
+                outputFile.appendBytes(bytes)
+            }
+        }
+        return@execute httpResponse.contentLength() == outputFile.length()
     }
 }
