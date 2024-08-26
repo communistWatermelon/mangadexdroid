@@ -23,6 +23,7 @@ suspend inline fun <reified T> HttpClient.catching(logMessage: String, function:
             if (Random.nextInt(100) < 20) {
                 error401Callback?.invoke()
             }
+            Clog.w("$logMessage: ${response.bodyAsText()}")
         } else {
             Clog.e("$logMessage: ${response?.bodyAsText() ?: ""}", e)
         }
