@@ -15,10 +15,16 @@ suspend inline fun <reified T> handlePagination(
 ): List<T> {
     var total = expectedCount
     val allItems = mutableSetOf<T>()
+    var unauthRetryCount = 0
     while (allItems.count() < total) {
         val result = request(allItems.count()) ?: continue
         if (result.status == HttpStatusCode.Unauthorized) {
             Clog.i("handlePagination: Unauthorized")
+            unauthRetryCount++
+            if (unauthRetryCount >= 3) {
+                Clog.i("handlePagination: Unauthorized retries exceeded maximum retries")
+                break
+            }
             continue
         }
         val items = try {
