@@ -88,12 +88,11 @@ internal class ChapterCacheImpl(
             val jobsList = mutableListOf<Deferred<Boolean>>()
             withContext(Dispatchers.IO) {
                 for ((i, page) in chapterData.withIndex()) {
+                    Clog.i("Downloading page $i for ${mangaForChapter.chosenTitle} chapter $chapterTitle - $page")
+                    val fileExtension = page.substringAfterLast(".")
+                    val pageFile = File(chapterDirectory, "$i.$fileExtension")
+                    pageFile.createNewFile()
                     val downloadJob = async {
-                        Clog.i("Downloading page $i for ${mangaForChapter.chosenTitle} chapter $chapterTitle - $page")
-                        val fileExtension = page.substringAfterLast(".")
-                        val pageFile = File(chapterDirectory, "$i.$fileExtension")
-                        pageFile.createNewFile()
-
                         try {
                             val result = httpClient.downloadFile(pageFile, page)
                             if (!result) {
