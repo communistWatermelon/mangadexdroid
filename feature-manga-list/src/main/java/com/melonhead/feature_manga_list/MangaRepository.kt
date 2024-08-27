@@ -28,8 +28,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import java.util.concurrent.CompletableFuture
 
 internal interface MangaRepository {
@@ -51,9 +49,8 @@ internal class MangaRepositoryImpl(
     private val appEventsRepository: AppEventsRepository,
     private val newChapterNotificationChannel: NewChapterNotificationChannel,
     private val appContext: AppContext,
-): MangaRepository, KoinComponent {
-    private val mangaService: MangaService by inject()
-
+    private val mangaService: MangaService,
+): MangaRepository {
     private val refreshMangaThrottled: (AppEvent) -> Unit = throttleLatest(300L, externalScope) { event ->
         refreshManga((event as? UserEvent.RefreshManga)?.completionJob)
     }
@@ -147,8 +144,8 @@ internal class MangaRepositoryImpl(
         if (uiManga.isEmpty()) return emptyList()
 
         // split into two categories, unread and read
-        val hasUnread = uiManga.filter { it.chapters.any { it.read != true } }.sortedByDescending { it.chapters.first().createdDate }
-        val allRead = uiManga.filter { it.chapters.all { it.read == true } }.sortedByDescending { it.chapters.first().createdDate }
+        val hasUnread = uiManga.filter { it.chapters.any { !it.read } }.sortedByDescending { it.chapters.first().createdDate }
+        val allRead = uiManga.filter { it.chapters.all { it.read } }.sortedByDescending { it.chapters.first().createdDate }
 
         return hasUnread + allRead
     }
