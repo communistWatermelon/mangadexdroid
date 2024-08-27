@@ -54,11 +54,9 @@ internal class ChapterCacheImpl(
 
     override suspend fun cacheImagesForChapters(manga: List<MangaEntity>, chapters: List<ChapterEntity>) {
         mutableCachingStatus.value = CachingStatus.StartedCaching
-        Clog.i("Caching images for ${chapters.count()} chapters")
         for (chapter in chapters) {
             val mangaForChapter = manga.find { it.id == chapter.mangaId } ?: continue
             if (mangaForChapter.useWebview) continue
-            Clog.i("Caching images for manga ${mangaForChapter.chosenTitle} chapter ${chapter.chapterTitle}")
             val cacheDirectory = appContext.cacheDir
             val mangaDirectory = File(cacheDirectory, mangaForChapter.id)
 
@@ -74,6 +72,8 @@ internal class ChapterCacheImpl(
             if (chapterDirectory.listFiles(FileFilter { it.extension == "pages" })?.isNotEmpty() == true) continue
             val chapterData = getChapterData(chapter.id)
             if (chapterData.isNullOrEmpty()) continue
+
+            Clog.i("Caching images for manga ${mangaForChapter.chosenTitle} chapter ${chapter.chapterTitle}")
 
             val oldFiles = chapterDirectory.listFiles() ?: arrayOf()
             if (oldFiles.none { it.extension == "pages" } && oldFiles.count() != chapterData.count()) {
