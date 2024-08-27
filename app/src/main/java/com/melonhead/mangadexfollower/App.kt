@@ -53,15 +53,14 @@ class App: Application() {
                 super.onStart(owner)
                 appContext.isInForeground = true
                 appEventsRepository.postEvent(AppLifecycleEvent.AppForegrounded)
+                Clog.i("Creating background task")
+                val refreshWorkRequest = PeriodicWorkRequestBuilder<RefreshWorker>(15.minutes.toJavaDuration()).build()
+                WorkManager.getInstance(this@App).enqueueUniquePeriodicWork("refresh-task", ExistingPeriodicWorkPolicy.KEEP, refreshWorkRequest)
             }
 
             override fun onStop(owner: LifecycleOwner) {
                 super.onStop(owner)
                 appContext.isInForeground = false
-                appEventsRepository.postEvent(AppLifecycleEvent.AppBackgrounded)
-                Clog.i("onStop: Creating background task")
-                val refreshWorkRequest = PeriodicWorkRequestBuilder<RefreshWorker>(15.minutes.toJavaDuration()).build()
-                WorkManager.getInstance(this@App).enqueueUniquePeriodicWork("refresh-task", ExistingPeriodicWorkPolicy.KEEP, refreshWorkRequest)
             }
         })
     }
