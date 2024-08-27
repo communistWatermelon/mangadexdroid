@@ -89,6 +89,6 @@ internal class AuthRepositoryImpl(
         val token = loginService.authenticate(email, password)
         appData.updateToken(session = token?.session, refresh = token?.refresh)
         appEventsRepository.postEvent(AuthenticationEvent.LoggedIn)
-        appEventsRepository.postEvent(UserEvent.RefreshManga)
+        appEventsRepository.postEvent(UserEvent.RefreshManga())
     }
 }

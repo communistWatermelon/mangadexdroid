@@ -9,6 +9,7 @@ import com.melonhead.data_user.services.UserService
 import com.melonhead.lib_app_context.AppContext
 import com.melonhead.lib_app_data.AppData
 import com.melonhead.lib_app_events.AppEventsRepository
+import com.melonhead.lib_app_events.events.AppEvent
 import com.melonhead.lib_app_events.events.AppLifecycleEvent
 import com.melonhead.lib_app_events.events.AuthenticationEvent
 import com.melonhead.lib_app_events.events.UserEvent
@@ -25,16 +26,16 @@ import com.melonhead.lib_logging.Clog
 import com.melonhead.lib_notifications.NewChapterNotificationChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.concurrent.CompletableFuture
 
 internal interface MangaRepository {
     val manga: Flow<List<UIManga>>
     val refreshStatus: Flow<MangaRefreshStatus>
     suspend fun getChapterData(mangaId: String,chapterId: String): List<String>?
-    @Deprecated("Use UserEvent.RefreshManga event instead of using this directly")
-    suspend fun forceRefresh()
 }
 
 internal class MangaRepositoryImpl(
@@ -53,7 +54,9 @@ internal class MangaRepositoryImpl(
 ): MangaRepository, KoinComponent {
     private val mangaService: MangaService by inject()
 
-    private val refreshMangaThrottled: (Unit) -> Unit = throttleLatest(300L, externalScope, ::refreshManga)
+    private val refreshMangaThrottled: (AppEvent) -> Unit = throttleLatest(300L, externalScope) { event ->
+        refreshManga((event as? UserEvent.RefreshManga)?.completionJob)
+    }
 
     // combine all manga series and chapters
     override val manga = combine(mangaDb.allSeries(), chapterDb.allChapters(), readMarkerDb.allMarkers(), chapterCache.cachingStatus) { dbSeries, dbChapters, _, cacheStatus ->
@@ -71,32 +74,32 @@ internal class MangaRepositoryImpl(
             // refresh manga on login
             try {
                 // TODO: it's easy to miss necessary events with this pattern, it would be better to include a way to pass in the list of expected events
-                appEventsRepository.events.collectLatest {
+                appEventsRepository.events.collectLatest { event ->
                     launch {
-                        when (it) {
+                        when (event) {
                             is AuthenticationEvent.LoggedIn -> {
                                 if (!isLoggedIn) {
                                     isLoggedIn = true
-                                    refreshMangaThrottled(Unit)
+                                    refreshMangaThrottled(event)
                                 }
                             }
                             is AuthenticationEvent.LoggedOut -> {
                                 isLoggedIn = false
                             }
                             is AppLifecycleEvent.AppForegrounded -> {
-                                refreshMangaThrottled(Unit)
+                                refreshMangaThrottled(event)
                             }
                             is UserEvent.RefreshManga -> {
-                                refreshMangaThrottled(Unit)
+                                refreshMangaThrottled(event)
                             }
                             is UserEvent.SetMarkChapterRead -> {
-                                markChapterRead(it.mangaId, it.chapterId, it.read)
+                                markChapterRead(event.mangaId, event.chapterId, event.read)
                             }
                             is UserEvent.SetUseWebView -> {
-                                setUseWebview(it.mangaId, it.useWebView)
+                                setUseWebview(event.mangaId, event.useWebView)
                             }
                             is UserEvent.UpdateChosenMangaTitle -> {
-                                updateChosenTitle(it.mangaId, it.title)
+                                updateChosenTitle(event.mangaId, event.title)
                             }
                         }
                     }
@@ -106,12 +109,7 @@ internal class MangaRepositoryImpl(
             }
         }
 
-        refreshMangaThrottled(Unit)
-    }
-
-    @Deprecated("Use UserEvent.RefreshManga event instead of using this directly")
-    override suspend fun forceRefresh() {
-        refreshMangaThrottled(Unit)
+        refreshMangaThrottled(AppLifecycleEvent.AppForegrounded)
     }
 
     private fun generateUIManga(dbSeries: List<MangaEntity>, dbChapters: List<ChapterEntity>): List<UIManga> {
@@ -156,7 +154,7 @@ internal class MangaRepositoryImpl(
     }
 
     // note: unit needs to be included as a param for the throttleLatest call above
-    private fun refreshManga(@Suppress("UNUSED_PARAMETER") unit: Unit) = externalScope.launch {
+    private fun refreshManga(refreshCompletable: (CompletableFuture<Unit>)?) = externalScope.launch {
         // wait for refresh token to complete
         val refreshCompletionJob = CompletableFuture<Unit>()
         appEventsRepository.postEvent(AuthenticationEvent.RefreshToken(completionJob = refreshCompletionJob))
@@ -207,6 +205,9 @@ internal class MangaRepositoryImpl(
 
         mutableRefreshStatus.value = None
         appData.updateLastRefreshDate()
+
+        // mark refresh as completed
+        refreshCompletable?.complete(Unit)
     }
 
     private suspend fun handleUnreadChapters() {

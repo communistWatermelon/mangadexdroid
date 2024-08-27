@@ -120,7 +120,7 @@ internal class MangaListViewModel(
     }
 
     fun refreshContent() = viewModelScope.launch {
-        appEventsRepository.postEvent(UserEvent.RefreshManga)
+        appEventsRepository.postEvent(UserEvent.RefreshManga())
         delay(5000) // prevent another refresh for 5 second
     }
 

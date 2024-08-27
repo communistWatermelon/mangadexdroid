@@ -1,16 +1,14 @@
 package com.melonhead.feature_manga_list.di
 
-import com.melonhead.lib_app_data.di.LibAppDataModule
 import com.melonhead.data_at_home.di.DataAtHomeModule
 import com.melonhead.data_manga.di.DataMangaModule
 import com.melonhead.data_user.di.DataUserModule
 import com.melonhead.feature_manga_list.MangaRepository
 import com.melonhead.feature_manga_list.MangaRepositoryImpl
 import com.melonhead.feature_manga_list.navigation.MangaListScreenResolver
-import com.melonhead.feature_manga_list.usecases.RefreshMangaUseCase
-import com.melonhead.feature_manga_list.usecases.RefreshMangaUseCaseImpl
 import com.melonhead.feature_manga_list.viewmodels.MangaListViewModel
 import com.melonhead.lib_app_context.di.LibAppContextModule
+import com.melonhead.lib_app_data.di.LibAppDataModule
 import com.melonhead.lib_app_events.di.LibAppEventsModule
 import com.melonhead.lib_chapter_cache.di.LibChapterCacheModule
 import com.melonhead.lib_database.di.LibDbModule
@@ -50,5 +48,4 @@ val FeatureMangaListModule = module {
     viewModel { MangaListViewModel(get(), get(), get(), get()) }
 
     single<MangaListScreenResolver>(createdAtStart = true) { MangaListScreenResolver() }
-    factory<RefreshMangaUseCase> { RefreshMangaUseCaseImpl(get()) }
 }
