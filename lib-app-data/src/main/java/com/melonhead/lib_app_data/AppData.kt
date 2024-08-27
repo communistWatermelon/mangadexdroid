@@ -56,11 +56,6 @@ internal class AppDataImpl(
 
     private var hasFetchedDbUser = false
 
-    private val authTokenFlow: Flow<String> = appContext.dataStore.data.map { preferences ->
-        // No type safety.
-        preferences[AUTH_TOKEN] ?: ""
-    }.distinctUntilChanged()
-
     private val tokenMutex = Mutex()
 
     init {
@@ -84,6 +79,11 @@ internal class AppDataImpl(
             }
         }
     }
+
+    private val authTokenFlow: Flow<String> = appContext.dataStore.data.map { preferences ->
+        // No type safety.
+        preferences[AUTH_TOKEN] ?: ""
+    }.distinctUntilChanged()
 
     private val refreshTokenFlow: Flow<String> = appContext.dataStore.data.map { preferences ->
         // No type safety.

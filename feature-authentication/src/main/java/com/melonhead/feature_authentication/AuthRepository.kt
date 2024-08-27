@@ -40,7 +40,10 @@ internal class AuthRepositoryImpl(
         externalScope.launch(context = Dispatchers.IO) {
             appEventsRepository.events.collectLatest {
                 launch {
-                    if (it is AuthenticationEvent.RefreshToken) refreshToken(logoutOnFail = it.logoutOnFail)
+                    if (it is AuthenticationEvent.RefreshToken) {
+                        refreshToken(logoutOnFail = it.logoutOnFail)
+                        it.completionJob?.complete(Unit)
+                    }
                 }
             }
         }

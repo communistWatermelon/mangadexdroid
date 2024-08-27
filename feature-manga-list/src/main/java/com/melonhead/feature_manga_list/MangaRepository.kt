@@ -157,8 +157,11 @@ internal class MangaRepositoryImpl(
 
     // note: unit needs to be included as a param for the throttleLatest call above
     private fun refreshManga(@Suppress("UNUSED_PARAMETER") unit: Unit) = externalScope.launch {
-        // refresh auth
-        appEventsRepository.postEvent(AuthenticationEvent.RefreshToken())
+        // wait for refresh token to complete
+        val refreshCompletionJob = CompletableFuture<Unit>()
+        appEventsRepository.postEvent(AuthenticationEvent.RefreshToken(completionJob = refreshCompletionJob))
+        refreshCompletionJob.await()
+
         val token = appData.getToken()
         if (token == null) {
             Clog.i("Failed to refresh token")
