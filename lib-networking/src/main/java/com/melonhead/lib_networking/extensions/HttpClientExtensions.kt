@@ -68,6 +68,12 @@ suspend fun HttpClient.downloadFile(outputFile: File, url: String): Boolean {
                 outputFile.appendBytes(bytes)
             }
         }
-        return@execute httpResponse.contentLength() == outputFile.length()
+        val sourceLength = httpResponse.contentLength()
+        val fileLength = outputFile.length()
+        if (sourceLength != fileLength) {
+            Clog.w("Downloaded file size and source file size don't match. Source = $sourceLength, file = $fileLength")
+            return@execute false
+        }
+        return@execute true
     }
 }

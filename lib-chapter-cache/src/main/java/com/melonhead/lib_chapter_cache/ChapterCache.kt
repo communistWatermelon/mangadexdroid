@@ -95,13 +95,14 @@ internal class ChapterCacheImpl(
                     val downloadJob = async {
                         try {
                             val result = httpClient.downloadFile(pageFile, page)
-                            if (!result) {
+                            if (result) {
+                                Clog.i("Finished downloading page $i for ${mangaForChapter.chosenTitle} chapter $chapterTitle - $page")
+                                true
+                            } else {
                                 pageFile.delete()
-                                Clog.w("Error downloading page $i for ${mangaForChapter.chosenTitle} chapter ${chapter.chapterTitle} - $page")
-                                return@async false
+                                Clog.w("Failed to download page $i for ${mangaForChapter.chosenTitle} chapter ${chapter.chapterTitle} - $page")
+                                false
                             }
-                            Clog.i("Finished downloading page $i for ${mangaForChapter.chosenTitle} chapter $chapterTitle - $page")
-                            true
                         } catch (e: Exception) {
                             Clog.w("Error downloading page $i for ${mangaForChapter.chosenTitle} chapter ${chapter.chapterTitle} - $page")
                             Clog.e("Error downloading page", e)
