@@ -54,10 +54,10 @@ internal class ChapterCacheImpl(
 
     override suspend fun cacheImagesForChapters(manga: List<MangaEntity>, chapters: List<ChapterEntity>) {
         mutableCachingStatus.value = CachingStatus.StartedCaching
+        val cacheDirectory = appContext.cacheDir
         for (chapter in chapters) {
             val mangaForChapter = manga.find { it.id == chapter.mangaId } ?: continue
             if (mangaForChapter.useWebview) continue
-            val cacheDirectory = appContext.cacheDir
             val mangaDirectory = File(cacheDirectory, mangaForChapter.id)
 
             if (!mangaDirectory.exists()) {
@@ -91,7 +91,11 @@ internal class ChapterCacheImpl(
                     Clog.i("Downloading page $i for ${mangaForChapter.chosenTitle} chapter $chapterTitle - $page")
                     val fileExtension = page.substringAfterLast(".")
                     val pageFile = File(chapterDirectory, "$i.$fileExtension")
-                    pageFile.createNewFile()
+                    if (pageFile.exists()) {
+                        pageFile.delete()
+                    } else {
+                        pageFile.createNewFile()
+                    }
                     val downloadJob = async {
                         try {
                             val result = httpClient.downloadFile(pageFile, page)
@@ -104,6 +108,7 @@ internal class ChapterCacheImpl(
                                 false
                             }
                         } catch (e: Exception) {
+                            pageFile.delete()
                             Clog.w("Error downloading page $i for ${mangaForChapter.chosenTitle} chapter ${chapter.chapterTitle} - $page")
                             Clog.e("Error downloading page", e)
                             false
@@ -112,7 +117,8 @@ internal class ChapterCacheImpl(
                     jobsList.add(downloadJob)
                 }
             }
-            if (jobsList.awaitAll().any { false }) {
+            if (jobsList.awaitAll().any { false } || jobsList.size != chapterData.count()) {
+                chapterDirectory.deleteRecursively()
                 Clog.w("Failed to download images to cache for ${mangaForChapter.chosenTitle} chapter ${chapter.chapterTitle}")
                 continue
             }
