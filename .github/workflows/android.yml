@@ -24,8 +24,10 @@ jobs:
         versionCode: ${{github.run_number}}
     - name: Build Release APK
       run: ./gradlew assembleDebug
-    - name: Releasing using Hub
-      uses: sangatdesai/release-apk@main
-      env:
-       GITHUB_TOKEN: ${{ secrets.TOKEN }}
-       APP_FOLDER: app
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        generate_release_notes: true
+        token: ${{ secrets.TOKEN }}
+          
