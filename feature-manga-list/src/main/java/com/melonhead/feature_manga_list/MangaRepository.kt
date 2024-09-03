@@ -308,8 +308,8 @@ internal class MangaRepositoryImpl(
                 -> {
                     if (read && manga?.lastChapter == chapter.chapter && appData.autoMarkMangaCompleted.firstOrNull() == true) {
                         mangaService.changeSeriesReadingStatus(mangaId, ReadingStatus.Completed)
+                        appEventsRepository.postEvent(SystemLogicEvents.PromptMangaRating(mangaId))
                     }
-                    appEventsRepository.postEvent(SystemLogicEvents.PromptMangaRating(mangaId))
                 }
 
                 ReadingStatus.OnHold -> {
