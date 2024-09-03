@@ -27,6 +27,7 @@ interface AppData {
     val lastRefreshDateSeconds: Flow<Long?>
     val userIdFlow: Flow<String?>
     val autoMarkMangaCompleted: Flow<Boolean>
+    val autoMarkMangaReading: Flow<Boolean>
 
     val renderStyle: RenderStyle
     val useDataSaver: Boolean
@@ -39,6 +40,7 @@ interface AppData {
     suspend fun updateUserId(id: String)
     suspend fun updateRenderStyle(renderStyle: RenderStyle)
     suspend fun updateAutoMarkMangaCompleted(autoMarkMangaCompleted: Boolean)
+    suspend fun updateAutoMarkMangaReading(autoMarkMangaReading: Boolean)
     suspend fun setUseDataSaver(useDataSaver: Boolean)
     suspend fun setShowReadChapterCount(readChapterCount: Int)
     suspend fun getToken(): Pair<String, String>?
@@ -112,6 +114,10 @@ internal class AppDataImpl(
         it?.autoMarkMangaCompleted ?: true
     }.distinctUntilChanged()
 
+    override val autoMarkMangaReading: Flow<Boolean> = currentFirebaseDBUser.map {
+        it?.autoMarkMangaReading ?: true
+    }.distinctUntilChanged()
+
     override var token: Flow<Pair<String, String>?> = authTokenFlow.combine(refreshTokenFlow) { auth, refresh ->
         if (auth.isBlank() || refresh.isBlank()) return@combine null
         auth to refresh
@@ -166,6 +172,12 @@ internal class AppDataImpl(
     override suspend fun updateAutoMarkMangaCompleted(autoMarkMangaCompleted: Boolean) {
         val userDb = userDb() ?: return
         val new = currentDbUser().copy(autoMarkMangaCompleted = autoMarkMangaCompleted)
+        userDb.setValue(new)
+    }
+
+    override suspend fun updateAutoMarkMangaReading(autoMarkMangaReading: Boolean) {
+        val userDb = userDb() ?: return
+        val new = currentDbUser().copy(autoMarkMangaReading = autoMarkMangaReading)
         userDb.setValue(new)
     }
 

@@ -3,6 +3,7 @@ package com.melonhead.feature_manga_list
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import com.melonhead.data_at_home.AtHomeService
+import com.melonhead.data_manga.models.ReadingStatus
 import com.melonhead.data_manga.services.MangaService
 import com.melonhead.data_shared.models.ui.*
 import com.melonhead.data_user.services.UserService
@@ -277,6 +278,7 @@ internal class MangaRepositoryImpl(
 
     private fun markChapterRead(mangaId: String, chapterId: String, read: Boolean) {
         externalScope.launch {
+            val manga = mangaDb.getMangaById(mangaId)
             val chapter = chapterDb.getChapterForId(chapterId)
             val entity = readMarkerDb.getEntityByChapter(
                 mangaId = mangaId,
@@ -292,6 +294,29 @@ internal class MangaRepositoryImpl(
                 chapterId = chapterId,
                 readStatus = read
             )
+
+            val readingStatus = mangaService.getSeriesReadingStatus(mangaId) ?: return@launch
+            when (readingStatus) {
+                ReadingStatus.ReReading,
+                ReadingStatus.Reading -> {
+                    if (read && manga?.lastChapter == chapter.chapter && appData.autoMarkMangaCompleted.firstOrNull() == true) {
+                        mangaService.changeSeriesReadingStatus(mangaId, ReadingStatus.Completed)
+                    }
+                }
+
+                ReadingStatus.OnHold -> {
+                    if (read && appData.autoMarkMangaReading.firstOrNull() == true) {
+                        mangaService.changeSeriesReadingStatus(mangaId, ReadingStatus.Reading)
+                    }
+                }
+
+                ReadingStatus.Completed,
+                ReadingStatus.PlanToRead,
+                ReadingStatus.Dropped,
+                -> {
+                    // no-op
+                }
+            }
         }
     }
 

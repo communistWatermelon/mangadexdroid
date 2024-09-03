@@ -7,5 +7,6 @@ data class FirebaseDbUser(
     val installDateSeconds: Long? = null,
     val lastRefreshDateSeconds: Long? = null,
     val autoMarkMangaCompleted: Boolean? = null,
+    val autoMarkMangaReading: Boolean? = null,
     // TODO: add useful settings for user here
 )
