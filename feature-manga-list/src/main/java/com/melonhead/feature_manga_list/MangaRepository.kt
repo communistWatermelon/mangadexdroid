@@ -10,10 +10,7 @@ import com.melonhead.data_user.services.UserService
 import com.melonhead.lib_app_context.AppContext
 import com.melonhead.lib_app_data.AppData
 import com.melonhead.lib_app_events.AppEventsRepository
-import com.melonhead.lib_app_events.events.AppEvent
-import com.melonhead.lib_app_events.events.AppLifecycleEvent
-import com.melonhead.lib_app_events.events.AuthenticationEvent
-import com.melonhead.lib_app_events.events.UserEvent
+import com.melonhead.lib_app_events.events.*
 import com.melonhead.lib_chapter_cache.ChapterCache
 import com.melonhead.lib_core.extensions.throttleLatest
 import com.melonhead.lib_database.chapter.ChapterDao
@@ -298,10 +295,12 @@ internal class MangaRepositoryImpl(
             val readingStatus = mangaService.getSeriesReadingStatus(mangaId) ?: return@launch
             when (readingStatus) {
                 ReadingStatus.ReReading,
-                ReadingStatus.Reading -> {
+                ReadingStatus.Reading,
+                -> {
                     if (read && manga?.lastChapter == chapter.chapter && appData.autoMarkMangaCompleted.firstOrNull() == true) {
                         mangaService.changeSeriesReadingStatus(mangaId, ReadingStatus.Completed)
                     }
+                    appEventsRepository.postEvent(SystemLogicEvents.PromptMangaRating(mangaId))
                 }
 
                 ReadingStatus.OnHold -> {
@@ -312,8 +311,7 @@ internal class MangaRepositoryImpl(
 
                 ReadingStatus.Completed,
                 ReadingStatus.PlanToRead,
-                ReadingStatus.Dropped,
-                -> {
+                ReadingStatus.Dropped -> {
                     // no-op
                 }
             }
