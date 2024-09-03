@@ -47,7 +47,7 @@ internal fun MangaRatingDialog(
             },
             text = {
                 Column {
-                    for (i in 1..10) {
+                    for (i in (1..10).reversed()) {
                         Row(
                             Modifier
                                 .fillMaxWidth()
