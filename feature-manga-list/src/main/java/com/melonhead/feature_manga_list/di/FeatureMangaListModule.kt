@@ -46,7 +46,7 @@ val FeatureMangaListModule = module {
         )
     }
 
-    viewModel { MangaListViewModel(get(), get(), get(), get()) }
+    viewModel { MangaListViewModel(get(), get(), get(), get(), get()) }
 
     single<MangaListScreenResolver>(createdAtStart = true) { MangaListScreenResolver() }
 }

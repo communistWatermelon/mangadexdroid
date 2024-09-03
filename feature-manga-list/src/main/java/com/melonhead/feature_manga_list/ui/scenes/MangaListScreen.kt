@@ -24,11 +24,9 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.melonhead.data_shared.models.ui.None
 import com.melonhead.data_shared.models.ui.UIChapter
 import com.melonhead.data_shared.models.ui.UIManga
-import com.melonhead.lib_core.scenes.LoadingScreen
+import com.melonhead.feature_manga_list.ui.scenes.dialogs.MangaOptionsDialog
 import com.melonhead.feature_manga_list.ui.scenes.dialogs.MarkChapterReadDialog
-import com.melonhead.feature_manga_list.ui.scenes.dialogs.ShowMangaDescriptionDialog
-import com.melonhead.feature_manga_list.ui.scenes.dialogs.TitleChangeDialog
-import com.melonhead.feature_manga_list.ui.scenes.dialogs.ToggleRenderTypeDialog
+import com.melonhead.lib_core.scenes.LoadingScreen
 import com.melonhead.feature_manga_list.viewmodels.MangaListViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -45,25 +43,15 @@ internal fun MangaListScreen(
         onDismissed = { chapterReadStatusDialog = null }
     )
 
-    var mangaWebviewToggleDialog by remember { mutableStateOf<UIManga?>(null) }
-    ToggleRenderTypeDialog(
-        mangaWebviewToggleDialog,
-        onRenderTypeToggled = { uiManga -> viewModel.toggleMangaWebview(uiManga) },
-        onDismissed = { mangaWebviewToggleDialog = null }
-    )
-
-    var showTitleChangeDialogForManga by remember { mutableStateOf<UIManga?>(null) }
-    TitleChangeDialog(
-        showTitleChangeDialogForManga,
-        onChangeMangaTitle = { uiManga, title -> viewModel.setMangaTitle(uiManga, title) },
-        onDismissed = { showTitleChangeDialogForManga = null }
-    )
-
-    var showDescriptionDialogForManga by remember { mutableStateOf<UIManga?>(null) }
-    ShowMangaDescriptionDialog(
-        showDescriptionDialogForManga,
-        onDismissed = { showDescriptionDialogForManga = null }
-    )
+    var showMangaModal by remember { mutableStateOf<UIManga?>(null) }
+    MangaOptionsDialog(
+        manga = showMangaModal,
+        onChangeTitle = { manga, title -> viewModel.setMangaTitle(manga, title) },
+        onToggleRendering = { manga, renderingValue -> viewModel.toggleMangaWebview(manga, renderingValue) },
+        onClearCache = { manga -> viewModel.clearCache(manga) }
+    ) {
+        showMangaModal = null
+    }
 
     val isRefreshing = rememberSwipeRefreshState(isRefreshing = false)
     var justPulledRefresh by remember { mutableStateOf(false) }
@@ -168,23 +156,19 @@ internal fun MangaListScreen(
                             it is Pair<*, *> && it.first is UIChapter -> (it.first as UIChapter).id
                             else -> it.hashCode()
                         }
-                    }) {
-                        if (it is UIManga) {
+                    }) { item ->
+                        if (item is UIManga) {
                             MangaCoverListItem(
-                                modifier = Modifier.padding(top = if (itemState.first() == it) 0.dp else 12.dp),
-                                uiManga = it,
-                                onLongPress = { mangaWebviewToggleDialog = it },
-                                onTapped = { showDescriptionDialogForManga = it },
-                                onTitleLongPress = {
-                                    showTitleChangeDialogForManga = it
-                                }
+                                modifier = Modifier.padding(top = if (itemState.first() == item) 0.dp else 12.dp),
+                                uiManga = item,
+                                onTapped = { manga -> showMangaModal = manga }
                             )
                         }
-                        if (it is Pair<*, *> && it.first is UIChapter) {
+                        if (item is Pair<*, *> && item.first is UIChapter) {
                             ChapterListItem(
                                 modifier = Modifier.padding(bottom = 12.dp),
-                                uiChapter = it.first as UIChapter,
-                                uiManga = it.second as UIManga,
+                                uiChapter = item.first as UIChapter,
+                                uiManga = item.second as UIManga,
                                 refreshStatus = refreshStatus,
                                 onChapterClicked = { uiManga, uiChapter ->
                                     viewModel.onChapterClicked(context, uiManga, uiChapter)

@@ -17,6 +17,7 @@ import com.melonhead.lib_app_data.models.RenderStyle
 import com.melonhead.feature_manga_list.MangaRepository
 import com.melonhead.lib_app_events.AppEventsRepository
 import com.melonhead.lib_app_events.events.UserEvent
+import com.melonhead.lib_chapter_cache.ChapterCache
 import com.melonhead.lib_navigation.Navigator
 import com.melonhead.lib_navigation.keys.ActivityKey
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +30,7 @@ import kotlinx.datetime.Instant
 
 internal class MangaListViewModel(
     private val mangaRepository: MangaRepository,
+    private val chapterCache: ChapterCache,
     private val userAppData: AppData,
     private val navigator: Navigator,
     private val appEventsRepository: AppEventsRepository,
@@ -124,11 +126,15 @@ internal class MangaListViewModel(
         delay(5000) // prevent another refresh for 5 second
     }
 
-    fun toggleMangaWebview(uiManga: UIManga) = viewModelScope.launch {
-        appEventsRepository.postEvent(UserEvent.SetUseWebView(uiManga.id, !uiManga.useWebview))
+    fun toggleMangaWebview(uiManga: UIManga, newValue: Boolean? = null) = viewModelScope.launch {
+        appEventsRepository.postEvent(UserEvent.SetUseWebView(uiManga.id, newValue ?: !uiManga.useWebview))
     }
 
     fun setMangaTitle(uiManga: UIManga, newTitle: String) = viewModelScope.launch {
         appEventsRepository.postEvent(UserEvent.UpdateChosenMangaTitle(uiManga.id, newTitle))
+    }
+
+    fun clearCache(uiManga: UIManga) {
+        chapterCache.clearCacheForManga(uiManga.id)
     }
 }

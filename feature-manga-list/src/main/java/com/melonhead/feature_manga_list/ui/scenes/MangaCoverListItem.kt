@@ -26,6 +26,7 @@ import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.melonhead.lib_core.extensions.Previews
 import com.melonhead.data_shared.models.ui.UIManga
+import com.melonhead.lib_core.theme.MangadexFollowerTheme
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
@@ -33,10 +34,8 @@ internal fun MangaCoverListItem(
     modifier: Modifier = Modifier,
     uiManga: UIManga,
     onTapped: (uiManga: UIManga) -> Unit,
-    onLongPress: (uiManga: UIManga) -> Unit,
-    onTitleLongPress: (uiManga: UIManga) -> Unit,
 ) {
-    Row(modifier.combinedClickable(onClick = { onTapped(uiManga) }, onLongClick = { onLongPress(uiManga) })) {
+    Row(modifier.combinedClickable(onClick = { onTapped(uiManga) })) {
         Box(
             modifier
                 .padding(horizontal = 10.dp)
@@ -81,10 +80,7 @@ internal fun MangaCoverListItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    modifier = Modifier
-                        .combinedClickable(onClick = { },
-                            onLongClick = { onTitleLongPress(uiManga) })
-                        .weight(1f),
+                    modifier = Modifier.weight(1f),
                     text = uiManga.title,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -95,10 +91,7 @@ internal fun MangaCoverListItem(
                 Text(
                     modifier = Modifier
                         .border(2.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(4.dp))
-                        .padding(horizontal = 4.dp)
-                        .combinedClickable(
-                            onClick = { },
-                            onLongClick = { onTitleLongPress(uiManga) }),
+                        .padding(horizontal = 4.dp),
                     text = uiManga.status.uppercase(),
                     maxLines = 1,
                     fontWeight = FontWeight.Normal,
@@ -150,23 +143,19 @@ private fun TagText(text: String, overrideColor: Color? = null) {
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun MangaPreview() {
-    com.melonhead.lib_core.theme.MangadexFollowerTheme {
+    MangadexFollowerTheme {
         Column(modifier = Modifier.fillMaxWidth()) {
             MangaCoverListItem(
                 uiManga = Previews.previewUIManga(),
-                onLongPress = { },
-                onTapped = { },
-                onTitleLongPress = { }
+                onTapped = { }
             )
             MangaCoverListItem(
                 uiManga = Previews.previewUIManga()
                     .copy(title = "Test Manga with a really long name that causes the name to clip a little"),
-                onLongPress = { },
-                onTapped = { },
-                onTitleLongPress = { }
+                onTapped = { }
             )
         }
     }
