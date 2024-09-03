@@ -16,6 +16,7 @@ import com.melonhead.lib_app_data.AppData
 import com.melonhead.lib_app_data.models.RenderStyle
 import com.melonhead.feature_manga_list.MangaRepository
 import com.melonhead.lib_app_events.AppEventsRepository
+import com.melonhead.lib_app_events.events.SystemLogicEvents
 import com.melonhead.lib_app_events.events.UserEvent
 import com.melonhead.lib_chapter_cache.ChapterCache
 import com.melonhead.lib_navigation.Navigator
@@ -39,14 +40,22 @@ internal class MangaListViewModel(
     val refreshStatus = mangaRepository.refreshStatus.asLiveData(viewModelScope.coroutineContext)
     val readMangaCount = userAppData.showReadChapterCount
 
+    private val mutableShowRatingDialog = MutableLiveData<UIManga?>()
+    val showRatingDialog = mutableShowRatingDialog.asLiveData()
+
     private val mutableRefreshText = MutableLiveData<String>()
     val refreshText = mutableRefreshText.asLiveData()
 
     init {
         viewModelScope.launch {
-            appEventsRepository.events.collectLatest {
-                if (it is UserEvent.OpenedNotification) {
-                    onChapterClicked(it.context, it.manga, it.chapter)
+            appEventsRepository.events.collectLatest { event ->
+                if (event is UserEvent.OpenedNotification) {
+                    onChapterClicked(event.context, event.manga, event.chapter)
+                }
+
+                if (event is SystemLogicEvents.PromptMangaRating) {
+                    val uiManga = manga.value?.first { it.id == event.mangaId } ?: return@collectLatest
+                    mutableShowRatingDialog.value = uiManga
                 }
             }
         }
@@ -136,5 +145,14 @@ internal class MangaListViewModel(
 
     fun clearCache(uiManga: UIManga) {
         chapterCache.clearCacheForManga(uiManga.id)
+    }
+
+    fun rateManga(manga: UIManga, rating: Int) {
+        mangaRepository.rateManga(manga.id, rating)
+        mutableShowRatingDialog.value = null
+    }
+
+    fun dismissRatingModal() {
+        mutableShowRatingDialog.value = null
     }
 }

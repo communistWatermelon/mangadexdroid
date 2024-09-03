@@ -2,6 +2,7 @@ package com.melonhead.feature_manga_list.di
 
 import com.melonhead.data_at_home.di.DataAtHomeModule
 import com.melonhead.data_manga.di.DataMangaModule
+import com.melonhead.data_rating.di.DataRatingModule
 import com.melonhead.data_user.di.DataUserModule
 import com.melonhead.feature_manga_list.MangaRepository
 import com.melonhead.feature_manga_list.MangaRepositoryImpl
@@ -27,9 +28,11 @@ val FeatureMangaListModule = module {
     includes(DataUserModule)
     includes(DataAtHomeModule)
     includes(DataMangaModule)
+    includes(DataRatingModule)
 
     single<MangaRepository>(createdAtStart = true) {
         MangaRepositoryImpl(
+            get(),
             get(),
             get(),
             get(),

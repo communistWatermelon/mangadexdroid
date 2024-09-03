@@ -25,6 +25,7 @@ import com.melonhead.data_shared.models.ui.None
 import com.melonhead.data_shared.models.ui.UIChapter
 import com.melonhead.data_shared.models.ui.UIManga
 import com.melonhead.feature_manga_list.ui.scenes.dialogs.MangaOptionsDialog
+import com.melonhead.feature_manga_list.ui.scenes.dialogs.MangaRatingDialog
 import com.melonhead.feature_manga_list.ui.scenes.dialogs.MarkChapterReadDialog
 import com.melonhead.lib_core.scenes.LoadingScreen
 import com.melonhead.feature_manga_list.viewmodels.MangaListViewModel
@@ -41,6 +42,13 @@ internal fun MangaListScreen(
         chapterReadStatusDialog,
         onToggleChapterRead = { uiManga, chapter -> viewModel.toggleChapterRead(uiManga, chapter) },
         onDismissed = { chapterReadStatusDialog = null }
+    )
+
+    val showRatingDialog by viewModel.showRatingDialog.observeAsState()
+    MangaRatingDialog(
+        showRatingDialog,
+        onRatingChanged = { manga, rating -> viewModel.rateManga(manga, rating) },
+        onDismissed = { viewModel.dismissRatingModal() }
     )
 
     var showMangaModal by remember { mutableStateOf<UIManga?>(null) }

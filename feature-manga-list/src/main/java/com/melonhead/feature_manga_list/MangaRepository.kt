@@ -5,6 +5,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.melonhead.data_at_home.AtHomeService
 import com.melonhead.data_manga.models.ReadingStatus
 import com.melonhead.data_manga.services.MangaService
+import com.melonhead.data_rating.services.RatingService
 import com.melonhead.data_shared.models.ui.*
 import com.melonhead.data_user.services.UserService
 import com.melonhead.lib_app_context.AppContext
@@ -31,7 +32,8 @@ import java.util.concurrent.CompletableFuture
 internal interface MangaRepository {
     val manga: Flow<List<UIManga>>
     val refreshStatus: Flow<MangaRefreshStatus>
-    suspend fun getChapterData(mangaId: String,chapterId: String): List<String>?
+    fun rateManga(mangaId: String, rating: Int)
+    suspend fun getChapterData(mangaId: String, chapterId: String): List<String>?
 }
 
 internal class MangaRepositoryImpl(
@@ -48,6 +50,7 @@ internal class MangaRepositoryImpl(
     private val newChapterNotificationChannel: NewChapterNotificationChannel,
     private val appContext: AppContext,
     private val mangaService: MangaService,
+    private val ratingService: RatingService,
 ): MangaRepository {
     private val refreshMangaThrottled: (AppEvent) -> Unit = throttleLatest(300L, externalScope) { event ->
         refreshManga((event as? UserEvent.RefreshManga)?.completionJob)
@@ -270,6 +273,12 @@ internal class MangaRepositoryImpl(
             chapterData?.pagesDataSaver()
         } else {
             chapterData?.pages()
+        }
+    }
+
+    override fun rateManga(mangaId: String, rating: Int) {
+        externalScope.launch {
+            ratingService.setRating(mangaId, rating)
         }
     }
 

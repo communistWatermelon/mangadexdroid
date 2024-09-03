@@ -54,6 +54,7 @@ dependencies {
     implementation project(":data-user")
     implementation project(":data-at-home")
     implementation project(":data-manga")
+    implementation project(":data-rating")
     api project(':data-shared')
 
     api project(":data-manga")
