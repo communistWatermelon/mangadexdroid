@@ -1,12 +1,14 @@
 package com.melonhead.data_manga.services
 
-import com.melonhead.lib_app_data.AppData
-import com.melonhead.data_shared.models.Manga
+import com.melonhead.data_manga.models.*
 import com.melonhead.data_manga.models.MangaReadMarkersResponse
 import com.melonhead.data_manga.models.ReadChapterRequest
+import com.melonhead.lib_app_data.AppData
+import com.melonhead.data_shared.models.Manga
 import com.melonhead.data_manga.routes.HttpRoutes.ID_PLACEHOLDER
 import com.melonhead.data_manga.routes.HttpRoutes.MANGA_READ_CHAPTER_MARKERS_URL
 import com.melonhead.data_manga.routes.HttpRoutes.MANGA_READ_MARKERS_URL
+import com.melonhead.data_manga.routes.HttpRoutes.MANGA_READ_STATUS_URL
 import com.melonhead.data_manga.routes.HttpRoutes.MANGA_URL
 import com.melonhead.lib_logging.Clog
 import com.melonhead.lib_networking.extensions.catching
@@ -21,6 +23,8 @@ interface MangaService {
     suspend fun getManga(mangaIds: List<String>): List<Manga>
     suspend fun getReadChapters(mangaIds: List<String>): List<String>
     suspend fun changeReadStatus(mangaId: String, chapterId: String, readStatus: Boolean)
+    suspend fun getSeriesReadingStatus(mangaId: String): ReadingStatus?
+    suspend fun changeSeriesReadingStatus(mangaId: String, readingStatus: ReadingStatus)
 }
 
 internal class MangaServiceImpl(
@@ -84,6 +88,35 @@ internal class MangaServiceImpl(
                     bearerAuth(session)
                 }
                 setBody(ReadChapterRequest.from(chapterId, readStatus))
+            }
+        }
+    }
+
+    override suspend fun getSeriesReadingStatus(mangaId: String): ReadingStatus? {
+        val session = appData.getSession() ?: return null
+        Clog.i("getSeriesReadingStatus: manga $mangaId")
+        val result: ReadingStatusResponse? = client.catching("getSeriesReadingStatus") {
+            client.get(MANGA_READ_STATUS_URL.replace(ID_PLACEHOLDER, mangaId)) {
+                headers {
+                    contentType(ContentType.Application.Json)
+                    bearerAuth(session)
+                }
+            }
+        }
+        val status = result?.status
+        return ReadingStatus.from(status)
+    }
+
+    override suspend fun changeSeriesReadingStatus(mangaId: String, readingStatus: ReadingStatus) {
+        val session = appData.getSession() ?: return
+        Clog.i("changeSeriesReadingStatus: manga $mangaId readingStatus $readingStatus")
+        client.catchingSuccess("changeSeriesReadingStatus") {
+            client.post(MANGA_READ_STATUS_URL.replace(ID_PLACEHOLDER, mangaId)) {
+                headers {
+                    contentType(ContentType.Application.Json)
+                    bearerAuth(session)
+                }
+                setBody(ReadingStatusRequest.from(readingStatus))
             }
         }
     }

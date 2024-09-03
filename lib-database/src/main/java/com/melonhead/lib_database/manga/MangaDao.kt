@@ -15,9 +15,12 @@ interface MangaDao {
     fun allSeries() = getAll().distinctUntilChanged()
 
     @Query("SELECT * FROM manga WHERE id IS :mangaId")
-    fun getMangaById(mangaId: String): Flow<MangaEntity?>
+    fun getMangaByIdAsync(mangaId: String): Flow<MangaEntity?>
 
-    fun mangaById(mangaId: String) = getMangaById(mangaId).distinctUntilChanged()
+    fun mangaByIdAsyncDistinct(mangaId: String) = getMangaByIdAsync(mangaId).distinctUntilChanged()
+
+    @Query("SELECT * FROM manga WHERE id IS :mangaId")
+    fun getMangaById(mangaId: String): MangaEntity?
 
     @Query("SELECT EXISTS(SELECT * FROM manga WHERE id = :mangaId)")
     suspend fun containsManga(mangaId: String): Boolean

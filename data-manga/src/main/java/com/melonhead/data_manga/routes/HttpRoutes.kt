@@ -11,4 +11,6 @@ internal object HttpRoutes {
     const val ID_PLACEHOLDER = "{id}"
     const val MANGA_READ_CHAPTER_MARKERS_URL = "$MANGA_ROUTE/$ID_PLACEHOLDER/read"
 
+    const val MANGA_READ_STATUS_URL = "$MANGA_ROUTE/$ID_PLACEHOLDER/status"
+
 }

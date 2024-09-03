@@ -188,7 +188,7 @@ internal class MangaRepositoryImpl(
                 val mangaSeries = mangaService.getManga(mangaIds.toList())
                 val manga = mangaSeries.map {
                     // grab the chosen title from the DB
-                    MangaEntity.from(it, mangaDb.getMangaById(it.id).first()?.chosenTitle)
+                    MangaEntity.from(it, mangaDb.getMangaByIdAsync(it.id).first()?.chosenTitle)
                 }
 
                 // insert new series into local db
@@ -297,14 +297,14 @@ internal class MangaRepositoryImpl(
 
     private fun setUseWebview(mangaId: String, useWebView: Boolean) {
         externalScope.launch {
-            val entity = mangaDb.mangaById(mangaId).first() ?: return@launch
+            val entity = mangaDb.mangaByIdAsyncDistinct(mangaId).first() ?: return@launch
             mangaDb.update(entity.copy(useWebview = useWebView))
         }
     }
 
     private fun updateChosenTitle(mangaId: String, chosenTitle: String) {
         externalScope.launch {
-            val entity = mangaDb.mangaById(mangaId).first() ?: return@launch
+            val entity = mangaDb.mangaByIdAsyncDistinct(mangaId).first() ?: return@launch
             if (!entity.mangaTitles.contains(chosenTitle)) return@launch
             mangaDb.update(entity.copy(chosenTitle = chosenTitle))
         }
