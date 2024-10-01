@@ -106,13 +106,15 @@ internal fun MangaCoverListItem(
                 if (uiManga.contentRating != "safe") {
                     TagText(
                         text = uiManga.contentRating.replaceFirstChar { it.uppercase() },
-                        overrideColor = colorForContentRating(uiManga.contentRating)
+                        overrideBackgroundColor = backgroundColorForTag(uiManga.contentRating),
+                        overrideTextColor = textColorForTag(tag = uiManga.contentRating)
                     )
                 }
                 for (tag in uiManga.tags) {
                     TagText(
                         text = tag,
-                        overrideColor = colorForContentRating(tag)
+                        overrideBackgroundColor = backgroundColorForTag(tag),
+                        overrideTextColor = textColorForTag(tag = tag)
                     )
                 }
             }
@@ -122,8 +124,8 @@ internal fun MangaCoverListItem(
 }
 
 @Composable
-private fun colorForContentRating(contentRating: String): Color? {
-    return when (contentRating.lowercase()) {
+private fun backgroundColorForTag(tag: String): Color? {
+    return when (tag.lowercase()) {
         "suggestive" -> return MaterialTheme.colorScheme.tertiary
         "erotica" -> return MaterialTheme.colorScheme.error
         "pornographic" -> return MaterialTheme.colorScheme.error
@@ -132,13 +134,31 @@ private fun colorForContentRating(contentRating: String): Color? {
 }
 
 @Composable
-private fun TagText(text: String, overrideColor: Color? = null) {
+private fun textColorForTag(tag: String): Color? {
+    return when (tag.lowercase()) {
+        "suggestive" -> return MaterialTheme.colorScheme.onTertiary
+        "erotica" -> return MaterialTheme.colorScheme.onError
+        "pornographic" -> return MaterialTheme.colorScheme.onError
+        else -> null
+    }
+}
+
+
+@Composable
+private fun TagText(
+    text: String,
+    overrideBackgroundColor: Color? = null,
+    overrideTextColor: Color? = null,
+) {
     Text(
         modifier = Modifier
-            .background(overrideColor ?: MaterialTheme.colorScheme.surfaceTint, RoundedCornerShape(4.dp))
+            .background(
+                overrideBackgroundColor ?: MaterialTheme.colorScheme.surfaceTint,
+                RoundedCornerShape(4.dp)
+            )
             .padding(horizontal = 4.dp),
         text = text,
-        color = MaterialTheme.colorScheme.surface,
+        color = overrideTextColor ?: MaterialTheme.colorScheme.surface,
         fontSize = 12.sp
     )
 }
