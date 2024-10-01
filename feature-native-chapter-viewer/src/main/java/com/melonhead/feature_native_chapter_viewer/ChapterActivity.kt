@@ -11,6 +11,7 @@ import com.melonhead.feature_native_chapter_viewer.ui.scenes.ChapterScreen
 import com.melonhead.feature_native_chapter_viewer.viewmodels.ChapterViewModel
 import com.melonhead.data_shared.models.ui.UIChapter
 import com.melonhead.data_shared.models.ui.UIManga
+import com.melonhead.feature_native_chapter_viewer.ui.scenes.LongStripChapterScreen
 import com.melonhead.lib_core.theme.MangadexFollowerTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -23,17 +24,29 @@ internal class ChapterActivity: ComponentActivity() {
             MangadexFollowerTheme {
                 val page by viewModel.currentPage.collectAsState(initial = null)
                 val pages by viewModel.chapterData.collectAsState()
-                ChapterScreen(
-                    currentPage = page,
-                    allPages = pages,
-                    chapterTapAreaSize = viewModel.chapterTapAreaSize,
-                    onCompletedChapter = {
-                        viewModel.markAsRead()
-                        finish()
-                    },
-                    nextPage = { viewModel.nextPage() },
-                    prevPage = { viewModel.prevPage() }
-                )
+
+                if (viewModel.longStrip) {
+                    LongStripChapterScreen(
+                        allPages = pages,
+                        onCompletedChapter = {
+                            viewModel.markAsRead()
+                            finish()
+                        },
+                    )
+                } else {
+                    ChapterScreen(
+                        currentPage = page,
+                        allPages = pages,
+                        chapterTapAreaSize = viewModel.chapterTapAreaSize,
+                        onCompletedChapter = {
+                            viewModel.markAsRead()
+                            finish()
+                        },
+                        nextPage = { viewModel.nextPage() },
+                        prevPage = { viewModel.prevPage() }
+                    )
+                }
+
             }
         }
         viewModel.parseIntent(this, intent)
