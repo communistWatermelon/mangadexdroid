@@ -91,20 +91,6 @@ private fun ChapterTapArea(chapterTapAreaSize: Dp, modifier: Modifier) {
 }
 
 @Composable
-private fun LoadingChapterView(
-    onDoneTapped: () -> Unit
-) {
-    Surface(modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            CloseBanner("Loading...", onDoneTapped = onDoneTapped)
-            LoadingScreen(refreshStatus = null)
-        }
-    }
-}
-
-@Composable
 private fun ChapterView(
     title: String,
     currentPageUrl: String,
