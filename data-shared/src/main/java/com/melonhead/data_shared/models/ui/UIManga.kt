@@ -21,4 +21,7 @@ data class UIManga(
     Parcelable {
     @IgnoredOnParcel
     val coverAddress: String? = if (coverFilename == null) null else "https://mangadex.org/covers/$id/${coverFilename}.256.jpg"
+
+    val longStrip: Boolean
+        get() = tags.contains("Long Strip")
 }

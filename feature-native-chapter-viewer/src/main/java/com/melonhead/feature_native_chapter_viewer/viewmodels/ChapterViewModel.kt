@@ -40,6 +40,9 @@ internal class ChapterViewModel(
     private lateinit var chapter: UIChapter
     private lateinit var chapterPagesData: List<String>
 
+    val longStrip: Boolean
+        get() = manga.longStrip
+
     private val chapterLoadMutex = Mutex()
 
     private fun loadChapter(activity: Activity) {

@@ -129,6 +129,7 @@ private fun backgroundColorForTag(tag: String): Color? {
         "suggestive" -> return MaterialTheme.colorScheme.tertiary
         "erotica" -> return MaterialTheme.colorScheme.error
         "pornographic" -> return MaterialTheme.colorScheme.error
+        "long strip" -> return MaterialTheme.colorScheme.secondary
         else -> null
     }
 }
@@ -139,6 +140,7 @@ private fun textColorForTag(tag: String): Color? {
         "suggestive" -> return MaterialTheme.colorScheme.onTertiary
         "erotica" -> return MaterialTheme.colorScheme.onError
         "pornographic" -> return MaterialTheme.colorScheme.onError
+        "long strip" -> return MaterialTheme.colorScheme.onSecondary
         else -> null
     }
 }
