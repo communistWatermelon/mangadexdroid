@@ -16,6 +16,8 @@ android {
 
     def debugEmail = properties.getProperty("debug_email", "")
     def debugPassword = properties.getProperty("debug_password", "")
+    def debugClientId = properties.getProperty("debug_client_id", "")
+    def debugClientSecret = properties.getProperty("debug_client_secret", "")
 
     defaultConfig {
         minSdk 24
@@ -25,6 +27,8 @@ android {
 
         buildConfigField("String", "DEBUG_EMAIL", "\"${debugEmail}\"")
         buildConfigField("String", "DEBUG_PASSWORD", "\"${debugPassword}\"")
+        buildConfigField("String", "DEBUG_CLIENT_ID", "\"${debugClientId}\"")
+        buildConfigField("String", "DEBUG_CLIENT_SECRET", "\"${debugClientSecret}\"")
     }
 
     buildTypes {
