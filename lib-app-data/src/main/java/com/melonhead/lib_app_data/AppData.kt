@@ -35,6 +35,7 @@ interface AppData {
     val showReadChapterCount: Int
 
     suspend fun updateToken(session: String?, refresh: String?)
+    suspend fun updateClient(email: String?, apiClient: String?, apiSecret: String?)
     suspend fun updateInstallTime()
     suspend fun updateLastRefreshDate()
     suspend fun updateUserId(id: String)
@@ -46,6 +47,7 @@ interface AppData {
     suspend fun getToken(): Pair<String, String>?
     suspend fun getSession(): String?
     suspend fun getRefresh(): String?
+    suspend fun getClient(): Triple<String, String, String>?
 }
 
 internal class AppDataImpl(
@@ -54,6 +56,9 @@ internal class AppDataImpl(
 ): AppData {
     private val firebaseDb = Firebase.database
 
+    private val CLIENT_ID = stringPreferencesKey("client_id")
+    private val CLIENT_SECRET = stringPreferencesKey("client_secret")
+    private val CLIENT_EMAIL = stringPreferencesKey("client_email")
     private val AUTH_TOKEN = stringPreferencesKey("auth_token")
     private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
     private val USER_ID = stringPreferencesKey("user_id")
@@ -61,6 +66,7 @@ internal class AppDataImpl(
     private var hasFetchedDbUser = false
 
     private val tokenMutex = Mutex()
+    private val clientMutex = Mutex()
 
     init {
         externalScope.launch(IO) {
@@ -83,6 +89,18 @@ internal class AppDataImpl(
             }
         }
     }
+
+    private val clientEmail: Flow<String> = appContext.dataStore.data.map { preferences ->
+        preferences[CLIENT_EMAIL] ?: ""
+    }.distinctUntilChanged()
+
+    private val clientId: Flow<String> = appContext.dataStore.data.map { preferences ->
+        preferences[CLIENT_ID] ?: ""
+    }.distinctUntilChanged()
+
+    private val clientSecret: Flow<String> = appContext.dataStore.data.map { preferences ->
+        preferences[CLIENT_SECRET] ?: ""
+    }.distinctUntilChanged()
 
     private val authTokenFlow: Flow<String> = appContext.dataStore.data.map { preferences ->
         // No type safety.
@@ -134,6 +152,21 @@ internal class AppDataImpl(
 
     override val showReadChapterCount: Int
         get() = 1
+
+    override suspend fun updateClient(email: String?, apiClient: String?, apiSecret: String?) {
+        clientMutex.withLock {
+            appContext.dataStore.edit { settings ->
+                if (settings[CLIENT_EMAIL] != email)
+                    settings[CLIENT_EMAIL] = email ?: ""
+
+                if (settings[CLIENT_ID] != apiClient)
+                    settings[CLIENT_ID] = apiClient ?: ""
+
+                if (settings[CLIENT_SECRET] != apiSecret)
+                    settings[CLIENT_SECRET] = apiSecret ?: ""
+            }
+        }
+    }
 
     override suspend fun updateToken(session: String?, refresh: String?) {
         tokenMutex.withLock {
@@ -202,6 +235,15 @@ internal class AppDataImpl(
     override suspend fun getRefresh(): String? {
         tokenMutex.withLock {
             return token.first()?.second
+        }
+    }
+
+    override suspend fun getClient(): Triple<String, String, String>? {
+        clientMutex.withLock {
+            val email = clientEmail.firstOrNull() ?: return null
+            val id = clientId.firstOrNull() ?: return null
+            val secret = clientSecret.firstOrNull() ?: return null
+            return Triple(email, id, secret)
         }
     }
 
