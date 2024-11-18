@@ -6,6 +6,7 @@ import com.melonhead.data_user.di.DataUserModule
 import com.melonhead.feature_authentication.AuthRepository
 import com.melonhead.feature_authentication.AuthRepositoryImpl
 import com.melonhead.feature_authentication.navigation.LoginScreenResolver
+import com.melonhead.feature_authentication.navigation.OauthLoginScreenResolver
 import com.melonhead.lib_app_context.di.LibAppContextModule
 import com.melonhead.lib_app_events.di.LibAppEventsModule
 import com.melonhead.lib_notifications.di.LibNotificationsModule
@@ -25,5 +26,6 @@ val FeatureAuthenticationModule = module {
     includes(DataUserModule)
 
     single<AuthRepository>(createdAtStart = true) { AuthRepositoryImpl(get(), get(), get(), get(), get(), get(), get(), get()) }
+    single<OauthLoginScreenResolver>(createdAtStart = true) { OauthLoginScreenResolver() }
     single<LoginScreenResolver>(createdAtStart = true) { LoginScreenResolver() }
 }
