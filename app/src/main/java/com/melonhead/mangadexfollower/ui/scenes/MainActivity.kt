@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import com.melonhead.lib_core.scenes.LoadingScreen
 import com.melonhead.lib_core.theme.MangadexFollowerTheme
 import com.melonhead.feature_authentication.models.LoginStatus
+import com.melonhead.lib_app_data.AppData
 import com.melonhead.lib_navigation.Navigator
 import com.melonhead.lib_navigation.keys.ScreenKey
 import com.melonhead.mangadexfollower.BuildConfig
@@ -29,6 +30,7 @@ class MainActivity : ComponentActivity() {
     private val viewModel by viewModel<MainViewModel>()
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private val navigator: Navigator by inject()
+    private val appData: AppData by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +52,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val loginStatus by viewModel.loginStatus.observeAsState()
+                    val clientDetails by viewModel.clientDetails.observeAsState()
 
                     when (loginStatus) {
                         LoginStatus.LoggedIn -> {
@@ -62,12 +65,16 @@ class MainActivity : ComponentActivity() {
                         }
 
                         LoginStatus.LoggedOut, null -> {
-                            navigator.ComposeWithKey(screenKey = ScreenKey.LoginScreen(onLoginTapped = { username, password ->
+                            val (email, clientId, clientSecret) = clientDetails ?: Triple("", "", "")
+                            navigator.ComposeWithKey(screenKey = ScreenKey.OauthLoginScreen(onLoginTapped = { username, password, clientId, clientSecret ->
                                 viewModel.authenticate(
                                     username,
-                                    password
+                                    password,
+                                    clientId,
+                                    clientSecret
                                 )
-                            }))
+                            },
+                                email, clientId, clientSecret))
                         }
 
                         LoginStatus.LoggingIn -> LoadingScreen(null)
